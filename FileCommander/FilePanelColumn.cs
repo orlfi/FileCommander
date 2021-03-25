@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,16 +43,19 @@ namespace FileCommander
             result[result.First().Key] += remainder;
             return result;
         }
-        public FilePanelColumn(FileColumnTypes columnType, string name)
+        public FilePanelColumn(FileColumnTypes columnType, string name):base(0,0, name.Length, 1)
         {
             ColumnType = columnType;
             Name = name;
         }
         public static int GetStaticColumnWidth(List<FilePanelColumn> columns)
         {
-            return columns.Where(item => item.Width != -1).Sum(item => item.Width);
+            return columns.Where(item => item.Flex == 0).Sum(item => item.Width);
         }
 
-
+        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

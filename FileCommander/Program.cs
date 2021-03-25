@@ -40,7 +40,7 @@ namespace FileCommander
             if (args.Length > 0)
                 path = args[0];
 
-            FileManager manager = FileManager.GetInstance();
+            CommandManager manager = CommandManager.GetInstance();
             manager.SetPath(path);
             manager.Run();
         }

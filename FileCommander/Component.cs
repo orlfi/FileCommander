@@ -2,123 +2,153 @@ using System;
 
 namespace FileCommander
 {
-    public abstract class  Component
+    public abstract class Component
     {
         private static ConsoleColor saveForegroundColor;
-        private static ConsoleColor saveBackgroundColor;
-        protected string _path;
-        public virtual string Path { get => _path; set => _path = value;}
-        public virtual string Name { get; set;} = "";
-        public int X {get; set;}
-        public int Y {get; set;}
-        public int Width { get; set;}
-        public int Height { get; set;}
-        public bool Disabled { get; set;}
-        public Component Parent { get; set;}
-        public ComponentPosition Position { get; set;}
-        public virtual Buffer Buffer  { get; set;}
-        public Component() {
-            Buffer = new Buffer(0,0);
-        }
-        public Component(int x, int y, int width, int height)
-        {
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
-            Buffer = new Buffer(Width, Height);
-        }
-        public bool Focused {get; private set;}
 
-        
-        protected (int x, int y) GetAbsolutePosition(Component component)
+        private static ConsoleColor saveBackgroundColor;
+
+        protected string _path;
+
+        public virtual string Path { get => _path; set => _path = value; }
+
+        public virtual string Name { get; set; } = "";
+
+        private Rectangle _rectangle;
+        public Rectangle Rectangle 
+        { 
+            get => _rectangle;
+            set => _rectangle = value; 
+        }
+
+        public int X
+        {
+            get => _rectangle.X;
+            set => _rectangle.X = value;
+        }
+        public int Y
+        {
+            get => _rectangle.Y;
+            set => _rectangle.Y = value;
+        }
+
+        public int Width
+        {
+            get => _rectangle.Width;
+            set => _rectangle.Width = value;
+        }
+
+        public int Height
+        {
+            get => _rectangle.Height;
+            set => _rectangle.Height = value;
+        }
+
+        public Point Location
+        {
+            get => _rectangle.Location;
+            set => _rectangle.Location = value;
+        }
+
+        public Size Size
+        {
+            get => _rectangle.Size;
+            set => _rectangle.Size = value;
+        }
+
+
+        public bool Disabled { get; set; }
+
+        public Component Parent { get; set; }
+
+        public ComponentPosition Position { get; set; }
+
+        public Component(int x, int y, int width, int height): this(new Rectangle(x,y, width,height)) { }
+        public Component(Rectangle Rectangle)
+        {
+            this.Rectangle = Rectangle;
+        }
+
+        public bool Focused { get; private set; }
+
+        protected static Point GetAbsolutePosition(Component component)
         {
             if (component == null)
-                return (0,0);
-            var pos = GetAbsolutePosition(component.Parent);
-            return (X + pos.x, Y+ pos.y);
-        }
+                return new Point(0, 0);
 
-        public virtual void SetFocus(bool focused) 
+            var location = GetAbsolutePosition(component.Parent);
+            return new Point(component.X + location.X, component.Y + location.Y);
+        }
+        
+        public virtual void SetFocus(bool focused)
         {
             Focused = focused;
         }
 
-        public virtual void Draw(){}
-        public abstract void Draw(Buffer buffer, int targetX, int targetY );
-
-        public virtual void Redraw()
+        //public abstract void Draw();
+        
+        public abstract void Draw(Buffer buffer, int targetX, int targetY);
+        
+        public void Update()
         {
-            var position = GetAbsolutePosition(Parent);
+            var location = GetAbsolutePosition(this);
 
-            FileManager.GetInstance().Refresh(position.x, position.y, Width, Height);
+            Update(location.X, location.Y, Width, Height);
         }
 
-        public virtual void Refresh(Buffer buffer)
+        public static void Update(int x, int y, int width, int height)
         {
-            Draw();
-            Merge(buffer);
+            CommandManager.GetInstance().Refresh(x, y, width, height);
         }
 
-        public virtual void Merge(Buffer buffer)
-        {
-            buffer.Merge(X,Y, Buffer);
-        }
-        public virtual void Update() 
-        {
-            Paint();
-        }
-        public virtual void Paint()
-        {
-            //Buffer.Paint(X,Y);
-        }
-
-        public virtual void SetPath(string path) 
+        public virtual void SetPath(string path)
         {
             Path = path;
         }
-        public  virtual void OnKeyPress(ConsoleKeyInfo keyInfo) { }
+
+        public abstract void OnKeyPress(ConsoleKeyInfo keyInfo);
+        
 
         public static void SaveCursor()
         {
             saveForegroundColor = Console.ForegroundColor;
             saveBackgroundColor = Console.BackgroundColor;
-            //saveCursorPosition = Console.GetCursorPosition();
         }
+        
         public static void RestoreCursor()
         {
             Console.ForegroundColor = saveForegroundColor;
             Console.BackgroundColor = saveBackgroundColor;
-            //Console.SetCursorPosition(saveCursorPosition.x, saveCursorPosition.y);
         }
-
+        
         public static void SetColor(ConsoleColor foreground, ConsoleColor background)
         {
             Console.ForegroundColor = foreground;
             Console.BackgroundColor = background;
         }
+        
         public static void WriteAt(string text, int x, int y)
         {
             Console.SetCursorPosition(x, y);
             Console.Write(text);
         }
+        
         public static void WriteAt(string text, int x, int y, ConsoleColor foreground, ConsoleColor background)
         {
             SetColor(foreground, background);
             WriteAt(text, x, y);
         }
+        
         public static void WriteAt(char ch, int x, int y, ConsoleColor foreground, ConsoleColor background)
         {
             SetColor(foreground, background);
             WriteAt(ch, x, y);
         }
-
+        
         public static void WriteAt(char ch, int x, int y)
         {
             Console.SetCursorPosition(x, y);
             Console.Write(ch);
         }
-
-
     }
 }

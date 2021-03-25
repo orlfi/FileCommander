@@ -81,7 +81,7 @@ namespace FileCommander
         {
             _buffer[x, y] = new Pixel(ch, foreground, background);
         }
-        public void Paint(int x, int y)
+        public void Paint()
         {
             Console.CursorVisible = false;
             List<string> strings = new List<String>();
@@ -140,11 +140,11 @@ namespace FileCommander
             ConsoleColor foreground = Console.ForegroundColor;
             ConsoleColor background = Console.BackgroundColor;
             StringBuilder sb = new StringBuilder();
-            for (int j = y; j < Height; j++)
+            for (int j = y; j < y + height; j++)
             {
                 List<string> strings = new List<String>();
                 List<ConsoleColor> colors = new List<ConsoleColor>();
-                for (int i = x; i < Width; i++)
+                for (int i = x; i < x + width; i++)
                 {
                     if (_buffer[i, j]!= null)
                     {
@@ -167,6 +167,7 @@ namespace FileCommander
                         // Without last character to avoid scrolling
                         if (i != Width-1 || j != bufferHeight-1)
                             sb.Append(_buffer[i, j].Char);
+                            //sb.Append('*');
                     } 
                 }
                 strings.Add(sb.ToString());

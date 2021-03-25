@@ -14,20 +14,20 @@ namespace FileCommander
         public override void OnKeyPress(ConsoleKeyInfo keyInfo) 
         {
             if (keyInfo.Key == ConsoleKey.F10)
-                FileManager.GetInstance().Quit = true;
+                CommandManager.GetInstance().Quit = true;
         }
 
-        public override void Draw()
-        {
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.SetCursorPosition(X, Y);
-            Console.Write(Number.ToString().PadLeft(2));
+        //public override void Draw()
+        //{
+        //    Console.ForegroundColor = ConsoleColor.Gray;
+        //    Console.BackgroundColor = ConsoleColor.Black;
+        //    Console.SetCursorPosition(X, Y);
+        //    Console.Write(Number.ToString().PadLeft(2));
 
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.BackgroundColor = ConsoleColor.DarkCyan;
-            Console.SetCursorPosition(X+2, Y);
-            Console.Write(Name.PadRight(DEFAULT_WIDTH-2));
-        }
+        //    Console.ForegroundColor = ConsoleColor.Black;
+        //    Console.BackgroundColor = ConsoleColor.DarkCyan;
+        //    Console.SetCursorPosition(X+2, Y);
+        //    Console.Write(Name.PadRight(DEFAULT_WIDTH-2));
+        //}
     }
 }

@@ -18,7 +18,7 @@ namespace FileCommander
 
         public FilePanel(int x, int y, int width, int height) : base(x, y, width, height)
         {
-            View = new DetailsView(1, 1, width-3, height - 3, Files);
+            View = new DetailsView(1, 1, width-2, height - 4, Files);
             Add(View);
             View.ChangeFocusEvent += OnChangeViewFocus;
             FileInfoPanel = new PanelItem(1, Y + Height - 2, "Test", FileItem.DEFAULT_FILE_FOREGROUND_COLOR, FileItem.DEFAULT_BACKGROUND_COLOR);
@@ -82,6 +82,7 @@ namespace FileCommander
         }
         private void OnChangeViewFocus(FileItem item)
         {
+            if (item != null)
             FileInfoPanel.SetName(FileItem.GetFitName(item.Name, Width - 1).PadRight(Width - 2, ' '));
             //FileInfoPanel.Draw();
         }
@@ -127,12 +128,12 @@ namespace FileCommander
                     try
                     {
                         SetPath(Path.Substring(0, Path.LastIndexOf('\\')));
-                        View.SelectItem(path);
+                        View.FocusItem(path);
                     }
                     catch (Exception) { }
                 }
             }
-            Redraw();
+            Update();
         }
 
         private void DrawFooterBox(Buffer buffer, int targetX, int targetY)

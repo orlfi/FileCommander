@@ -6,7 +6,7 @@ namespace FileCommander
     {
         public ConsoleColor ForegroundColor {get; set;}
         public ConsoleColor BackgroundColor {get; set;}
-        protected PanelItem() {}
+        //protected PanelItem() {}
         public PanelItem(int x, int y, int width, int height):base(x, y, width, height) {}
 
         public PanelItem(int x, int y, int width, string name):this(x, y, width, 1) 
@@ -25,21 +25,26 @@ namespace FileCommander
 
         public void SetName(string name)
         {
-            if (Name.Length != name.Length)
-                Buffer = new Buffer(name.Length,1);
+            //if (Name.Length != name.Length)
+            //    Buffer = new Buffer(name.Length,1);
             Name = name;
         }
         
-        public override void Draw()
-        {
-            //Buffer.Write(Name, ForegroundColor, BackgroundColor);
-            //// var parentBuffer = Parent.Buffer.GetBuffer(Parent.X - X, Parent.Y - Y, Parent.Width - 2, 1);
-            //WriteAt(Name, X, Y, ForegroundColor, BackgroundColor);
-        }
+        //public override void Draw()
+        //{
+        //    //Buffer.Write(Name, ForegroundColor, BackgroundColor);
+        //    //// var parentBuffer = Parent.Buffer.GetBuffer(Parent.X - X, Parent.Y - Y, Parent.Width - 2, 1);
+        //    //WriteAt(Name, X, Y, ForegroundColor, BackgroundColor);
+        //}
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             buffer.WriteAt(Name, X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+        }
+
+        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
+        {
+            throw new NotImplementedException();
         }
     }
 }

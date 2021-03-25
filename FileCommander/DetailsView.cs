@@ -18,6 +18,22 @@ namespace FileCommander
 
         private const int HEADER_HEIGHT = 1;
         private int _startIndex;
+        public int StartIndex
+        {
+            get => _startIndex;
+            set
+            {
+                if (_startIndex != value)
+                {
+                    _startIndex = value;
+                    this.Update();
+                }
+                else
+                    _startIndex = value;
+
+            }
+        }
+
         private int HeaderHeight => (DrawHeader?HEADER_HEIGHT:0);
         private int _cursorY;
         public int CursorY
@@ -26,18 +42,18 @@ namespace FileCommander
             set
             {
                 var files = Components;
-                int max = Math.Min(Height - 2 , HeaderHeight + (files.Count == 0 ? 0 : files.Count - 1));
+                int max = Math.Min(Height - HeaderHeight , HeaderHeight + (files.Count == 0 ? 0 : files.Count - 1));
                 if (value < ((DrawHeader?HEADER_HEIGHT:0)))
                 {
-                    if (_startIndex > 0)
-                        _startIndex--;
+                    if (StartIndex > 0)
+                        StartIndex--;
                     _cursorY = HeaderHeight;
                 }   
                 else if (value > max)
                 {
-                    if (value < files.Count - _startIndex +HeaderHeight)
-                        _startIndex = _startIndex + value - max;
                     _cursorY = max;
+                    if (value < files.Count - StartIndex + HeaderHeight)
+                        StartIndex = StartIndex + value - max;
                 }
                 else
                     _cursorY = value;
@@ -83,75 +99,66 @@ namespace FileCommander
 
         public void Start()
         {
-            CursorY=0;
-            _startIndex=0;
-            //RefreshItems();
-            Redraw();
+            CursorY= HeaderHeight;
+            StartIndex = 0;
+            Update();
 
         }
 
         public void Top()
         {
-            CursorY=HeaderHeight+1;
-            //RefreshItems();
-            Redraw();
+            CursorY=HeaderHeight;
+            FocusItem();
 
         }
 
         public void Bottom()
         {
             CursorY=Height-1;
-            Redraw();
-            //RefreshItems();
+            FocusItem();
         }
 
         public void End()
         {
-            _startIndex=0;
-            CursorY=Components.Count + HeaderHeight;
-            //RefreshItems();
+            _startIndex = 0;
+            CursorY=Components.Count;
         }
 
         public void Next()
         {
             CursorY--;
-            //RefreshItems();
-            Redraw();
+            FocusItem();
         }
 
         public void Previous()
         {
             CursorY++;
-            //RefreshItems();
-            Redraw();
-        }
-        public override void Draw()
-        {
-            //DrawColumns();
-           // RefreshItems();
+            FocusItem();
         }
 
-        public override void Refresh(Buffer buffer)
+        public void FocusItem()
         {
-            //Draw();
+            FocusedItem.SetFocus(false);
+            FocusedItem.Update();
+            FocusedItem = (FileItem)Components.ElementAtOrDefault(CursorY + _startIndex - HeaderHeight);
+            FocusedItem.Update();
         }
 
-        public void SelectItem(string path)
+        public void FocusItem(string path)
         {
             var files = Components;
             int index = files.FindIndex(item => item.Path.ToLower() == path.ToLower());
             if (index >= 0)
             {
                 _startIndex = 0;
-                CursorY = index + 1 + HeaderHeight;
-                Redraw();
-                //RefreshItems();
+                CursorY = index + HeaderHeight;
+                Update();
             }
         }
         public void DrawItems(Buffer buffer, int targetX, int targetY)
         {
             var files = Components;
-            int count = Height - HeaderHeight -1;
+            int count = Height - HeaderHeight;
             for (int i = 0; i < count; i++)
             {
                 int x = 0;
@@ -190,7 +197,7 @@ namespace FileCommander
                 }
                 if (i > 0 && i < Columns.Count - 1)
                 {
-                    var box = new Box(x-1, Y-1, columnWidth + 2, Height + 1);
+                    var box = new Box(x-1, Y-1, columnWidth + 2, Height + 2);
                     box.TopLeft = '┬';
                     box.TopRight = '┬';
                     box.BottomLeft = '┴';

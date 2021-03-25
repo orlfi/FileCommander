@@ -10,23 +10,24 @@ namespace FileCommander
     public delegate void OnProgressHandler(ProgressInfo progressInfo, bool done);
     public delegate void OnErrorHandler(Exception error);
 
-    public class FileManager
+    public class CommandManager
     {
         public event OnKeyPressHandler KeyPressEvent;
         public event OnProgressHandler ProgressEvent;
         public event OnErrorHandler ErrorEvent;
         public const int DAFAULT_WIDTH = 120;
-        public const int DAFAULT_HEIGHT = 30;
+        public const int DAFAULT_HEIGHT = 10;
+        
         public const string APP_NAME = "File Commander";
         public bool Quit { get; set; }
-        private static FileManager instance;
+        private static CommandManager instance;
         public string Path { get; private set; }
-        public Container MainWindow { get; set; }
+        public Panel MainWindow { get; set; }
         public Window ModalWindow { get; set; } = null;
         public Component Active { get; set; }
 
         public Buffer Screen { get; set; }
-        public FileManager()
+        public CommandManager()
         {
             Initialize();
         }
@@ -35,14 +36,14 @@ namespace FileCommander
 
             ErrorEvent+=OnError;
             Console.Title = APP_NAME;
-            Console.BufferWidth = Console.WindowWidth = DAFAULT_WIDTH;
-            Console.WindowHeight = DAFAULT_HEIGHT;
-            Console.BufferHeight = DAFAULT_HEIGHT;
-            Console.SetWindowPosition(0, 0);
-            MainWindow = new Container(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT);
+            //Console.BufferWidth = Console.WindowWidth = DAFAULT_WIDTH;
+            //Console.WindowHeight = DAFAULT_HEIGHT;
+            //Console.BufferHeight = DAFAULT_HEIGHT;
+            //Console.SetWindowPosition(0, 0);
+            MainWindow = new Panel(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT);
             Screen = new Buffer(DAFAULT_WIDTH, DAFAULT_HEIGHT, true);
 
-            var filePanelLeft = new FilePanel(0, 0, Console.WindowWidth / 2, Console.WindowHeight - 2);
+            var filePanelLeft = new FilePanel(0, 0, DAFAULT_WIDTH / 2, DAFAULT_HEIGHT - 2);
             filePanelLeft.Border = true;
             filePanelLeft.Fill = true;
             filePanelLeft.SetFocus(true);
@@ -55,7 +56,7 @@ namespace FileCommander
             //MainWindow.Add(сommandHistoryPanel);
 
 
-            var filePanelRight = new FilePanel(Console.WindowWidth/2,0, Console.WindowWidth/2, Console.WindowHeight-2);
+            var filePanelRight = new FilePanel(Console.WindowWidth/2,0, DAFAULT_WIDTH / 2, DAFAULT_HEIGHT - 2);
             filePanelRight.Fill = true;
             filePanelRight.Border = true;
             MainWindow.Add(filePanelRight);
@@ -69,10 +70,10 @@ namespace FileCommander
             KeyPressEvent += filePanelLeft.OnKeyPress;
         }
 
-        public static FileManager GetInstance()
+        public static CommandManager GetInstance()
         {
             if (instance == null)
-                instance = new FileManager();
+                instance = new CommandManager();
             return instance;
         }
 
@@ -85,7 +86,7 @@ namespace FileCommander
         public void Run()
         {
             //MainWindow.Update();
-            Refresh(true);
+            Refresh();
             while (!Quit)
             {
                 if (Console.KeyAvailable)
@@ -109,7 +110,7 @@ namespace FileCommander
                             break;
                        
                         case ConsoleKey.Spacebar:
-                            Refresh(true);
+                            Refresh();
                             break;
                         case ConsoleKey.UpArrow:
                         case ConsoleKey.DownArrow:
@@ -124,6 +125,11 @@ namespace FileCommander
                             break;
                     }
 
+             if (ModalWindow != null)
+                 ModalWindow.OnKeyPress(keyInfo);
+             else
+                 MainWindow.OnKeyPress(keyInfo);
+
 
             // if (keyInfo.Key == ConsoleKey.Tab)
             // {
@@ -131,10 +137,6 @@ namespace FileCommander
             //         panel.SetFocus(!panel.Focused);
             // }
 
-            // if (ModalWindow != null)
-            //     ModalWindow.OnKeyPress(keyInfo);
-            // else
-            //     MainWindow.OnKeyPress(keyInfo);
         }
         public void OnError(Exception error)
         {
@@ -146,6 +148,16 @@ namespace FileCommander
         }
         public void OnCopy()
         {
+            var window = new Window(10, 10, 30, 5);
+            window.Border = true;
+            window.Fill = true;
+            //MainWindow.Add(window);
+            //ModalWindow = window;
+            window.Open();
+            //Refresh(10, 10, 30, 5);
+            //            window.Repaint();
+            return;
+
             string source = "c:\\tmp\\1.zip"; 
             string dest1 = "C:\\tmp\\2.zip";
             string dest2 = "c:\\tmp\\3.zip";
@@ -258,24 +270,9 @@ namespace FileCommander
         {
 
         }
-        public void Refresh(bool paint)
+        public void Refresh()
         {
-            
-            Console.CursorVisible = false;
-            Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            MainWindow.Draw(Screen, 0, 0);
-            var task = Task.Run(()=>{
-                Screen.Paint(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT);                
-                //Screen.Paint(0, 0);
-                });
-            task.Wait();
-            //Screen.Paint(0, 0);
-            
-            sw.Stop();
-
-            Console.SetCursorPosition(0,DAFAULT_HEIGHT-1);
-            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+            Refresh(0, 0, MainWindow.Width, MainWindow.Height);
         }
 
         public void Refresh(int x, int y, int width, int height)
@@ -285,11 +282,8 @@ namespace FileCommander
             Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             MainWindow.Draw(Screen, 0, 0);
-            var task = Task.Run(()=>{
-                Screen.Paint(x, y, width, height);                
-                //Screen.Paint(0, 0);
-                });
-            task.Wait();
+            ModalWindow?.Draw(Screen, 0, 0);
+            Screen.Paint(x, y, width, height);                
             sw.Stop();
 
             Console.SetCursorPosition(0,DAFAULT_HEIGHT-1);

@@ -1,7 +1,7 @@
 using System;
 namespace FileCommander
 {
-    public class HotKeyPanel:Container
+    public class HotKeyPanel:Panel
     {
         public HotKeyPanel(int x, int y, int width, int height) : base(x, y, width, height)
         {
@@ -30,19 +30,19 @@ namespace FileCommander
             AddRange(items);
         }
 
-        public override void Draw()
-        {
-            SaveCursor();
+        //public override void Draw()
+        //{
+        //    SaveCursor();
 
-            for(int i = 0; i < Components.Count; i++)
-            {
-                Components[i].X = Components[i].Width*i;
-                Components[i].Y = Y;
-                Components[i].Draw();
-            }
-            // Для предотвращения скроллирования
-            Console.SetCursorPosition(0, 0);
-            RestoreCursor();
-        }
+        //    for(int i = 0; i < Components.Count; i++)
+        //    {
+        //        Components[i].X = Components[i].Width*i;
+        //        Components[i].Y = Y;
+        //        Components[i].Draw();
+        //    }
+        //    // Для предотвращения скроллирования
+        //    Console.SetCursorPosition(0, 0);
+        //    RestoreCursor();
+        //}
     }
 }
