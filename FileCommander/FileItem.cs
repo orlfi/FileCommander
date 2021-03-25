@@ -44,12 +44,10 @@ namespace FileCommander
             ItemType = itemType;
             FileSystemInfo = fileSystemInfo;
         }
-
         public static string GetName(string path)
         {
             return path.Substring(path.LastIndexOf("\\") + 1);
         }
-        //public override void Draw()
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             if (!Visible)
@@ -81,15 +79,12 @@ namespace FileCommander
 
                 }
 
-                //Buffer.WriteAt(text, x, 0, foreground, Focused && Parent.Focused ? DEFAULT_FOCUSED_BACKGROUND_COLOR : DEFAULT_BACKGROUND_COLOR);
                 buffer.WriteAt(text, x + targetX, Y + targetY, foreground, Focused && Parent.Focused ? DEFAULT_FOCUSED_BACKGROUND_COLOR : DEFAULT_BACKGROUND_COLOR);
 
-                //WriteAt(text, , Y, foreground, Focused && Parent.Focused ? DEFAULT_FOCUSED_BACKGROUND_COLOR : DEFAULT_BACKGROUND_COLOR);
                 x += columnWidth;
                 if (i < Columns.Count - 1)
                 {
                     buffer.WriteAt('│', x+ targetX, Y+targetY, Box.DEFAULT_BORDER_FOREGROUND_COLOR, Focused && Parent.Focused ? DEFAULT_FOCUSED_BACKGROUND_COLOR : DEFAULT_BACKGROUND_COLOR);
-                    //WriteAt('│', x, Y, Box.DEFAULT_BORDER_FOREGROUND_COLOR, Focused && Parent.Focused ? DEFAULT_FOCUSED_BACKGROUND_COLOR : DEFAULT_BACKGROUND_COLOR);
                     x++;
                 }
 
@@ -112,7 +107,6 @@ namespace FileCommander
             }
             return result;
         }
-
         public static string GetFitName(string name, int width)
         {
             string result = name;

@@ -45,7 +45,7 @@ namespace FileCommander
             if (keyInfo.Key == ConsoleKey.Tab)
             {
                 //DrawPath(Path);
-                View.RefreshItems();
+                //View.RefreshItems();
             }
             else if (Focused)
             {

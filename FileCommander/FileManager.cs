@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
 
@@ -36,7 +37,7 @@ namespace FileCommander
             Console.Title = APP_NAME;
             Console.BufferWidth = Console.WindowWidth = DAFAULT_WIDTH;
             Console.WindowHeight = DAFAULT_HEIGHT;
-            Console.BufferHeight = DAFAULT_HEIGHT+1;
+            Console.BufferHeight = DAFAULT_HEIGHT;
             Console.SetWindowPosition(0, 0);
             MainWindow = new Container(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT);
             Screen = new Buffer(DAFAULT_WIDTH, DAFAULT_HEIGHT, true);
@@ -253,14 +254,10 @@ namespace FileCommander
                 readStream?.Close();
             }
         }
-
-
-
         public void Move(string source, string destination)
         {
 
         }
-
         public void Refresh(bool paint)
         {
             
@@ -268,40 +265,36 @@ namespace FileCommander
             Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             MainWindow.Draw(Screen, 0, 0);
-             sw.Stop();
-             Console.SetCursorPosition(0,DAFAULT_HEIGHT-1);
-             Console.Write($"{sw.ElapsedMilliseconds:D3}");
-             
-             sw.Restart();
-            //if (paint)
-                 Screen.Paint1(0, 0);
+            var task = Task.Run(()=>{
+                Screen.Paint(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT);                
+                //Screen.Paint(0, 0);
+                });
+            task.Wait();
+            //Screen.Paint(0, 0);
+            
             sw.Stop();
 
-            Console.SetWindowPosition(0, 0);
-            Console.SetCursorPosition(50,DAFAULT_HEIGHT-1);
-             Console.Write($"{sw.ElapsedMilliseconds:D3}");
-
-            //Console.BufferHeight = DAFAULT_HEIGHT;
-            //onsole.Write("Test");
+            Console.SetCursorPosition(0,DAFAULT_HEIGHT-1);
+            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
         }
 
-        // public void Refresh(bool paint)
-        // {
-        //     Stopwatch sw = new System.Diagnostics.Stopwatch(); ;
-        //     sw.Start();
-        //     string s = GetString();
-        //     //sw.Stop();
-        //     //Console.SetCursorPosition(0,29);
-        //     //Console.Write($"{DateTime.Now.ToLongTimeString()}:  {sw.ElapsedMilliseconds}");
-        //     //sw.Restart();
-        //     Console.BackgroundColor = ConsoleColor.Blue;
-        //     Console.SetCursorPosition(0,0);
-        //     Console.Write(s);
-        //     sw.Stop();
-        //     Console.SetCursorPosition(20,29);
-        //     Console.Write($"{DateTime.Now.ToLongTimeString()}:  {sw.ElapsedMilliseconds}");
-                    
-        // }
+        public void Refresh(int x, int y, int width, int height)
+        {
+            
+            Console.CursorVisible = false;
+            Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            MainWindow.Draw(Screen, 0, 0);
+            var task = Task.Run(()=>{
+                Screen.Paint(x, y, width, height);                
+                //Screen.Paint(0, 0);
+                });
+            task.Wait();
+            sw.Stop();
+
+            Console.SetCursorPosition(0,DAFAULT_HEIGHT-1);
+            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+        }
 
         public string GetString()
         {
@@ -314,8 +307,5 @@ namespace FileCommander
                 keyInfo.Key == ConsoleKey.LeftArrow || keyInfo.Key == ConsoleKey.RightArrow || keyInfo.Key == ConsoleKey.Delete ||
                 keyInfo.Key == ConsoleKey.Escape;
         }
-
-
-
     }
 }

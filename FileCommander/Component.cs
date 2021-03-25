@@ -30,6 +30,15 @@ namespace FileCommander
         }
         public bool Focused {get; private set;}
 
+        
+        protected (int x, int y) GetAbsolutePosition(Component component)
+        {
+            if (component == null)
+                return (0,0);
+            var pos = GetAbsolutePosition(component.Parent);
+            return (X + pos.x, Y+ pos.y);
+        }
+
         public virtual void SetFocus(bool focused) 
         {
             Focused = focused;
@@ -40,7 +49,9 @@ namespace FileCommander
 
         public virtual void Redraw()
         {
-            FileManager.GetInstance().Refresh(true);
+            var position = GetAbsolutePosition(Parent);
+
+            FileManager.GetInstance().Refresh(position.x, position.y, Width, Height);
         }
 
         public virtual void Refresh(Buffer buffer)

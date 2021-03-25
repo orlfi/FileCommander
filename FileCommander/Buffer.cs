@@ -81,16 +81,9 @@ namespace FileCommander
         {
             _buffer[x, y] = new Pixel(ch, foreground, background);
         }
-
         public void Paint(int x, int y)
         {
             Console.CursorVisible = false;
-            for (int j = 0; j < Height; j++)
-                for (int i = 0; i < Width; i++)
-                    _buffer[i, j]?.Paint(x + i, y + j);
-        }
-        public void Paint1(int x, int y)
-        {
             List<string> strings = new List<String>();
             List<ConsoleColor> colors = new List<ConsoleColor>();
             ConsoleColor foreground = Console.ForegroundColor;
@@ -117,11 +110,21 @@ namespace FileCommander
                             sb.Clear();
                         }
 
-                        sb.Append(_buffer[i, j].Char);
-
+                        // Without last character to avoid scrolling
+                        if (i != Width-1 || j != Height-1)
+                            sb.Append(_buffer[i, j].Char);
                     } 
                 }
             strings.Add(sb.ToString());
+            
+            // To avoid scrolling when writing character in the last column of a last row.
+            //Console.SetCursorPosition(0,0);
+            //var lastChar =_buffer[Width-1, Height-1]; 
+            //Console.BackgroundColor = lastChar.Background;
+            //Console.Write(lastChar.Char);
+            //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
+
+            // Write whole text lines
             Console.SetCursorPosition(0,0);
             for(int i=0;i< strings.Count; i++)
             {
@@ -130,5 +133,60 @@ namespace FileCommander
             }
         }
 
+        public void Paint(int x, int y, int width, int height)
+        {
+            int bufferHeight = _buffer.GetLength(1);
+            Console.CursorVisible = false;
+            ConsoleColor foreground = Console.ForegroundColor;
+            ConsoleColor background = Console.BackgroundColor;
+            StringBuilder sb = new StringBuilder();
+            for (int j = y; j < Height; j++)
+            {
+                List<string> strings = new List<String>();
+                List<ConsoleColor> colors = new List<ConsoleColor>();
+                for (int i = x; i < Width; i++)
+                {
+                    if (_buffer[i, j]!= null)
+                    {
+                        if (colors.Count == 0)
+                        {
+                            background = _buffer[i, j].Background;
+                            colors.Add(background);
+                            
+                        }
+
+                        if (_buffer[i, j].Background != background)
+                        {
+
+                            strings.Add(sb.ToString());
+                            colors.Add(_buffer[i, j].Background);
+                            background =_buffer[i, j].Background;
+                            sb.Clear();
+                        }
+
+                        // Without last character to avoid scrolling
+                        if (i != Width-1 || j != bufferHeight-1)
+                            sb.Append(_buffer[i, j].Char);
+                    } 
+                }
+                strings.Add(sb.ToString());
+                Console.SetCursorPosition(x,j);
+                for(int i=0;i< strings.Count; i++)
+                {
+                    Console.BackgroundColor = colors[i];
+                    Console.Write(strings[i]);
+                }
+                sb.Clear();
+            }
+            
+            // To avoid scrolling when writing character in the last column of a last row.
+            //Console.SetCursorPosition(0,0);
+            //var lastChar =_buffer[Width-1, Height-1]; 
+            //Console.BackgroundColor = lastChar.Background;
+            //Console.Write(lastChar.Char);
+            //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
+
+            // Write whole text lines
+        }
     }
 }

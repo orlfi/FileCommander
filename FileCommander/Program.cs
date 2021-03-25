@@ -35,8 +35,11 @@ namespace FileCommander
             // Window win = new Window(10,10,9,4);
             // win.Draw();
             // win.Paint();
-
             string path = @"c:\tmp";
+
+            if (args.Length > 0)
+                path = args[0];
+
             FileManager manager = FileManager.GetInstance();
             manager.SetPath(path);
             manager.Run();

@@ -35,7 +35,7 @@ namespace FileCommander
                 }   
                 else if (value > max)
                 {
-                    if (value < files.Count - _startIndex +HeaderHeight+1)
+                    if (value < files.Count - _startIndex +HeaderHeight)
                         _startIndex = _startIndex + value - max;
                     _cursorY = max;
                 }
@@ -76,7 +76,8 @@ namespace FileCommander
             if (files.Count > 0)
             {
                 AddRange(files.Select(item => new FileItem(item.FullName, item, Width, item is DirectoryInfo ? FileTypes.Directory : FileTypes.File)));
-                RefreshItems();
+                //RefreshItems();
+                //Redraw();
             }
         }
 
@@ -84,41 +85,44 @@ namespace FileCommander
         {
             CursorY=0;
             _startIndex=0;
-            RefreshItems();
+            //RefreshItems();
+            Redraw();
 
         }
 
         public void Top()
         {
             CursorY=HeaderHeight+1;
-            RefreshItems();
+            //RefreshItems();
+            Redraw();
 
         }
 
         public void Bottom()
         {
             CursorY=Height-1;
-            RefreshItems();
+            Redraw();
+            //RefreshItems();
         }
 
         public void End()
         {
             _startIndex=0;
             CursorY=Components.Count + HeaderHeight;
-            RefreshItems();
+            //RefreshItems();
         }
 
         public void Next()
         {
             CursorY--;
-            RefreshItems();
+            //RefreshItems();
             Redraw();
         }
 
         public void Previous()
         {
             CursorY++;
-            RefreshItems();
+            //RefreshItems();
             Redraw();
         }
         public override void Draw()
@@ -140,12 +144,11 @@ namespace FileCommander
             {
                 _startIndex = 0;
                 CursorY = index + 1 + HeaderHeight;
-                RefreshItems();
+                Redraw();
+                //RefreshItems();
             }
         }
-
-
-        public void RefreshItems()
+        public void DrawItems(Buffer buffer, int targetX, int targetY)
         {
             var files = Components;
             int count = Height - HeaderHeight -1;
@@ -157,7 +160,7 @@ namespace FileCommander
                 var item = (FileItem)files.ElementAtOrDefault(i+_startIndex);
                 if (item == null)
                     break;
-//                    item = new FileItem(x,y,Width, 1,"", null, FileTypes.Empty);
+
                 item.X = x;
                 item.Y = y;
                 item.Visible = true;
@@ -171,11 +174,10 @@ namespace FileCommander
                 }
 
                 item.Columns = Columns;
-                //item.Draw();
+                item.Draw(buffer, targetX, targetY);
             }
 
         }
-
         public void DrawColumns(Buffer buffer, int targetX, int targetY)
         {
             int x = X;
@@ -195,7 +197,6 @@ namespace FileCommander
                     box.BottomRight = '┴';
                     box.Border = true;
                     box.Fill = false;
-                    //box.Draw(buffer, targetX, targetY, true, false);
                     box.Draw(buffer, targetX, targetY);
                 }
                 x += columnWidth + 1;
@@ -204,9 +205,8 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            //base.Draw(buffer, targetX, targetY);
             DrawColumns(buffer, targetX, targetY);
-            DrawChildren(buffer, targetX, targetY);
+            DrawItems(buffer, targetX + X, targetY + Y);
         }
     }
 }
