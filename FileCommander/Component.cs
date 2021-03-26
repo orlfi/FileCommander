@@ -4,12 +4,17 @@ namespace FileCommander
 {
     public abstract class Component
     {
+        #region Constants
         private static ConsoleColor saveForegroundColor;
 
         private static ConsoleColor saveBackgroundColor;
+        #endregion
 
+        #region Fields
         protected string _path;
-
+        #endregion
+        
+        #region Properties
         public virtual string Path { get => _path; set => _path = value; }
 
         public virtual string Name { get; set; } = "";
@@ -62,15 +67,19 @@ namespace FileCommander
         public Component Parent { get; set; }
 
         public ComponentPosition Position { get; set; }
+        public bool Focused { get; private set; }
 
+        #endregion
+
+        #region Constructors
         public Component(int x, int y, int width, int height): this(new Rectangle(x,y, width,height)) { }
         public Component(Rectangle Rectangle)
         {
             this.Rectangle = Rectangle;
         }
+        #endregion
 
-        public bool Focused { get; private set; }
-
+        #region Static methods
         protected static Point GetAbsolutePosition(Component component)
         {
             if (component == null)
@@ -79,35 +88,10 @@ namespace FileCommander
             var location = GetAbsolutePosition(component.Parent);
             return new Point(component.X + location.X, component.Y + location.Y);
         }
-        
-        public virtual void SetFocus(bool focused)
-        {
-            Focused = focused;
-        }
-
-        //public abstract void Draw();
-        
-        public abstract void Draw(Buffer buffer, int targetX, int targetY);
-        
-        public void Update()
-        {
-            var location = GetAbsolutePosition(this);
-
-            Update(location.X, location.Y, Width, Height);
-        }
-
         public static void Update(int x, int y, int width, int height)
         {
             CommandManager.GetInstance().Refresh(x, y, width, height);
         }
-
-        public virtual void SetPath(string path)
-        {
-            Path = path;
-        }
-
-        public abstract void OnKeyPress(ConsoleKeyInfo keyInfo);
-        
 
         public static void SaveCursor()
         {
@@ -150,5 +134,32 @@ namespace FileCommander
             Console.SetCursorPosition(x, y);
             Console.Write(ch);
         }
+        #endregion
+
+        #region Methods
+        public virtual void SetFocus(bool focused)
+        {
+            Focused = focused;
+        }
+
+        //public abstract void Draw();
+        
+        public abstract void Draw(Buffer buffer, int targetX, int targetY);
+        
+        public void Update()
+        {
+            var location = GetAbsolutePosition(this);
+
+            Update(location.X, location.Y, Width, Height);
+        }
+
+
+        public virtual void SetPath(string path)
+        {
+            Path = path;
+        }
+
+        public abstract void OnKeyPress(ConsoleKeyInfo keyInfo);
+        #endregion
     }
 }

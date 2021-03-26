@@ -90,6 +90,17 @@ namespace FileCommander
 
             }
         }
+
+        public static string FormatSize(long size, int width)
+        {
+
+            if (size < 1000000000000L)
+
+            else
+
+            if (size.ToString(NumberFormatInfo.InvariantInfo).Length > width)
+        }
+
         public ConsoleColor GetItemForegroundColor(bool selected)
         {
             ConsoleColor result = ConsoleColor.Cyan;
@@ -122,5 +133,6 @@ namespace FileCommander
             }
             return result;
         }
+
     }
 }

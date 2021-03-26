@@ -15,8 +15,8 @@ namespace FileCommander
         public event OnKeyPressHandler KeyPressEvent;
         public event OnProgressHandler ProgressEvent;
         public event OnErrorHandler ErrorEvent;
-        public const int DAFAULT_WIDTH = 120;
-        public const int DAFAULT_HEIGHT = 10;
+        public const int DEFAULT_WIDTH = 120;
+        public const int DEFAULT_HEIGHT = 30;
         
         public const string APP_NAME = "File Commander";
         public bool Quit { get; set; }
@@ -26,6 +26,7 @@ namespace FileCommander
         public Window ModalWindow { get; set; } = null;
         public Component Active { get; set; }
 
+        public Size Size {get; set;} = new Size(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         public Buffer Screen { get; set; }
         public CommandManager()
         {
@@ -36,35 +37,35 @@ namespace FileCommander
 
             ErrorEvent+=OnError;
             Console.Title = APP_NAME;
-            //Console.BufferWidth = Console.WindowWidth = DAFAULT_WIDTH;
-            //Console.WindowHeight = DAFAULT_HEIGHT;
-            //Console.BufferHeight = DAFAULT_HEIGHT;
-            //Console.SetWindowPosition(0, 0);
-            MainWindow = new Panel(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT);
-            Screen = new Buffer(DAFAULT_WIDTH, DAFAULT_HEIGHT, true);
+            Console.BufferWidth = Console.WindowWidth = Size.Width;
+            Console.WindowHeight = Size.Height;
+            Console.BufferHeight = Size.Height;
+            Console.SetWindowPosition(0, 0);
+            MainWindow = new Panel(0, 0, Size.Width, Size.Height);
+            Screen = new Buffer(Size.Width, Size.Height, true);
 
-            var filePanelLeft = new FilePanel(0, 0, DAFAULT_WIDTH / 2, DAFAULT_HEIGHT - 2);
+            var filePanelLeft = new FilePanel(0, 0, Size.Width / 2, Size.Height - 2);
             filePanelLeft.Border = true;
             filePanelLeft.Fill = true;
             filePanelLeft.SetFocus(true);
             MainWindow.Add(filePanelLeft);
 
-            var сommandHistoryPanel = new CommandHistoryPanel(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT-1);
+            var сommandHistoryPanel = new CommandHistoryPanel(0, 0, Size.Width, Size.Height-1);
             сommandHistoryPanel.Border = true;
             сommandHistoryPanel.Fill = true;
             Active = сommandHistoryPanel;
             //MainWindow.Add(сommandHistoryPanel);
 
 
-            var filePanelRight = new FilePanel(Console.WindowWidth/2,0, DAFAULT_WIDTH / 2, DAFAULT_HEIGHT - 2);
+            var filePanelRight = new FilePanel(Size.Width/2,0, Size.Width / 2, Size.Height - 2);
             filePanelRight.Fill = true;
             filePanelRight.Border = true;
             MainWindow.Add(filePanelRight);
 
-            // var hotKeyPanel = new HotKeyPanel(0, Console.WindowHeight-1, Console.WindowWidth, 1);
+            // var hotKeyPanel = new HotKeyPanel(0, Size.Width-1, Size.Height, 1);
             // MainWindow.Add(hotKeyPanel);
 
-            // var commandPanel = new CommandPanel(0, Console.WindowHeight-2, Console.WindowWidth, 1);
+            // var commandPanel = new CommandPanel(0, Size.Width-2, Size.Height, 1);
             // MainWindow.Add(commandPanel);
 
             KeyPressEvent += filePanelLeft.OnKeyPress;
@@ -286,13 +287,13 @@ namespace FileCommander
             Screen.Paint(x, y, width, height);                
             sw.Stop();
 
-            Console.SetCursorPosition(0,DAFAULT_HEIGHT-1);
+            Console.SetCursorPosition(0,DEFAULT_HEIGHT-1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
         }
 
         public string GetString()
         {
-            return new string('+', DAFAULT_WIDTH*(DAFAULT_HEIGHT-1));
+            return new string('+', DEFAULT_WIDTH*(DEFAULT_HEIGHT-1));
         }
         
         private bool IsCommandKey(ConsoleKeyInfo keyInfo)
