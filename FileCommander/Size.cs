@@ -17,5 +17,21 @@ namespace FileCommander
             this.Width = Width;
             this.Height = Height;
         }
+
+        public Size(Size size) : this(size.Width, size.Height) { }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            if (Width == ((Size)obj).Width && Height == ((Size)obj).Height)
+                return true;
+            else
+                return false;
+        }
+
     }
 }

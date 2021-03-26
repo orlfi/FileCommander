@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Linq;
 using System.Diagnostics;
 
@@ -9,15 +10,21 @@ namespace FileCommander
     public delegate void OnKeyPressHandler(ConsoleKeyInfo keyInfo);
     public delegate void OnProgressHandler(ProgressInfo progressInfo, bool done);
     public delegate void OnErrorHandler(Exception error);
+    public delegate void OnWindowResizeHandler(Size size);
 
     public class CommandManager
     {
         public event OnKeyPressHandler KeyPressEvent;
         public event OnProgressHandler ProgressEvent;
         public event OnErrorHandler ErrorEvent;
+        public event OnWindowResizeHandler WindowResizeEvent;
         public const int DAFAULT_WIDTH = 120;
         public const int DAFAULT_HEIGHT = 10;
-        
+
+        private Task _task;
+
+        public Size Size { get; set; } = new Size(DAFAULT_WIDTH, DAFAULT_HEIGHT);
+
         public const string APP_NAME = "File Commander";
         public bool Quit { get; set; }
         private static CommandManager instance;
@@ -40,23 +47,23 @@ namespace FileCommander
             //Console.WindowHeight = DAFAULT_HEIGHT;
             //Console.BufferHeight = DAFAULT_HEIGHT;
             //Console.SetWindowPosition(0, 0);
-            MainWindow = new Panel(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT);
-            Screen = new Buffer(DAFAULT_WIDTH, DAFAULT_HEIGHT, true);
+            MainWindow = new Panel(0, 0, Size.Width, Size.Height);
+            Screen = new Buffer(Size.Width, DAFAULT_HEIGHT, true);
 
-            var filePanelLeft = new FilePanel(0, 0, DAFAULT_WIDTH / 2, DAFAULT_HEIGHT - 2);
+            var filePanelLeft = new FilePanel(0, 0, Size.Width / 2, DAFAULT_HEIGHT - 2);
             filePanelLeft.Border = true;
             filePanelLeft.Fill = true;
             filePanelLeft.SetFocus(true);
             MainWindow.Add(filePanelLeft);
 
-            var сommandHistoryPanel = new CommandHistoryPanel(0, 0, DAFAULT_WIDTH, DAFAULT_HEIGHT-1);
+            var сommandHistoryPanel = new CommandHistoryPanel(0, 0, Size.Width, DAFAULT_HEIGHT-1);
             сommandHistoryPanel.Border = true;
             сommandHistoryPanel.Fill = true;
             Active = сommandHistoryPanel;
             //MainWindow.Add(сommandHistoryPanel);
 
 
-            var filePanelRight = new FilePanel(Console.WindowWidth/2,0, DAFAULT_WIDTH / 2, DAFAULT_HEIGHT - 2);
+            var filePanelRight = new FilePanel(Size.Width / 2,0, DAFAULT_WIDTH / 2, DAFAULT_HEIGHT - 2);
             filePanelRight.Fill = true;
             filePanelRight.Border = true;
             MainWindow.Add(filePanelRight);
@@ -67,7 +74,15 @@ namespace FileCommander
             // var commandPanel = new CommandPanel(0, Console.WindowHeight-2, Console.WindowWidth, 1);
             // MainWindow.Add(commandPanel);
 
+            _task = new Task(() => { BackgroundWorker(); });
+            WindowResizeEvent += CommandManager_WindowResizeEvent;
+
             KeyPressEvent += filePanelLeft.OnKeyPress;
+        }
+
+        private void CommandManager_WindowResizeEvent(Size size)
+        {
+            Refresh();
         }
 
         public static CommandManager GetInstance()
@@ -300,6 +315,28 @@ namespace FileCommander
             return keyInfo.KeyChar >= (char)48 || keyInfo.KeyChar == (char)8 ||
                 keyInfo.Key == ConsoleKey.LeftArrow || keyInfo.Key == ConsoleKey.RightArrow || keyInfo.Key == ConsoleKey.Delete ||
                 keyInfo.Key == ConsoleKey.Escape;
+        }
+
+        public void BackgroundWorker()
+        {
+            int width = Console.WindowWidth;
+            int height = Console.WindowHeight;
+
+            while (true)
+            {
+                Thread.Sleep(200);
+
+                int currentWidth = Console.WindowWidth;
+                int currentHeight = Console.WindowHeight;
+
+                if (width != currentWidth  || height != currentHeight)
+                {
+                    WindowResizeEvent?.Invoke(new Size(currentWidth, currentHeight));
+                    width = currentWidth;
+                    height = currentHeight;
+
+                }
+            }
         }
     }
 }
