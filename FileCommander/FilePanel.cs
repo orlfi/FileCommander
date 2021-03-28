@@ -7,55 +7,50 @@ namespace FileCommander
 {
     public class FilePanel : Panel
     {
-
         public int Order { get; set; }
-        //public FilePanel() : this(0, 0, 0, 0) { }
+
         DirectoryPanelItem DirectoryPanel { get; set; }
-        PanelItem FileInfoPanel { get; set; }
+
+        Control FileInfoPanel { get; set; }
+
         DetailsView View { get; set; }
 
-        public List<FileSystemInfo> Files { get; set;} = new List<FileSystemInfo>();
+        public List<FileSystemInfo> Files { get; set; } = new List<FileSystemInfo>();
 
-        public FilePanel(int x, int y, int width, int height) : base(x, y, width, height)
+        public FilePanel(string rectangle, Size size) : base(rectangle, size)
         {
-            View = new DetailsView(1, 1, width-2, height - 4, Files);
+            View = new DetailsView("1,1,100%-2,100%-4", Size, Files);
             Add(View);
             View.ChangeFocusEvent += OnChangeViewFocus;
-            FileInfoPanel = new PanelItem(1, Y + Height - 2, "Test", FileItem.DEFAULT_FILE_FOREGROUND_COLOR, FileItem.DEFAULT_BACKGROUND_COLOR);
+            FileInfoPanel = new Control("1, 100%-2, 100% - 2, 1", this.Size, Alignment.None, "Test", Theme.FilePanelFileForegroundColor, Theme.FilePanelItemBackgroundColor);
             Add(FileInfoPanel);
+            DirectoryPanel = new DirectoryPanelItem("0, 0, 0, 1", this.Size, Alignment.HorizontalCenter, "Test");
+            Add(DirectoryPanel);
         }
-        
-        private void SetDirectoryPanel(DirectoryPanelItem directoryPanel)
-        {
-            if (DirectoryPanel != null)
-                Components.Remove(DirectoryPanel);
 
-            directoryPanel.X = Width/2 - directoryPanel.Width/2;
-            DirectoryPanel =  directoryPanel;
-            Add(directoryPanel);
-            //DirectoryPanel.Draw();
-        }
         public override void SetFocus(bool focused)
         {
             base.SetFocus(focused);
             View.SetFocus(focused);
         }
+
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-            if (keyInfo.Key == ConsoleKey.Tab)
-            {
-                //DrawPath(Path);
-                //View.RefreshItems();
-            }
-            else if (Focused)
+            //if (keyInfo.Key == ConsoleKey.Tab)
+            //{
+            //    //DrawPath(Path);
+            //    //View.RefreshItems();
+            //}
+            //else 
+            if (Focused)
             {
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        View.Next();
+                        View.Previous();
                         break;
                     case ConsoleKey.DownArrow:
-                        View.Previous();
+                        View.Next();
                         break;
                     case ConsoleKey.Enter:
                         ChangePath();
@@ -73,7 +68,7 @@ namespace FileCommander
                         View.Bottom();
                         break;
                     case ConsoleKey.F5:
-                        var window = new CopyWindow(70,8);
+                        var window = new CopyWindow("50%-35,50%-4,70,8", Size, WindowButtons.OK | WindowButtons.Cancel);
                         window.Open();
                         break;
 
@@ -83,22 +78,24 @@ namespace FileCommander
         private void OnChangeViewFocus(FileItem item)
         {
             if (item != null)
-            FileInfoPanel.SetName(FileItem.GetFitName(item.Name, Width - 1).PadRight(Width - 2, ' '));
-            //FileInfoPanel.Draw();
+            {
+                FileInfoPanel?.SetName(FileItem.GetFitName(item.Name, Width - 1).PadRight(Width - 2, ' '), Parent.Size);
+                FileInfoPanel?.Update();
+            }
         }
 
         public override void SetPath(string path)
         {
             try
             {
-                path += path[path.Length-1] == ':'?"\\":"";
+                path += path[path.Length - 1] == ':' ? "\\" : "";
                 DirectoryInfo di = new DirectoryInfo(path);
                 Files.Clear();
                 Files.AddRange(di.GetDirectories());
                 Files.AddRange(di.GetFiles());
 
                 Path = path;
-                SetDirectoryPanel(new DirectoryPanelItem(1,0, Path));
+                DirectoryPanel.SetName(Path, Size);
                 View.Path = Path;
                 View.SetFiles(Files);
             }
@@ -136,6 +133,13 @@ namespace FileCommander
             Update();
         }
 
+        public override void Draw(Buffer buffer, int targetX, int targetY)
+        {
+            var box = new Box(X, Y, Width, Height, Border, Fill);
+            box.Draw(buffer, targetX, targetY);
+            DrawFooterBox(buffer, targetX, targetY);
+            DrawChildren(buffer, targetX, targetY);
+        }
         private void DrawFooterBox(Buffer buffer, int targetX, int targetY)
         {
             var box = new Box(X, Y + Height - 3, Width, 3);
@@ -143,14 +147,6 @@ namespace FileCommander
             box.TopRight = '┤';
             box.Border = true;
             box.Draw(buffer, targetX, targetY);
-        }
-
-        public override void Draw(Buffer buffer, int targetX, int targetY)
-        {
-            var box = new Box(X, Y, Width, Height, Border, Fill);
-            box.Draw(buffer, targetX, targetY);
-            DrawFooterBox(buffer, targetX, targetY);
-            DrawChildren(buffer, targetX, targetY);
         }
     }
 }

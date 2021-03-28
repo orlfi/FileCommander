@@ -3,18 +3,19 @@ namespace FileCommander
 {
     public class HotKeyPanel:Panel
     {
-        public HotKeyPanel(int x, int y, int width, int height) : base(x, y, width, height)
+        public HotKeyPanel(string rectangle, Size size) : base(rectangle, size) 
         {
             Initialize();
         }
+
         public void Initialize()
         {
             int x = 0;
             HotKeyItem[] items = new HotKeyItem[11];
-            items[0] = new HotKeyItem(x,Y,"Help", 1);
-            items[1] = new HotKeyItem(x,Y,"Menu", 2);
-            items[2] = new HotKeyItem(x,Y,"View", 3);
-            items[3] = new HotKeyItem(x,Y,"Edit", 4);
+            //items[0] = new HotKeyItem(x,Y,"Help", 1);
+            //items[1] = new HotKeyItem(x,Y,"Menu", 2);
+            //items[2] = new HotKeyItem(x,Y,"View", 3);
+            //items[3] = new HotKeyItem(x,Y,"Edit", 4);
 
                 // new HotKeyItem("Menu", 2),
                 // new HotKeyItem("View", 3),

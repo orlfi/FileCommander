@@ -1,12 +1,12 @@
 using System;
 namespace FileCommander
 {
-    public class HotKeyItem: PanelItem
+    public class HotKeyItem: Control
     {
         public const int DEFAULT_WIDTH = 8;
         public int Number { get; set;}
-        
-        public HotKeyItem(int x, int y, string name, int number):base(x, y, DEFAULT_WIDTH, name)
+
+        public HotKeyItem(string rectangle, Size size, Alignment alignment, string name, int number) : base(rectangle, size, alignment, name) 
         {
             Number = number;
         }

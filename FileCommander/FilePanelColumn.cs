@@ -4,19 +4,14 @@ using System.Linq;
 
 namespace FileCommander
 {
-    public class FilePanelColumn:Component
+    public class FilePanelColumn
     {
         public FileColumnTypes ColumnType {get; set;}
 
-        //public string Name  {get; set;}
         public int Flex  {get; set;}
+        public string Name { get; set; }
 
-        public override void Draw(Buffer buffer, int targetX, int targetY)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        //public int Width { get; set;}
+        public int Width { get; set;}
 
         public int GetWidth(List<FilePanelColumn> columns, int panelWidth)
         {
@@ -30,20 +25,8 @@ namespace FileCommander
                 return Width;
             }
         }
-        public static Dictionary<FilePanelColumn, int> GetFlexColumsWidth(List<FilePanelColumn> columns, int panelWidth)
-        {
-            Dictionary<FilePanelColumn, int> result = new Dictionary<FilePanelColumn, int>();
-            int flexSum = columns.Sum(item => item.Flex);
-            int staticWidth = GetStaticColumnWidth(columns);
-            foreach(var flexColumn in columns.Where(item => item.Flex > 0))
-            {
-                result.Add(flexColumn, (panelWidth - staticWidth)*flexColumn.Flex/flexSum);
-            }
-            int remainder = panelWidth - staticWidth - result.Sum(item => item.Value);
-            result[result.First().Key] += remainder;
-            return result;
-        }
-        public FilePanelColumn(FileColumnTypes columnType, string name):base(0,0, name.Length, 1)
+
+        public FilePanelColumn(FileColumnTypes columnType, string name)
         {
             ColumnType = columnType;
             Name = name;
@@ -53,9 +36,18 @@ namespace FileCommander
             return columns.Where(item => item.Flex == 0).Sum(item => item.Width);
         }
 
-        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
+        public static Dictionary<FilePanelColumn, int> GetFlexColumsWidth(List<FilePanelColumn> columns, int panelWidth)
         {
-            throw new NotImplementedException();
+            Dictionary<FilePanelColumn, int> result = new Dictionary<FilePanelColumn, int>();
+            int flexSum = columns.Sum(item => item.Flex);
+            int staticWidth = GetStaticColumnWidth(columns);
+            foreach (var flexColumn in columns.Where(item => item.Flex > 0))
+            {
+                result.Add(flexColumn, (panelWidth - staticWidth) * flexColumn.Flex / flexSum);
+            }
+            int remainder = panelWidth - staticWidth - result.Sum(item => item.Value);
+            result[result.First().Key] += remainder;
+            return result;
         }
     }
 }

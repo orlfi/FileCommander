@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
@@ -35,14 +36,25 @@ namespace FileCommander
             // Window win = new Window(10,10,9,4);
             // win.Draw();
             // win.Paint();
-            string path = @"c:\tmp";
 
-            if (args.Length > 0)
-                path = args[0];
+            //try
+            //{
+                string path = @"c:\tmp";
 
-            CommandManager manager = CommandManager.GetInstance();
-            manager.SetPath(path);
-            manager.Run();
+                if (args.Length > 0)
+                    path = args[0];
+
+                CommandManager manager = CommandManager.GetInstance();
+                manager.SetPath(path);
+                manager.Run();
+            //}
+            //catch(Exception ex)
+            //{
+            //    string path = Path.Combine(Directory.GetCurrentDirectory(), "Erorrs");
+            //    if (Directory.Exists(path))
+            //        Directory.CreateDirectory(path);
+            //    File.WriteAllText(path, ex.Message);
+            //}
         }
 
         static void SetConsoleVirtualProcessing(bool input = false, bool output = true)

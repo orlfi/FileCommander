@@ -6,6 +6,8 @@ namespace FileCommander
         public static string PadCenter(this string text, int width)
         {
             int marginLeft = (width - text.Length) / 2;
+            if (marginLeft < 0)
+                marginLeft = 0;
             int marginRigth = marginLeft;
 
             if ((width - text.Length) % 2 != 0)

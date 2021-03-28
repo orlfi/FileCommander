@@ -5,24 +5,35 @@ namespace FileCommander
 {
     public class Panel : Component
     {
-        public const ConsoleColor DEFAULT_BORDER_FOREGROUND_COLOR = ConsoleColor.Gray;
-
-        public const ConsoleColor DEFAULT_BORDER_BACKGROUND_COLOR = ConsoleColor.Blue;
-        
+        protected CommandManager CommandManager => CommandManager.GetInstance();
         public Component FocusedComponent { get; set; } = null;
         
         public List<Component> Components { get; set; } = new List<Component>();
-
-        public ConsoleColor ForegroundColor { get; set; } = DEFAULT_BORDER_FOREGROUND_COLOR;
-        
-        public ConsoleColor BackgroundColor { get; set; } = DEFAULT_BORDER_BACKGROUND_COLOR;
-        
+       
         public bool Border { get; set; }
         
         public bool Fill { get; set; }
         
-        public Panel(int x, int y, int width, int height) : base(x, y, width, height) { }
-        
+
+        public Panel(string rectangle, Size size) : base(rectangle, size) 
+        {
+            ForegroundColor = Theme.FilePanelForegroundColor;
+            BackgroundColor = Theme.FilePanelBackgroundColor;
+        }
+
+        public override void UpdateRectangle(Size size)
+        {
+            if (Parent != null)
+                size = Parent.Size;
+
+            SetRectangle(size);
+            foreach (var component in Components)
+            {
+                component.UpdateRectangle(Size);
+            }
+        }
+
+
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             if (Border || Fill)

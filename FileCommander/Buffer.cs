@@ -6,6 +6,24 @@ namespace FileCommander
 {
     public class Buffer
     {
+        private struct ColorPair
+        {
+            public ConsoleColor ForegroundColor { get; set; }
+            public ConsoleColor BackgroundColor { get; set; }
+            
+            public ColorPair(ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+            {
+                ForegroundColor = foregroundColor;
+                BackgroundColor = backgroundColor;
+            }
+        }
+
+        public Dictionary<ConsoleColor, string> ColorEscCodes = new Dictionary<ConsoleColor, string>() 
+        {
+            { ConsoleColor.Black, "323" }, 
+            { ConsoleColor.Cyan, "323" }
+        };
+        
         private Pixel[,] _buffer;
 
         public int Width { get => _buffer.GetLength(0); }
@@ -85,7 +103,7 @@ namespace FileCommander
         {
             Console.CursorVisible = false;
             List<string> strings = new List<String>();
-            List<ConsoleColor> colors = new List<ConsoleColor>();
+            List<ColorPair> colors = new List<ColorPair>();
             ConsoleColor foreground = Console.ForegroundColor;
             ConsoleColor background = Console.BackgroundColor;
             StringBuilder sb = new StringBuilder();
@@ -96,19 +114,22 @@ namespace FileCommander
                     {
                         if (colors.Count == 0)
                         {
-                            background = _buffer[i, j].Background;
-                            colors.Add(background);
+                            foreground = _buffer[i, j].ForegroundColor;
+                            background = _buffer[i, j].BackgroundColor;
+                            colors.Add(new ColorPair(foreground, background));
                             
                         }
 
-                        if (_buffer[i, j].Background != background)
+                        if (_buffer[i, j].BackgroundColor != background || _buffer[i, j].ForegroundColor != foreground)
                         {
 
                             strings.Add(sb.ToString());
-                            colors.Add(_buffer[i, j].Background);
-                            background =_buffer[i, j].Background;
+                            colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
+                            foreground = _buffer[i, j].ForegroundColor;
+                            background = _buffer[i, j].BackgroundColor;
                             sb.Clear();
                         }
+
 
                         // Without last character to avoid scrolling
                         if (i != Width-1 || j != Height-1)
@@ -128,7 +149,8 @@ namespace FileCommander
             Console.SetCursorPosition(0,0);
             for(int i=0;i< strings.Count; i++)
             {
-                Console.BackgroundColor = colors[i];
+                Console.ForegroundColor = colors[i].ForegroundColor;
+                Console.BackgroundColor = colors[i].BackgroundColor;
                 Console.Write(strings[i]);
             }
         }
@@ -143,26 +165,46 @@ namespace FileCommander
             for (int j = y; j < y + height; j++)
             {
                 List<string> strings = new List<String>();
-                List<ConsoleColor> colors = new List<ConsoleColor>();
+                List<ColorPair> colors = new List<ColorPair>();
                 for (int i = x; i < x + width; i++)
                 {
                     if (_buffer[i, j]!= null)
                     {
                         if (colors.Count == 0)
                         {
-                            background = _buffer[i, j].Background;
-                            colors.Add(background);
+                            foreground = _buffer[i, j].ForegroundColor;
+                            background = _buffer[i, j].BackgroundColor;
+                            colors.Add(new ColorPair(foreground, background));
                             
                         }
 
-                        if (_buffer[i, j].Background != background)
+                        if (_buffer[i, j].BackgroundColor != background || _buffer[i, j].ForegroundColor != foreground)
                         {
 
                             strings.Add(sb.ToString());
-                            colors.Add(_buffer[i, j].Background);
-                            background =_buffer[i, j].Background;
+                            colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
+                            foreground = _buffer[i, j].ForegroundColor;
+                            background = _buffer[i, j].BackgroundColor;
                             sb.Clear();
                         }
+
+                        //if (_buffer[i, j].ForegroundColor != background)
+                        //{
+
+                        //    strings.Add(sb.ToString());
+                        //    colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
+                        //    background =_buffer[i, j].BackgroundColor;
+                        //    sb.Clear();
+                        //}
+
+                        //if (_buffer[i, j].ForegroundColor != foreground)
+                        //{
+
+                        //    strings.Add(sb.ToString());
+                        //    colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
+                        //    foreground = _buffer[i, j].ForegroundColor;
+                        //    sb.Clear();
+                        //}
 
                         // Without last character to avoid scrolling
                         if (i != Width-1 || j != bufferHeight-1)
@@ -174,7 +216,8 @@ namespace FileCommander
                 Console.SetCursorPosition(x,j);
                 for(int i=0;i< strings.Count; i++)
                 {
-                    Console.BackgroundColor = colors[i];
+                    Console.ForegroundColor = colors[i].ForegroundColor;
+                    Console.BackgroundColor = colors[i].BackgroundColor;
                     Console.Write(strings[i]);
                 }
                 sb.Clear();
@@ -189,5 +232,75 @@ namespace FileCommander
 
             // Write whole text lines
         }
+
+        public void PaintEsc(int x, int y, int width, int height)
+        {
+            int bufferHeight = _buffer.GetLength(1);
+            Console.CursorVisible = false;
+            ConsoleColor foreground = Console.ForegroundColor;
+            ConsoleColor background = Console.BackgroundColor;
+            StringBuilder sb = new StringBuilder();
+            for (int j = y; j < y + height; j++)
+            {
+                List<string> strings = new List<String>();
+                List<ColorPair> colors = new List<ColorPair>();
+                for (int i = x; i < x + width; i++)
+                {
+                    if (_buffer[i, j] != null)
+                    {
+                        if (colors.Count == 0)
+                        {
+                            foreground = _buffer[i, j].ForegroundColor;
+                            background = _buffer[i, j].BackgroundColor;
+                            colors.Add(new ColorPair(foreground, background));
+
+                        }
+
+                        if (_buffer[i, j].ForegroundColor != background)
+                        {
+
+                            strings.Add(sb.ToString());
+                            colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
+                            background = _buffer[i, j].BackgroundColor;
+                            sb.Clear();
+                        }
+
+                        if (_buffer[i, j].ForegroundColor != foreground)
+                        {
+
+                            strings.Add(sb.ToString());
+                            colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
+                            foreground = _buffer[i, j].ForegroundColor;
+                            sb.Clear();
+                        }
+
+                        // Without last character to avoid scrolling
+                        if (i != Width - 1 || j != bufferHeight - 1)
+                            sb.Append(_buffer[i, j].Char);
+                        //sb.Append('*');
+                    }
+                }
+                strings.Add(sb.ToString());
+                Console.SetCursorPosition(x, j);
+                for (int i = 0; i < strings.Count; i++)
+                {
+                    Console.ForegroundColor = colors[i].ForegroundColor;
+                    Console.BackgroundColor = colors[i].BackgroundColor;
+                    Console.Write(strings[i]);
+                }
+                sb.Clear();
+            }
+
+
+            // To avoid scrolling when writing character in the last column of a last row.
+            //Console.SetCursorPosition(0,0);
+            //var lastChar =_buffer[Width-1, Height-1]; 
+            //Console.BackgroundColor = lastChar.Background;
+            //Console.Write(lastChar.Char);
+            //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
+
+            // Write whole text lines
+        }
+
     }
 }

@@ -5,9 +5,8 @@ namespace FileCommander
     {
         public const ConsoleColor DEFAULT_COMMAND_FOREGROUND_COLOR = ConsoleColor.Gray;
         public const ConsoleColor DEFAULT_COMMAND_BACKGROUND_COLOR = ConsoleColor.Black;
-        public CommandPanel(int x, int y, int width, int height) : base(x, y, width, height)
-        {
-        }        
+
+        public CommandPanel(string rectangle, Size size) : base(rectangle, size) { }
         //public override void Draw()
         //{
         //    Console.ForegroundColor = DEFAULT_COMMAND_FOREGROUND_COLOR;

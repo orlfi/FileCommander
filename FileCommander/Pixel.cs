@@ -6,31 +6,31 @@ namespace FileCommander
         public const ConsoleColor DAFAULT_FOREGROUND_COLOR = ConsoleColor.Gray; 
         public const ConsoleColor DAFAULT_BACKGROUND_COLOR = ConsoleColor.Black; 
         public char Char {get; set;}
-        public ConsoleColor Foreground {get; set;}
-        public ConsoleColor Background {get; set;}
+        public ConsoleColor ForegroundColor {get; set;}
+        public ConsoleColor BackgroundColor {get; set;}
         public Pixel(char ch, ConsoleColor foreground, ConsoleColor background)    
         {
             Char = ch;
-            Foreground = foreground;
-            Background = background;
+            ForegroundColor = foreground;
+            BackgroundColor = background;
         }
 
         public void Paint(int x, int y)
         {
             Console.SetCursorPosition(x, y);
-            SetColor(Foreground, Background);
+            SetColor(ForegroundColor, BackgroundColor);
             Console.Write(Char);
         }
         
-        public void SetColor(ConsoleColor foreground, ConsoleColor background)
+        public void SetColor(ConsoleColor foregroundColor, ConsoleColor backgroundColor)
         {
-            Console.ForegroundColor = foreground;
-            Console.BackgroundColor = background;
+            Console.ForegroundColor = foregroundColor;
+            Console.BackgroundColor = backgroundColor;
         }
 
         public Pixel Clone()
         {
-            return new Pixel(Char, Foreground, Background);
+            return new Pixel(Char, ForegroundColor, BackgroundColor);
         }
     }
 }

@@ -3,11 +3,8 @@ namespace FileCommander
 {
     public class Box
     {
-        public const ConsoleColor DEFAULT_BORDER_FOREGROUND_COLOR = ConsoleColor.Gray;
-        public const ConsoleColor DEFAULT_BORDER_BACKGROUND_COLOR = ConsoleColor.Blue;
-
-        public ConsoleColor foregroundColor {get; set;} = DEFAULT_BORDER_FOREGROUND_COLOR;
-        public ConsoleColor backgroundColor {get; set;} = DEFAULT_BORDER_BACKGROUND_COLOR;
+        public ConsoleColor foregroundColor {get; set;}
+        public ConsoleColor backgroundColor { get; set; } 
 
         public char TopLeft {get; set;} = '┌';
         public char TopRight {get; set;} = '┐';
@@ -23,6 +20,8 @@ namespace FileCommander
 
         public bool Border { get; set; } = false;
         public bool Fill { get; set; } = false;
+        
+        public Theme Theme => Theme.GetInstance();
 
         public Box(int x, int y, int width, int height)
         {
@@ -30,6 +29,8 @@ namespace FileCommander
             Y = y;
             Width = width;
             Height = height;
+            foregroundColor = Theme.FilePanelSelectedForegroundColor;
+            backgroundColor = Theme.FilePanelBackgroundColor;
         }
 
         public Box(int x, int y, int width, int height, bool border, bool fill) : this(x, y, width, height)

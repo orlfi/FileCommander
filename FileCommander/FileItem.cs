@@ -6,17 +6,17 @@ using System.Collections.Generic;
 
 namespace FileCommander
 {
-    public class FileItem : PanelItem
+    public class FileItem : Control
     {
-        public const ConsoleColor DEFAULT_COMMAND_FOREGROUND_COLOR = ConsoleColor.Gray;
-        public const ConsoleColor DEFAULT_COMMAND_BACKGROUND_COLOR = ConsoleColor.Black;
-        public const ConsoleColor DEFAULT_SELECTED_FOREGROUND_COLOR = ConsoleColor.Yellow;
-        public const ConsoleColor DEFAULT_DIRECTORY_FOREGROUND_COLOR = ConsoleColor.White;
-        public const ConsoleColor DEFAULT_FILE_FOREGROUND_COLOR = ConsoleColor.Cyan;
-        public const ConsoleColor DEFAULT_BACKGROUND_COLOR = ConsoleColor.Blue;
-        public const ConsoleColor DEFAULT_FOCUSED_BACKGROUND_COLOR = ConsoleColor.DarkCyan;
+        public const long KILOBYTE = 1024;
+        public const long MEGABYTE = KILOBYTE * 1024;
+        public const long GIGABYTE = MEGABYTE * 1024;
+        public const long TERABYTE = GIGABYTE * 1024;
+        public const long PETABYTE = TERABYTE * 1024;
 
         public bool Selected { get; set; }
+
+        public FilePanel FilePanel => (FilePanel)Parent.Parent;
 
         public bool Visible { get; set; } = false;
 
@@ -34,20 +34,24 @@ namespace FileCommander
                 _path = value;
             }
         }
-        public FileItem(string path, FileSystemInfo fileSystemInfo, int width, FileTypes itemType = FileTypes.File) : this(0, 0, width, 1, path, fileSystemInfo, itemType)
+
+        public FileItem(string path, FileSystemInfo fileSystemInfo, string width, Size size, FileTypes itemType = FileTypes.File) : this($"0, 0, {width}, 1", size, path, fileSystemInfo, itemType)
         {
 
         }
-        public FileItem(int x, int y, int width, int height, string path, FileSystemInfo fileSystemInfo, FileTypes itemType = FileTypes.File) : base(x, y, width, height)
+
+        public FileItem(string rectangle, Size size, string path, FileSystemInfo fileSystemInfo, FileTypes itemType = FileTypes.File) : base(rectangle, size)
         {
             Path = path;
             ItemType = itemType;
             FileSystemInfo = fileSystemInfo;
         }
+
         public static string GetName(string path)
         {
             return path.Substring(path.LastIndexOf("\\") + 1);
         }
+
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             if (!Visible)
@@ -66,39 +70,46 @@ namespace FileCommander
                     case FileColumnTypes.Size:
                         if (ItemType == FileTypes.File)
                         {
-                            FileInfo fi = new FileInfo(Name);
-                            text = "1234567";
+                            FileInfo fi = new FileInfo(Path);
+                            text = FormatSize(fi.Length);
                         }
                         break;
                     case FileColumnTypes.DateTime:
                         if (ItemType == FileTypes.File)
                         {
-                            text = File.GetLastWriteTime(Name).ToString("dd.MM.yy hh:mm").PadLeft(columnWidth);
+                            text = File.GetLastWriteTime(Path).ToString("dd.MM.yy hh:mm").PadLeft(columnWidth);
                         }
                         break;
 
                 }
 
-                buffer.WriteAt(text, x + targetX, Y + targetY, foreground, Focused && Parent.Focused ? DEFAULT_FOCUSED_BACKGROUND_COLOR : DEFAULT_BACKGROUND_COLOR);
+                buffer.WriteAt(text, x + targetX, Y + targetY, foreground, Focused && FilePanel.Focused ? Theme.FilePanelFocusedBackgroundColor : Theme.FilePanelItemBackgroundColor);
 
                 x += columnWidth;
                 if (i < Columns.Count - 1)
                 {
-                    buffer.WriteAt('│', x+ targetX, Y+targetY, Box.DEFAULT_BORDER_FOREGROUND_COLOR, Focused && Parent.Focused ? DEFAULT_FOCUSED_BACKGROUND_COLOR : DEFAULT_BACKGROUND_COLOR);
+                    buffer.WriteAt('│', x+ targetX, Y+targetY, Theme.FilePanelForegroundColor, Focused && FilePanel.Focused ? Theme.FilePanelFocusedBackgroundColor : Theme.FilePanelBackgroundColor);
                     x++;
                 }
 
             }
         }
 
-        public static string FormatSize(long size, int width)
+        public static string FormatSize(long size)
         {
 
-            if (size < 1000000000000L)
-
+            if (size >= PETABYTE)
+                return ((double)size / PETABYTE).ToString("###.###P").PadLeft(8);
+            else if(size > TERABYTE && size < PETABYTE)
+                return ((double)size / TERABYTE).ToString("###.###T").PadLeft(8);
+            else if (size > GIGABYTE && size < TERABYTE)
+                return ((double)size / GIGABYTE).ToString("###.###G").PadLeft(8);
+            else if (size > MEGABYTE && size < GIGABYTE)
+                return ((double)size / MEGABYTE).ToString("###.###M").PadLeft(8);
+            else if (size > KILOBYTE && size < MEGABYTE)
+                return ((double)size / KILOBYTE).ToString("###.###K").PadLeft(8);
             else
-
-            if (size.ToString(NumberFormatInfo.InvariantInfo).Length > width)
+                return (size).ToString().PadLeft(8);
         }
 
         public ConsoleColor GetItemForegroundColor(bool selected)
@@ -110,10 +121,10 @@ namespace FileCommander
                     result = ConsoleColor.Cyan;
                     break;
                 case FileTypes.Directory:
-                    result = selected ? DEFAULT_SELECTED_FOREGROUND_COLOR : DEFAULT_DIRECTORY_FOREGROUND_COLOR;
+                    result = selected ? Theme.FilePanelSelectedForegroundColor: Theme.FilePanelDirectoryForegroundColor;
                     break;
                 case FileTypes.File:
-                    result = selected ? DEFAULT_SELECTED_FOREGROUND_COLOR : DEFAULT_FILE_FOREGROUND_COLOR;
+                    result = selected ? Theme.FilePanelSelectedForegroundColor : Theme.FilePanelFileForegroundColor;
                     break;
             }
             return result;
@@ -127,7 +138,7 @@ namespace FileCommander
                 if (extensionIndex > 0)
                 {
                     string extension = name.Substring(extensionIndex);
-                    result = $"{name.Substring(0, width - extension.Length - 1)}~{extension}";
+                    result = $"{name.Substring(0, (width - extension.Length - 1)<0?0: (width - extension.Length - 1))}~{extension}";
                 } else
                     result = $"{name.Substring(0, width - 1)}~";
             }

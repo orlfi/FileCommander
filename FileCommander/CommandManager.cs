@@ -18,8 +18,8 @@ namespace FileCommander
         public event OnProgressHandler ProgressEvent;
         public event OnErrorHandler ErrorEvent;
         public event OnWindowResizeHandler WindowResizeEvent;
-        public const int DAFAULT_WIDTH = 120;
-        public const int DAFAULT_HEIGHT = 10;
+        public const int DAFAULT_WIDTH = 80;
+        public const int DAFAULT_HEIGHT = 24;
 
         private Task _task;
 
@@ -29,7 +29,7 @@ namespace FileCommander
         public bool Quit { get; set; }
         private static CommandManager instance;
         public string Path { get; private set; }
-        public Panel MainWindow { get; set; }
+        public MainWindow MainWindow { get; set; }
         public Window ModalWindow { get; set; } = null;
         public Component Active { get; set; }
 
@@ -47,26 +47,10 @@ namespace FileCommander
             Console.WindowHeight = Size.Height;
             Console.BufferHeight = Size.Height;
             Console.SetWindowPosition(0, 0);
-            MainWindow = new Panel(0, 0, Size.Width, Size.Height);
+            MainWindow = new MainWindow("0, 0, 100%, 100%-1", Size);
             Screen = new Buffer(Size.Width, Size.Height, true);
 
-            var filePanelLeft = new FilePanel(0, 0, Size.Width / 2, Size.Height - 2);
-            filePanelLeft.Border = true;
-            filePanelLeft.Fill = true;
-            filePanelLeft.SetFocus(true);
-            MainWindow.Add(filePanelLeft);
-
-            var сommandHistoryPanel = new CommandHistoryPanel(0, 0, Size.Width, Size.Height-1);
-            сommandHistoryPanel.Border = true;
-            сommandHistoryPanel.Fill = true;
-            Active = сommandHistoryPanel;
             //MainWindow.Add(сommandHistoryPanel);
-
-
-            var filePanelRight = new FilePanel(Size.Width/2,0, Size.Width / 2, Size.Height - 2);
-            filePanelRight.Fill = true;
-            filePanelRight.Border = true;
-            MainWindow.Add(filePanelRight);
 
             // var hotKeyPanel = new HotKeyPanel(0, Size.Width-1, Size.Height, 1);
             // MainWindow.Add(hotKeyPanel);
@@ -74,17 +58,23 @@ namespace FileCommander
             // var commandPanel = new CommandPanel(0, Size.Width-2, Size.Height, 1);
             // MainWindow.Add(commandPanel);
 
-            _task = new Task(() => { BackgroundWorker(); });
-            WindowResizeEvent += CommandManager_WindowResizeEvent;
+            //WindowResizeEvent += CommandManager_WindowResizeEvent;
+            //_task = Task.Run(() => { BackgroundWorker(); });
 
-            KeyPressEvent += filePanelLeft.OnKeyPress;
+            //KeyPressEvent += filePanelLeft.OnKeyPress;
         }
 
         private void CommandManager_WindowResizeEvent(Size size)
         {
-            Refresh();
         }
 
+        private void ResizeWindow(Size size)
+        {
+            Size = size;
+            Screen = new Buffer(Size.Width, Size.Height, true);
+            MainWindow.UpdateRectangle(Size);
+            Refresh();
+        }
         public static CommandManager GetInstance()
         {
             if (instance == null)
@@ -110,6 +100,19 @@ namespace FileCommander
                     ConsoleKeyInfo keyInfo = Console.ReadKey(true);
                     OnKeyPress(keyInfo);
                 }
+                else
+                {
+                    Thread.Sleep(10);
+
+                    int currentWidth = Console.WindowWidth;
+                    int currentHeight = Console.WindowHeight;
+
+                    if (Size.Width != currentWidth || Size.Height != currentHeight)
+                    {
+                        ResizeWindow(new Size(currentWidth, currentHeight));
+                    }
+                }
+
             }
         }
         private void OnKeyPress(ConsoleKeyInfo keyInfo)
@@ -125,7 +128,8 @@ namespace FileCommander
                             break;
                        
                         case ConsoleKey.Spacebar:
-                            Refresh();
+                            CommandManager_WindowResizeEvent(Size);
+                            //Refresh();
                             break;
                         case ConsoleKey.UpArrow:
                         case ConsoleKey.DownArrow:
@@ -136,14 +140,16 @@ namespace FileCommander
                         case ConsoleKey.Home:
                         case ConsoleKey.End:
                         case ConsoleKey.Enter:
-                            KeyPressEvent?.Invoke(keyInfo);
+                        case ConsoleKey.Tab:
+                            MainWindow.OnKeyPress(keyInfo);
+                            //KeyPressEvent?.Invoke(keyInfo);
                             break;
                     }
 
-             if (ModalWindow != null)
-                 ModalWindow.OnKeyPress(keyInfo);
-             else
-                 MainWindow.OnKeyPress(keyInfo);
+             //if (ModalWindow != null)
+             //    ModalWindow.OnKeyPress(keyInfo);
+             //else
+             //    MainWindow.OnKeyPress(keyInfo);
 
 
             // if (keyInfo.Key == ConsoleKey.Tab)
@@ -152,6 +158,37 @@ namespace FileCommander
             //         panel.SetFocus(!panel.Focused);
             // }
 
+        }
+
+        public void Refresh()
+        {
+            Console.CursorVisible = false;
+            Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+
+            MainWindow.Draw(Screen, 0, 0);
+            ModalWindow?.Draw(Screen, 0, 0);
+
+            Screen.Paint();
+
+            sw.Stop();
+            Console.SetCursorPosition(0, Size.Height - 1);
+            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+        }
+
+        public void Refresh(int x, int y, int width, int height)
+        {
+
+            Console.CursorVisible = false;
+            Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            MainWindow.Draw(Screen, 0, 0);
+            ModalWindow?.Draw(Screen, 0, 0);
+            Screen.Paint(x, y, width, height);
+            sw.Stop();
+
+            Console.SetCursorPosition(0, Size.Height - 1);
+            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
         }
         public void OnError(Exception error)
         {
@@ -163,7 +200,7 @@ namespace FileCommander
         }
         public void OnCopy()
         {
-            var window = new Window(10, 10, 30, 5);
+            var window = new CopyWindow("50%-25, 50%-3, 50, 6", Size, WindowButtons.OK | WindowButtons.Cancel);
             window.Border = true;
             window.Fill = true;
             //MainWindow.Add(window);
@@ -285,37 +322,14 @@ namespace FileCommander
         {
 
         }
-        public void Refresh()
-        {
-            Refresh(0, 0, MainWindow.Width, MainWindow.Height);
-        }
 
-        public void Refresh(int x, int y, int width, int height)
-        {
-            
-            Console.CursorVisible = false;
-            Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            MainWindow.Draw(Screen, 0, 0);
-            ModalWindow?.Draw(Screen, 0, 0);
-            Screen.Paint(x, y, width, height);                
-            sw.Stop();
 
-            Console.SetCursorPosition(0,DEFAULT_HEIGHT-1);
-            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
-        }
-
-        public string GetString()
-        {
-            return new string('+', DEFAULT_WIDTH*(DEFAULT_HEIGHT-1));
-        }
-        
-        private bool IsCommandKey(ConsoleKeyInfo keyInfo)
-        {
-            return keyInfo.KeyChar >= (char)48 || keyInfo.KeyChar == (char)8 ||
-                keyInfo.Key == ConsoleKey.LeftArrow || keyInfo.Key == ConsoleKey.RightArrow || keyInfo.Key == ConsoleKey.Delete ||
-                keyInfo.Key == ConsoleKey.Escape;
-        }
+        //private bool IsCommandKey(ConsoleKeyInfo keyInfo)
+        //{
+        //    return keyInfo.KeyChar >= (char)48 || keyInfo.KeyChar == (char)8 ||
+        //        keyInfo.Key == ConsoleKey.LeftArrow || keyInfo.Key == ConsoleKey.RightArrow || keyInfo.Key == ConsoleKey.Delete ||
+        //        keyInfo.Key == ConsoleKey.Escape;
+        //}
 
         public void BackgroundWorker()
         {
@@ -324,10 +338,10 @@ namespace FileCommander
 
             while (true)
             {
-                Thread.Sleep(200);
-
+                Thread.Sleep(100);
                 int currentWidth = Console.WindowWidth;
                 int currentHeight = Console.WindowHeight;
+                //WindowResizeEvent?.Invoke(new Size(currentWidth, currentHeight));
 
                 if (width != currentWidth  || height != currentHeight)
                 {

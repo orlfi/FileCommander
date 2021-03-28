@@ -18,7 +18,7 @@ namespace FileCommander
 
         private const int HEADER_HEIGHT = 1;
         private int _startIndex;
-        public int StartIndex
+        public int OffsetY
         {
             get => _startIndex;
             set
@@ -26,11 +26,10 @@ namespace FileCommander
                 if (_startIndex != value)
                 {
                     _startIndex = value;
-                    this.Update();
+                    this.Update(true);
                 }
                 else
                     _startIndex = value;
-
             }
         }
 
@@ -45,15 +44,15 @@ namespace FileCommander
                 int max = Math.Min(Height - HeaderHeight , HeaderHeight + (files.Count == 0 ? 0 : files.Count - 1));
                 if (value < ((DrawHeader?HEADER_HEIGHT:0)))
                 {
-                    if (StartIndex > 0)
-                        StartIndex--;
+                    if (OffsetY > 0)
+                        OffsetY--;
                     _cursorY = HeaderHeight;
                 }   
                 else if (value > max)
                 {
                     _cursorY = max;
-                    if (value < files.Count - StartIndex + HeaderHeight)
-                        StartIndex = StartIndex + value - max;
+                    if (value < files.Count - OffsetY + HeaderHeight)
+                        OffsetY = OffsetY + value - max;
                 }
                 else
                     _cursorY = value;
@@ -74,13 +73,14 @@ namespace FileCommander
             }
         } 
         public List<FilePanelColumn> Columns { get; set; } = new List<FilePanelColumn>();
-        public DetailsView(int x, int y, int width, int height, List<FileSystemInfo> files) : base(x, y, width, height)
+
+        public DetailsView(string rectangle, Size size, List<FileSystemInfo> files) : base(rectangle, size)
         {
             SetFiles(files);
             CursorX = 0;
             CursorY = 1;
             Columns.Add(new FilePanelColumn(FileColumnTypes.FileName, "FileName") { Flex = 1 });
-            Columns.Add(new FilePanelColumn(FileColumnTypes.Size, "Size") { Width = 7 });
+            Columns.Add(new FilePanelColumn(FileColumnTypes.Size, "Size") { Width = 8 });
             Columns.Add(new FilePanelColumn(FileColumnTypes.DateTime, "DateTime") { Width = 14 });
         }
 
@@ -88,10 +88,10 @@ namespace FileCommander
         {
             Components.Clear();
             if (System.IO.Path.GetPathRoot(Path) != Path)
-                    Add(new FileItem("..", null,  Width, FileTypes.ParentDirectory));
+                    Add(new FileItem("..", null, "100%", Size, FileTypes.ParentDirectory));
             if (files.Count > 0)
             {
-                AddRange(files.Select(item => new FileItem(item.FullName, item, Width, item is DirectoryInfo ? FileTypes.Directory : FileTypes.File)));
+                AddRange(files.Select(item => new FileItem(item.FullName, item, "100%", Size, item is DirectoryInfo ? FileTypes.Directory : FileTypes.File)));
                 //RefreshItems();
                 //Redraw();
             }
@@ -100,9 +100,8 @@ namespace FileCommander
         public void Start()
         {
             CursorY= HeaderHeight;
-            StartIndex = 0;
-            Update();
-
+            OffsetY = 0;
+            //Update(true);
         }
 
         public void Top()
@@ -124,13 +123,13 @@ namespace FileCommander
             CursorY=Components.Count;
         }
 
-        public void Next()
+        public void Previous ()
         {
             CursorY--;
             FocusItem();
         }
 
-        public void Previous()
+        public void Next()
         {
             CursorY++;
             FocusItem();
@@ -193,7 +192,7 @@ namespace FileCommander
                 int columnWidth = Columns[i].GetWidth(Columns, Width - Columns.Count+1);
                 if (DrawHeader)
                 {
-                    buffer.WriteAt(Columns[i].Name.PadCenter(columnWidth), targetX+ x, targetY + Y, DEFAULT_COLUMN_NAME_FOREGROUND_COLOR, DEFAULT_COLUMN_NAME_BACKGROUND_COLOR);
+                    buffer.WriteAt(Columns[i].Name.PadCenter(columnWidth), targetX+ x, targetY + Y, Theme.FilePanelColumnForegroundColor, Theme.FilePanelItemBackgroundColor);
                 }
                 if (i > 0 && i < Columns.Count - 1)
                 {
