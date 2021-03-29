@@ -18,11 +18,10 @@ namespace FileCommander
 
         public FilePanel FilePanel => (FilePanel)Parent.Parent;
 
-        public bool Visible { get; set; } = false;
-
         FileSystemInfo FileSystemInfo { get; set; }
 
         public FileTypes ItemType { get; set; }
+
         public List<FilePanelColumn> Columns { get; set; }
 
         public override string Path
@@ -54,8 +53,6 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            if (!Visible)
-                return;
             ConsoleColor foreground = GetItemForegroundColor(Selected);
             int x = X;
             for (int i = 0; i < Columns.Count; i++)

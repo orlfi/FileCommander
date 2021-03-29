@@ -30,10 +30,12 @@ namespace FileCommander
     }
 
     [Flags]
-    public enum WindowButtons
+    public enum WindowButton
     {
-        OK = 0b_0000001,
-        Cancel = 0b_0000010
+        Cancel = 0b_0000_0001,
+        Copy =   0b_0000_0010,
+        Move =   0b_0000_0100,
+        Delete = 0b_0000_1000
     }
 
     public enum Alignment

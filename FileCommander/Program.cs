@@ -39,7 +39,7 @@ namespace FileCommander
 
             //try
             //{
-                string path = @"c:\tmp";
+                string path = @"c:\";
 
                 if (args.Length > 0)
                     path = args[0];

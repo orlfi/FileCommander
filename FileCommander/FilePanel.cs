@@ -26,6 +26,12 @@ namespace FileCommander
             Add(FileInfoPanel);
             DirectoryPanel = new DirectoryPanelItem("0, 0, 0, 1", this.Size, Alignment.HorizontalCenter, "Test");
             Add(DirectoryPanel);
+            FocusEvent += (focused)=> DirectoryPanel.SetBackgroundColor(focused); 
+        }
+
+        private void FilePanel_FocusEvent(bool focus)
+        {
+            throw new NotImplementedException();
         }
 
         public override void SetFocus(bool focused)
@@ -68,7 +74,7 @@ namespace FileCommander
                         View.Bottom();
                         break;
                     case ConsoleKey.F5:
-                        var window = new CopyWindow("50%-35,50%-4,70,8", Size, WindowButtons.OK | WindowButtons.Cancel);
+                        var window = new CopyWindow("50%-35,50%-4,70,8", Size, WindowButton.OK | WindowButton.Cancel);
                         window.Open();
                         break;
 

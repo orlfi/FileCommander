@@ -8,7 +8,7 @@ namespace FileCommander
 {
     public class MainWindow: Panel
     {
-
+        public Window ModalWindow { get; set; } = null;
         public MainWindow(string rectangle, Size size) : base(rectangle, size)
         {
             var filePanelLeft = new FilePanel("0,0,50%,100%-2", Size);
@@ -18,7 +18,6 @@ namespace FileCommander
             filePanelLeft.SetFocus(true);
 
             var filePanelRight = new FilePanel("50%,0,50%,100%-2", Size);
-            //var filePanelRight = new FilePanel(Size.Width / 2, 0, Size.Width / 2, Size.Height - 2);
             filePanelRight.Fill = true;
             filePanelRight.Border = true;
             Add(filePanelRight);
@@ -26,44 +25,45 @@ namespace FileCommander
             var сommandHistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-1", Size);
             сommandHistoryPanel.Border = true;
             сommandHistoryPanel.Fill = true;
-            //Active = сommandHistoryPanel;
 
             FocusedComponent = filePanelLeft;
         }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-            if (keyInfo.Key == ConsoleKey.Tab)
+            if (ModalWindow != null)
             {
-                SetFocus(FocusNext());
+                ModalWindow.OnKeyPress(keyInfo);
+                return;
             }
-            else
-                FocusedComponent.OnKeyPress(keyInfo);
+
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.F5:
+                    OnCopy();
+                    break;
+                case ConsoleKey.Tab:
+                    SetFocus(FocusNext());
+                    break;
+                default:
+                    FocusedComponent.OnKeyPress(keyInfo);
+                    break;
+            }
         }
 
-        private void SetFocus(Component component)
+        public void OnCopy()
         {
-            if (FocusedComponent != component)
-            {
-                FocusedComponent.Focused = false;
-                FocusedComponent = component;
-                component.Focused = true;
-                CommandManager.Refresh();
-            }
+            var window = new CopyWindow("50%-25, 50%-3, 50, 6", Size, WindowButton.OK | WindowButton.Cancel);
+            window.Border = true;
+            window.Fill = true;
+            window.Open();
+            return;
         }
 
-        private Component FocusNext()
+        public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            int focusedIndex = Components.IndexOf(FocusedComponent);
-            int next = focusedIndex;
-            do
-            {
-                next++;
-                if (next > Components.Count-1)
-                    next = 0;
-            } while ((Components[next].Visible = true && Components[next].Disabled != false) || focusedIndex == next);
-
-            return Components[next];
+            base.Draw(buffer, targetX, targetY);
+            ModalWindow?.Draw(buffer, targetX, targetY);
         }
     }
 }

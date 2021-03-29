@@ -169,7 +169,6 @@ namespace FileCommander
 
                 item.X = x;
                 item.Y = y;
-                item.Visible = true;
 
                 item.SetFocus(false);
 

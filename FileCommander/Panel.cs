@@ -74,6 +74,32 @@ namespace FileCommander
             }
         }
 
+        protected void SetFocus(Component component)
+        {
+            if (FocusedComponent != component)
+            {
+                FocusedComponent.Focused = false;
+                FocusedComponent = component;
+                component.Focused = true;
+                Update(true);
+            }
+        }
+
+        protected Component FocusNext()
+        {
+            int focusedIndex = Components.IndexOf(FocusedComponent);
+            int next = focusedIndex;
+            do
+            {
+                next++;
+                if (next > Components.Count - 1)
+                    next = 0;
+            } while ((Components[next].Visible = true && Components[next].Disabled != false) || focusedIndex == next);
+
+            return Components[next];
+        }
+
+
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
         }

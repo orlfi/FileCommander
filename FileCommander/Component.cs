@@ -3,8 +3,11 @@ using System.Linq;
 
 namespace FileCommander
 {
+    public delegate void FocusHandler(bool focus);
     public abstract class Component
     {
+
+        public event FocusHandler FocusEvent;
         #region Constants
         private static ConsoleColor saveForegroundColor;
 
@@ -67,10 +70,25 @@ namespace FileCommander
 
         public bool Visible { get; set; } = true;
 
+        private Component _parent;
+
         public Component Parent { get; set; }
 
         public ComponentPosition Position { get; set; }
-        public bool Focused { get; set; }
+
+        private bool _focused;
+        public bool Focused 
+        {
+            get => _focused;
+            set
+            {
+                if (value != _focused)
+                {
+                    _focused = value;
+                    OnFocusChange(_focused);
+                }
+            }
+        }
 
         private string _rectangleString = "";
         private Alignment _alignment;
@@ -82,8 +100,6 @@ namespace FileCommander
         #endregion
 
         #region Constructors
-        //public Component(int x, int y, int width, int height) : this(new Rectangle(x, y, width, height)) { }
-
         public Component(string rectangle, Size size, Alignment alignment = Alignment.None)
         {
             _rectangleString = rectangle;
@@ -239,6 +255,11 @@ namespace FileCommander
         }
 
         public abstract void OnKeyPress(ConsoleKeyInfo keyInfo);
+
+        public virtual void OnFocusChange(bool focused)
+        {
+            FocusEvent?.Invoke(_focused);
+        }
         #endregion
     }
 }

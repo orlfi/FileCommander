@@ -41,7 +41,7 @@ namespace FileCommander
         public void Initialize()
         {
 
-            ErrorEvent+=OnError;
+            ErrorEvent += OnError;
             Console.Title = APP_NAME;
             Console.BufferWidth = Console.WindowWidth = Size.Width;
             Console.WindowHeight = Size.Height;
@@ -118,38 +118,26 @@ namespace FileCommander
         private void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
 
-                    switch (keyInfo.Key)
-                    {
-                        case ConsoleKey.F5:
-                            OnCopy();
-                            break;
-                        case ConsoleKey.F10:
-                            Quit = true;
-                            break;
-                       
-                        case ConsoleKey.Spacebar:
-                            CommandManager_WindowResizeEvent(Size);
-                            //Refresh();
-                            break;
-                        case ConsoleKey.UpArrow:
-                        case ConsoleKey.DownArrow:
-                        case ConsoleKey.LeftArrow:
-                        case ConsoleKey.RightArrow:
-                        case ConsoleKey.PageUp:
-                        case ConsoleKey.PageDown:
-                        case ConsoleKey.Home:
-                        case ConsoleKey.End:
-                        case ConsoleKey.Enter:
-                        case ConsoleKey.Tab:
-                            MainWindow.OnKeyPress(keyInfo);
-                            //KeyPressEvent?.Invoke(keyInfo);
-                            break;
-                    }
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.F10:
+                    Quit = true;
+                    break;
 
-             //if (ModalWindow != null)
-             //    ModalWindow.OnKeyPress(keyInfo);
-             //else
-             //    MainWindow.OnKeyPress(keyInfo);
+                case ConsoleKey.Spacebar:
+                    CommandManager_WindowResizeEvent(Size);
+                    //Refresh();
+                    break;
+                default:
+                    MainWindow.OnKeyPress(keyInfo);
+                    //KeyPressEvent?.Invoke(keyInfo);
+                    break;
+            }
+
+            //if (ModalWindow != null)
+            //    ModalWindow.OnKeyPress(keyInfo);
+            //else
+            //    MainWindow.OnKeyPress(keyInfo);
 
 
             // if (keyInfo.Key == ConsoleKey.Tab)
@@ -183,7 +171,6 @@ namespace FileCommander
             Stopwatch sw = new System.Diagnostics.Stopwatch();
             sw.Start();
             MainWindow.Draw(Screen, 0, 0);
-            ModalWindow?.Draw(Screen, 0, 0);
             Screen.Paint(x, y, width, height);
             sw.Stop();
 
@@ -200,17 +187,8 @@ namespace FileCommander
         }
         public void OnCopy()
         {
-            var window = new CopyWindow("50%-25, 50%-3, 50, 6", Size, WindowButtons.OK | WindowButtons.Cancel);
-            window.Border = true;
-            window.Fill = true;
-            //MainWindow.Add(window);
-            //ModalWindow = window;
-            window.Open();
-            //Refresh(10, 10, 30, 5);
-            //            window.Repaint();
-            return;
 
-            string source = "c:\\tmp\\1.zip"; 
+            string source = "c:\\tmp\\1.zip";
             string dest1 = "C:\\tmp\\2.zip";
             string dest2 = "c:\\tmp\\3.zip";
 
@@ -271,11 +249,11 @@ namespace FileCommander
                 } while (bytesRead > 0);
                 writeStream.Flush();
                 ProgressEvent?.Invoke(new ProgressInfo(total, fileSize, fileInfo.Name), true);
-            } 
+            }
             catch (Exception ex)
             {
                 ErrorEvent?.Invoke(ex);
-            } 
+            }
             finally
             {
                 writeStream?.Close();
@@ -307,11 +285,11 @@ namespace FileCommander
                 } while (bytesRead > 0);
                 writeStream.Flush();
                 ProgressEvent?.Invoke(new ProgressInfo(total, fileSize, fileInfo.Name), true);
-            } 
+            }
             catch (Exception ex)
             {
                 ErrorEvent?.Invoke(ex);
-            } 
+            }
             finally
             {
                 writeStream?.Close();
@@ -343,7 +321,7 @@ namespace FileCommander
                 int currentHeight = Console.WindowHeight;
                 //WindowResizeEvent?.Invoke(new Size(currentWidth, currentHeight));
 
-                if (width != currentWidth  || height != currentHeight)
+                if (width != currentWidth || height != currentHeight)
                 {
                     WindowResizeEvent?.Invoke(new Size(currentWidth, currentHeight));
                     width = currentWidth;

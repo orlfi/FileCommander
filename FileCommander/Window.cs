@@ -9,32 +9,37 @@ namespace FileCommander
     {
         List<Control> Buttons => Components.Where(item => item.GetType() == typeof(Control)).Cast<Control>().ToList();
 
-        public Window(string rectangle, Size size, WindowButtons buttons) : base(rectangle, size)
+        public MainWindow MainWindow => CommandManager.MainWindow;
+        public Window(string rectangle, Size size, WindowButton buttons) : base(rectangle, size)
         {
-            Parent = CommandManager.MainWindow;
+            Parent = MainWindow;
 
+            AddButtons(buttons);
+        }
+
+        private void AddButtons(WindowButton buttons)
+        {
             int count = BitOperations.PopCount((ulong)buttons);
 
-            if ((buttons & WindowButtons.OK) == WindowButtons.OK)
-                Add(new Control("35%,100%-1, 10, 1", Size, Alignment.None, "OK"));
+            if ((buttons & WindowButton.OK) == WindowButton.OK)
+                Add(new Control("20%,100%-2, 10, 1", Size, Alignment.None, "__OK______"));
 
-            if ((buttons & WindowButtons.Cancel) == WindowButtons.OK)
+            if ((buttons & WindowButton.Cancel) == WindowButton.OK)
                 Add(new Control("70%,100%-2, 10, 1", Size, Alignment.None, "Cancel"));
-
         }
 
         public virtual void Open()
         {
-            if (CommandManager.ModalWindow != null)
-                CommandManager.ModalWindow.Close();
+            if (MainWindow.ModalWindow != null)
+                MainWindow.ModalWindow.Close();
 
-            CommandManager.ModalWindow = this;
+            MainWindow.ModalWindow = this;
             Update(true);
         }
         public virtual void Close()
         {
-            CommandManager.ModalWindow = null;
-            Parent.Update(true);
+            MainWindow.ModalWindow = null;
+            Update(true);
             Console.CursorVisible = false;
         }
 
@@ -53,7 +58,7 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            ForegroundColor = Theme.WindowBorderColor;
+            ForegroundColor = Theme.WindowForegroundColor;
             BackgroundColor = Theme.WindowBackgroundColor;
             base.Draw(buffer, targetX, targetY);
             buffer.WriteAt($" {Name} ", targetX + X + Width/2 - Name.Length/2 , targetY + Y, ForegroundColor, BackgroundColor);

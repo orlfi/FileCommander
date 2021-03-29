@@ -5,14 +5,13 @@ namespace FileCommander
 {
     public class DirectoryPanelItem : Control
     {
-        public const ConsoleColor DEFAULT_PATH_FOREGROUND_COLOR = ConsoleColor.Black;
-        public const ConsoleColor DEFAULT_PATH_BACKGROUND_COLOR = ConsoleColor.DarkCyan;
 
-        public DirectoryPanelItem(string rectangle, Size size, Alignment alignment, string name) : 
-            this(rectangle, size, alignment, name, DEFAULT_PATH_FOREGROUND_COLOR, DEFAULT_PATH_BACKGROUND_COLOR) { }
-        
-        public DirectoryPanelItem(string rectangle, Size size, Alignment alignment, string name, ConsoleColor foregroundColor, ConsoleColor backgroundColor) : 
-            base(rectangle, size, alignment, name, foregroundColor, backgroundColor) { }
+        public DirectoryPanelItem(string rectangle, Size size, Alignment alignment, string name) :
+                        base(rectangle, size, alignment, name)
+        {
+            ForegroundColor = Theme.FilePanelDirectoryForegroundColor;
+            BackgroundColor = Theme.FilePanelBackgroundColor;
+        }
 
         public override void SetName(string name, Size size)
         {
@@ -21,6 +20,11 @@ namespace FileCommander
             SetRectangle(size);
             Width = name.Length;
             Align(size);
+        }
+
+        public void SetBackgroundColor(bool focused)
+        {
+            BackgroundColor = focused?Theme.FilePanelFocusedBackgroundColor:Theme.FilePanelBackgroundColor;
         }
 
         public static string GetFitName(string name, int width)
