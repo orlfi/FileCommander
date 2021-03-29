@@ -73,11 +73,6 @@ namespace FileCommander
                     case ConsoleKey.PageDown:
                         View.Bottom();
                         break;
-                    case ConsoleKey.F5:
-                        var window = new CopyWindow("50%-35,50%-4,70,8", Size, WindowButton.OK | WindowButton.Cancel);
-                        window.Open();
-                        break;
-
                 }
             }
         }

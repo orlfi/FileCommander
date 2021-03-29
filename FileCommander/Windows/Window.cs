@@ -1,5 +1,4 @@
 using System;
-using System.Numerics;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -10,22 +9,11 @@ namespace FileCommander
         List<Control> Buttons => Components.Where(item => item.GetType() == typeof(Control)).Cast<Control>().ToList();
 
         public MainWindow MainWindow => CommandManager.MainWindow;
-        public Window(string rectangle, Size size, WindowButton buttons) : base(rectangle, size)
+        public Window(string rectangle, Size size) : base(rectangle, size)
         {
             Parent = MainWindow;
-
-            AddButtons(buttons);
-        }
-
-        private void AddButtons(WindowButton buttons)
-        {
-            int count = BitOperations.PopCount((ulong)buttons);
-
-            if ((buttons & WindowButton.OK) == WindowButton.OK)
-                Add(new Control("20%,100%-2, 10, 1", Size, Alignment.None, "__OK______"));
-
-            if ((buttons & WindowButton.Cancel) == WindowButton.OK)
-                Add(new Control("70%,100%-2, 10, 1", Size, Alignment.None, "Cancel"));
+            Border = true;
+            Fill = true;
         }
 
         public virtual void Open()
@@ -41,19 +29,6 @@ namespace FileCommander
             MainWindow.ModalWindow = null;
             Update(true);
             Console.CursorVisible = false;
-        }
-
-        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
-        {
-            switch (keyInfo.Key)
-            {
-                case ConsoleKey.Escape:
-                    Close();
-                    break;
-                case ConsoleKey.Enter:
-                    Close();
-                    break;
-            }
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)

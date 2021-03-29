@@ -42,6 +42,12 @@ namespace FileCommander
                 case ConsoleKey.F5:
                     OnCopy();
                     break;
+                case ConsoleKey.F6:
+                    OnMove();
+                    break;
+                case ConsoleKey.F8:
+                    OnDelete();
+                    break;
                 case ConsoleKey.Tab:
                     SetFocus(FocusNext());
                     break;
@@ -53,9 +59,20 @@ namespace FileCommander
 
         public void OnCopy()
         {
-            var window = new CopyWindow("50%-25, 50%-3, 50, 6", Size, WindowButton.OK | WindowButton.Cancel);
-            window.Border = true;
-            window.Fill = true;
+            var window = new CopyWindow(Size);
+            window.Open();
+            return;
+        }
+        public void OnMove()
+        {
+            var window = new MoveWindow(Size);
+            window.Open();
+            return;
+        }
+
+        public void OnDelete()
+        {
+            var window = new DeleteWindow(Size);
             window.Open();
             return;
         }
