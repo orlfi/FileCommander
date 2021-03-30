@@ -25,17 +25,13 @@ namespace FileCommander
         
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            buffer.WriteAt(FitName(), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+            buffer.WriteAt(Name.Fit(Width), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
         }
 
-        public virtual string FitName()
-        {
-            return Name.Substring(0, Math.Min(Width, Name.Length));
-        }
+
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-            throw new NotImplementedException();
         }
     }
 }

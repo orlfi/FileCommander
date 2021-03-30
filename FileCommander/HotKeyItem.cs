@@ -23,7 +23,7 @@ namespace FileCommander
             Console.BackgroundColor = ConsoleColor.Black;
 
             buffer.WriteAt(Number==0?"  ":Number.ToString().PadLeft(2), X + targetX, Y + targetY, ConsoleColor.Gray, ConsoleColor.Black);
-            buffer.WriteAt(Name.PadRight(DEFAULT_WIDTH-2), X + 2  + targetX, Y + targetY, ConsoleColor.Black, ConsoleColor.DarkCyan);
+            buffer.WriteAt(Name.PadRight(Width-2), X + 2  + targetX, Y + targetY, ConsoleColor.Black, ConsoleColor.DarkCyan);
         }
         //public override void Draw()
         //{

@@ -40,36 +40,30 @@ namespace FileCommander
             x+=HotKeyItem.DEFAULT_WIDTH;
             item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Quit", 10);
             Add(item);
-            //items[0] = new HotKeyItem(x,Y,"Help", 1);
-            //items[1] = new HotKeyItem(x,Y,"Menu", 2);
-            //items[2] = new HotKeyItem(x,Y,"View", 3);
-            //items[3] = new HotKeyItem(x,Y,"Edit", 4);
-
-                // new HotKeyItem("Menu", 2),
-                // new HotKeyItem("View", 3),
-                // new HotKeyItem("Edit", 4),
-                // new HotKeyItem("Copy", 5),
-                // new HotKeyItem("RenMov", 6),
-                // new HotKeyItem("MkDir", 7),
-                // new HotKeyItem("Delete", 8),
-                // new HotKeyItem("PullDn", 9),
-                // new HotKeyItem("Quit", 10),
-
         }
 
-        //public override void Draw()
-        //{
-        //    SaveCursor();
+        public override void UpdateRectangle(Size size)
+        {
+            base.UpdateRectangle(size);
+            Align(size);
+        }
 
-        //    for(int i = 0; i < Components.Count; i++)
-        //    {
-        //        Components[i].X = Components[i].Width*i;
-        //        Components[i].Y = Y;
-        //        Components[i].Draw();
-        //    }
-        //    // Для предотвращения скроллирования
-        //    Console.SetCursorPosition(0, 0);
-        //    RestoreCursor();
-        //}
+        private void Align(Size size)
+        {
+            int itemWidth = size.Width / Components.Count;
+            int remains = size.Width - itemWidth * Components.Count;
+            int totalWidth = 0;
+            for (int i = 0; i < Components.Count; i++)
+            {
+                Components[i].Width = itemWidth;
+                Components[i].X = totalWidth;
+                if (remains > 0)
+                {
+                    Components[i].Width++;
+                    remains--;
+                }
+                totalWidth += Components[i].Width;
+            }
+        }
     }
 }

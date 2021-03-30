@@ -74,18 +74,19 @@ namespace FileCommander
             }
         }
 
-        protected void SetFocus(Component component)
+        public void SetFocus(Component component)
         {
             if (FocusedComponent != component)
             {
-                FocusedComponent.Focused = false;
+                if (FocusedComponent != null)
+                    FocusedComponent.Focused = false;
                 FocusedComponent = component;
                 component.Focused = true;
                 Update(true);
             }
         }
 
-        protected Component FocusNext()
+        public Component FocusNext()
         {
             int focusedIndex = Components.IndexOf(FocusedComponent);
             int next = focusedIndex;

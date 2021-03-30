@@ -18,5 +18,10 @@ namespace FileCommander
             return $"{"".PadRight(marginLeft)}{text}{"".PadRight(marginRigth)}";
         }
 
+        public static string Fit(this string text, int width)
+        {
+            return text.Substring(0, Math.Min(width, text.Length));
+        }
+
     }
 }

@@ -5,36 +5,44 @@ namespace FileCommander
 {
     public class CopyWindow: Window
     {
+        public Button SaveButton { get; set;}
+        public Button CancelButton { get; set;}
+        public TextEdit TextEdit { get; set; }
+
         const string DEFAULT_NAME = "Copy";        
-        public CopyWindow(Size targetSize) : base("50%-25, 50%-3, 50, 6", targetSize)
+        public CopyWindow(Size targetSize) : base("50%-25, 50%-3, 50, 7", targetSize)
         {
             Name = DEFAULT_NAME;
-
+            TextEdit = new TextEdit("2, 2, 100%-4, 1", Size, Alignment.None, "FileName", "Test");
+            Add(TextEdit);
             AddButtons();
+        }
+
+        public override void OnPaint()
+        {
+            base.OnPaint();
+            if (FocusedComponent == null)
+                SetFocus(TextEdit);
         }
 
         private void AddButtons()
         {
-            //int count = BitOperations.PopCount((ulong)buttons);
-
-            //if ((buttons & WindowButton.OK) == WindowButton.OK)
-            //    Add(new Control("20%,100%-2, 10, 1", Size, Alignment.None, "__OK______"));
-
-            //if ((buttons & WindowButton.Cancel) == WindowButton.OK)
-            //    Add(new Control("70%,100%-2, 10, 1", Size, Alignment.None, "Cancel"));
+            SaveButton = new Button("14,100%-2, 10, 1", Size, Alignment.None, "Copy");
+            SaveButton.ClickEvent += (button)=> { OnEnter(); };
+            Add(SaveButton);
+            CancelButton = new Button("26,100%-2, 10, 1", Size, Alignment.None, "Cancel");
+            CancelButton.ClickEvent += (button) => { OnEscape(); };
+            Add(CancelButton);
         }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-            switch (keyInfo.Key)
-            {
-                case ConsoleKey.Escape:
-                    Close();
-                    break;
-                case ConsoleKey.Enter:
-                    Close();
-                    break;
-            }
+            base.OnKeyPress(keyInfo);
+        }
+
+        public override void OnEnter()
+        {
+            throw new NotImplementedException();
         }
     }
 }

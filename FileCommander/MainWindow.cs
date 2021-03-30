@@ -27,6 +27,7 @@ namespace FileCommander
             сommandHistoryPanel.Fill = true;
 
             var hotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
+            hotKeyPanel.Disabled = true;
             Add(hotKeyPanel);
 
             FocusedComponent = Components[0];

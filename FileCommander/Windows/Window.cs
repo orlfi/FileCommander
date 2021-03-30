@@ -8,12 +8,48 @@ namespace FileCommander
     {
         List<Control> Buttons => Components.Where(item => item.GetType() == typeof(Control)).Cast<Control>().ToList();
 
+        public bool Enter { get; set; } = true;
+        
+        public bool Escape { get; set; } = true;
+        
         public MainWindow MainWindow => CommandManager.MainWindow;
+        
         public Window(string rectangle, Size size) : base(rectangle, size)
         {
             Parent = MainWindow;
             Border = true;
             Fill = true;
+        }
+
+        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
+        {
+
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.Tab:
+                    SetFocus(FocusNext());
+                    break;
+                case ConsoleKey.Enter:
+                    FocusedComponent?.OnKeyPress(keyInfo);
+                    if ((FocusedComponent == null || FocusedComponent.GetType() != typeof(Button)) && Enter)
+                        OnEnter();
+                    break;
+                case ConsoleKey.Escape:
+                    FocusedComponent?.OnKeyPress(keyInfo);
+                    if (Escape)
+                        OnEscape();
+                    break;
+                default:
+                    FocusedComponent.OnKeyPress(keyInfo);
+                    break;
+            }
+        }
+
+        public virtual void OnEnter() { }
+        public virtual void OnEscape() 
+        { 
+            if (MainWindow.ModalWindow == this)
+                Close(); 
         }
 
         public virtual void Open()

@@ -27,9 +27,14 @@ namespace FileCommander
         public ConsoleColor WindowBackgroundColor { get; set; } = ConsoleColor.Gray;
 
         public ConsoleColor ButtonForegroundColor { get; set; } = ConsoleColor.Black;
+        
         public ConsoleColor ButtonFocusedBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
+
         public ConsoleColor ButtonBackgroundColor { get; set; } = ConsoleColor.Gray;
 
+        public ConsoleColor TextEditForegroundColor { get; set; } = ConsoleColor.Black;
+
+        public ConsoleColor TextEditBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
 
         private static Theme instance;
 

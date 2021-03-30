@@ -3,11 +3,16 @@ using System.Linq;
 
 namespace FileCommander
 {
+    public delegate void PaintHandler(Component sender);
+    
     public delegate void FocusHandler(bool focus);
+    
     public abstract class Component
     {
 
         public event FocusHandler FocusEvent;
+        public event PaintHandler PaintEvent;
+
         #region Constants
         private static ConsoleColor saveForegroundColor;
 
@@ -125,6 +130,11 @@ namespace FileCommander
                 Height = Parse(expressions[3], size.Height);
 
             }
+        }
+
+        public virtual void OnPaint() 
+        {
+            PaintEvent?.Invoke(this);
         }
 
         public void Align(Size size)
@@ -247,6 +257,7 @@ namespace FileCommander
                 var location = GetAbsolutePosition(this);
                 Update(location.X, location.Y, Width, Height);
             }
+            OnPaint();
         }
 
         public virtual void SetPath(string path)
