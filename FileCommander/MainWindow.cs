@@ -22,11 +22,14 @@ namespace FileCommander
             filePanelRight.Border = true;
             Add(filePanelRight);
 
-            var сommandHistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-1", Size);
+            var сommandHistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-2", Size);
             сommandHistoryPanel.Border = true;
             сommandHistoryPanel.Fill = true;
 
-            FocusedComponent = filePanelLeft;
+            var hotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
+            Add(hotKeyPanel);
+
+            FocusedComponent = Components[0];
         }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
@@ -39,6 +42,8 @@ namespace FileCommander
 
             switch (keyInfo.Key)
             {
+                case ConsoleKey.F1:
+                    break;
                 case ConsoleKey.F5:
                     OnCopy();
                     break;
@@ -47,6 +52,9 @@ namespace FileCommander
                     break;
                 case ConsoleKey.F8:
                     OnDelete();
+                    break;
+                case ConsoleKey.F9:
+                    //OnChangeView();
                     break;
                 case ConsoleKey.Tab:
                     SetFocus(FocusNext());

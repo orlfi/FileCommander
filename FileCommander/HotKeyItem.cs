@@ -6,7 +6,7 @@ namespace FileCommander
         public const int DEFAULT_WIDTH = 8;
         public int Number { get; set;}
 
-        public HotKeyItem(string rectangle, Size size, Alignment alignment, string name, int number) : base(rectangle, size, alignment, name) 
+        public HotKeyItem(string rectangle, Size size, string name, int number) : base(rectangle, size, Alignment.None, name) 
         {
             Number = number;
         }
@@ -17,6 +17,14 @@ namespace FileCommander
                 CommandManager.GetInstance().Quit = true;
         }
 
+        public override void Draw(Buffer buffer, int targetX, int targetY)
+        {
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.BackgroundColor = ConsoleColor.Black;
+
+            buffer.WriteAt(Number==0?"  ":Number.ToString().PadLeft(2), X + targetX, Y + targetY, ConsoleColor.Gray, ConsoleColor.Black);
+            buffer.WriteAt(Name.PadRight(DEFAULT_WIDTH-2), X + 2  + targetX, Y + targetY, ConsoleColor.Black, ConsoleColor.DarkCyan);
+        }
         //public override void Draw()
         //{
         //    Console.ForegroundColor = ConsoleColor.Gray;

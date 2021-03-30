@@ -66,6 +66,7 @@ namespace FileCommander
 
         private void CommandManager_WindowResizeEvent(Size size)
         {
+            ResizeWindow(size);
         }
 
         private void ResizeWindow(Size size)
