@@ -24,16 +24,6 @@ namespace FileCommander
 
         public List<FilePanelColumn> Columns { get; set; }
 
-        public override string Path
-        {
-            get => _path;
-            set
-            {
-                Name = GetName(value);
-                _path = value;
-            }
-        }
-
         public FileItem(string path, FileSystemInfo fileSystemInfo, string width, Size size, FileTypes itemType = FileTypes.File) : this($"0, 0, {width}, 1", size, path, fileSystemInfo, itemType)
         {
 
@@ -42,18 +32,14 @@ namespace FileCommander
         public FileItem(string rectangle, Size size, string path, FileSystemInfo fileSystemInfo, FileTypes itemType = FileTypes.File) : base(rectangle, size)
         {
             Path = path;
+            Name = System.IO.Path.GetFileName(path);
             ItemType = itemType;
             FileSystemInfo = fileSystemInfo;
         }
 
-        public static string GetName(string path)
-        {
-            return path.Substring(path.LastIndexOf("\\") + 1);
-        }
-
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            ConsoleColor foreground = GetItemForegroundColor(Selected);
+            ConsoleColor foreground = GetItemForegroundColor();
             int x = X;
             for (int i = 0; i < Columns.Count; i++)
             {
@@ -68,7 +54,7 @@ namespace FileCommander
                         if (ItemType == FileTypes.File)
                         {
                             FileInfo fi = new FileInfo(Path);
-                            text = FormatSize(fi.Length);
+                            text = FormatFileSize(fi.Length);
                         }
                         break;
                     case FileColumnTypes.DateTime:
@@ -77,10 +63,10 @@ namespace FileCommander
                             text = File.GetLastWriteTime(Path).ToString("dd.MM.yy hh:mm").PadLeft(columnWidth);
                         }
                         break;
-
                 }
 
-                buffer.WriteAt(text, x + targetX, Y + targetY, foreground, Focused && FilePanel.Focused ? Theme.FilePanelFocusedBackgroundColor : Theme.FilePanelItemBackgroundColor);
+                buffer.WriteAt(text, x + targetX, Y + targetY, foreground, 
+                    Focused && FilePanel.Focused ? Theme.FilePanelFocusedBackgroundColor : Theme.FilePanelItemBackgroundColor);
 
                 x += columnWidth;
                 if (i < Columns.Count - 1)
@@ -92,7 +78,7 @@ namespace FileCommander
             }
         }
 
-        public static string FormatSize(long size)
+        public static string FormatFileSize(long size)
         {
 
             if (size >= PETABYTE)
@@ -109,7 +95,7 @@ namespace FileCommander
                 return (size).ToString().PadLeft(8);
         }
 
-        public ConsoleColor GetItemForegroundColor(bool selected)
+        public ConsoleColor GetItemForegroundColor()
         {
             ConsoleColor result = ConsoleColor.Cyan;
             switch (ItemType)
@@ -118,10 +104,18 @@ namespace FileCommander
                     result = ConsoleColor.Cyan;
                     break;
                 case FileTypes.Directory:
-                    result = selected ? Theme.FilePanelSelectedForegroundColor: Theme.FilePanelDirectoryForegroundColor;
+                    result =   Theme.FilePanelDirectoryForegroundColor;
+                    if (Selected)
+                        result = Theme.FilePanelSelectedForegroundColor;
+                    else if (Focused && FilePanel.Focused)
+                        result = Theme.FilePanelFocusedForegroundColor;
                     break;
                 case FileTypes.File:
-                    result = selected ? Theme.FilePanelSelectedForegroundColor : Theme.FilePanelFileForegroundColor;
+                    result = Theme.FilePanelFileForegroundColor;
+                    if (Selected)
+                        result = Theme.FilePanelSelectedForegroundColor;
+                    else if (Focused && FilePanel.Focused)
+                        result = Theme.FilePanelFocusedForegroundColor;
                     break;
             }
             return result;

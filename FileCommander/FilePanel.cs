@@ -13,7 +13,7 @@ namespace FileCommander
 
         Control FileInfoPanel { get; set; }
 
-        DetailsView View { get; set; }
+        public DetailsView View { get; set; }
 
         public List<FileSystemInfo> Files { get; set; } = new List<FileSystemInfo>();
 
@@ -80,7 +80,7 @@ namespace FileCommander
         {
             if (item != null)
             {
-                FileInfoPanel?.SetName(FileItem.GetFitName(item.Name, Width - 1).PadRight(Width - 2, ' '), Parent.Size);
+                FileInfoPanel?.SetName(FileItem.GetFitName(item.Name, Width - 2).PadRight(Width - 2, ' '), Parent.Size);
                 FileInfoPanel?.Update();
             }
         }

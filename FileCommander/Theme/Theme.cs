@@ -20,6 +20,8 @@ namespace FileCommander
 
         public ConsoleColor FilePanelItemBackgroundColor { get; set; } = ConsoleColor.DarkBlue;
 
+        public ConsoleColor FilePanelFocusedForegroundColor { get; set; } = ConsoleColor.Black;
+
         public ConsoleColor FilePanelFocusedBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
 
         public ConsoleColor WindowForegroundColor { get; set; } = ConsoleColor.Black;

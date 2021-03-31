@@ -19,6 +19,8 @@ namespace FileCommander
             Parent = MainWindow;
             Border = true;
             Fill = true;
+            ForegroundColor = Theme.WindowForegroundColor;
+            BackgroundColor = Theme.WindowBackgroundColor;
         }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
@@ -69,8 +71,6 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            ForegroundColor = Theme.WindowForegroundColor;
-            BackgroundColor = Theme.WindowBackgroundColor;
             base.Draw(buffer, targetX, targetY);
             buffer.WriteAt($" {Name} ", targetX + X + Width/2 - Name.Length/2 , targetY + Y, ForegroundColor, BackgroundColor);
             DrawShadow(buffer, targetX, targetY);

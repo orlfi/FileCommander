@@ -14,7 +14,7 @@ namespace FileCommander
             HotKeyItem item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Help", 1);
             Add(item);
             x+=HotKeyItem.DEFAULT_WIDTH;
-            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Menu", 2);
+            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Rename", 2);
             Add(item);
             x+=HotKeyItem.DEFAULT_WIDTH;
             item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "View", 3);

@@ -74,7 +74,7 @@ namespace FileCommander
             }
         }
 
-        public void SetFocus(Component component)
+        public void SetFocus(Component component, bool update = true)
         {
             if (FocusedComponent != component)
             {
@@ -82,7 +82,8 @@ namespace FileCommander
                     FocusedComponent.Focused = false;
                 FocusedComponent = component;
                 component.Focused = true;
-                Update(true);
+                if (update)
+                    Update(true);
             }
         }
 
