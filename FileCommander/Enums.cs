@@ -48,4 +48,19 @@ namespace FileCommander
         VerticalRight =     0b_0010000,
         VerticalCenter =    0b_0010000
     }
+
+    public enum MoveCursorDirection
+    {
+        Left,
+        Right,
+        LeftWord,
+        RightWord
+    }
+
+    public enum TextRemoveDirection
+    {
+        Next,
+        Previous
+    }
+
 }
