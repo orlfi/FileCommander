@@ -28,9 +28,19 @@ namespace FileCommander
 
         public ConsoleColor WindowBackgroundColor { get; set; } = ConsoleColor.Gray;
 
-        public ConsoleColor ErrorWindowForegroundColor { get; set; } = ConsoleColor.Black;
+        public ConsoleColor ErrorWindowForegroundColor { get; set; } = ConsoleColor.White;
 
         public ConsoleColor ErrorWindowBackgroundColor { get; set; } = ConsoleColor.DarkRed;
+        
+        public ConsoleColor DriveWindowForegroundColor { get; set; } = ConsoleColor.White;
+
+        public ConsoleColor DriveWindowBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
+        
+        public ConsoleColor DriveItemForegroundColor { get; set; } = ConsoleColor.White;
+
+        public ConsoleColor DriveItemBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
+
+        public ConsoleColor DriveItemFocusedBackgroundColor { get; set; } = ConsoleColor.Black;
 
         public ConsoleColor ButtonForegroundColor { get; set; } = ConsoleColor.Black;
         

@@ -15,7 +15,9 @@ namespace FileCommander
         public bool Fill { get; set; }
         
 
-        public Panel(string rectangle, Size size) : base(rectangle, size) 
+        public Panel(string rectangle, Size size) : this(rectangle, size, Alignment.None) { }
+
+        public Panel(string rectangle, Size size, Alignment alignment) : base(rectangle, size, alignment)
         {
             ForegroundColor = Theme.FilePanelForegroundColor;
             BackgroundColor = Theme.FilePanelBackgroundColor;

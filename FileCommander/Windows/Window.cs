@@ -13,8 +13,10 @@ namespace FileCommander
         public bool Escape { get; set; } = true;
         
         public MainWindow MainWindow => CommandManager.MainWindow;
-        
-        public Window(string rectangle, Size size) : base(rectangle, size)
+
+        public Window(string rectangle, Size size) : this(rectangle, size, Alignment.None) { }
+
+        public Window(string rectangle, Size size, Alignment alignment) : base(rectangle, size, alignment)
         {
             Parent = MainWindow;
             Border = true;
@@ -47,24 +49,27 @@ namespace FileCommander
             }
         }
 
-        public virtual void OnEnter() { }
+        public virtual void OnEnter() 
+        { 
+        }
+
         public virtual void OnEscape() 
         { 
-            if (MainWindow.ModalWindow == this)
+            if (MainWindow.ActiveWindow == this)
                 Close(); 
         }
 
         public virtual void Open()
         {
-            if (MainWindow.ModalWindow != null)
-                MainWindow.ModalWindow.Close();
+            if (MainWindow.ActiveWindow != null)
+                MainWindow.ActiveWindow.Close();
 
-            MainWindow.ModalWindow = this;
+            MainWindow.ActiveWindow = this;
             Update(true);
         }
         public virtual void Close()
         {
-            MainWindow.ModalWindow = null;
+            MainWindow.ActiveWindow = null;
             Update(true);
             Console.CursorVisible = false;
         }
@@ -84,5 +89,6 @@ namespace FileCommander
             line = new Line(targetX + X + Width, targetY + Y + 1, Height, 2, Direction.Vertical);
             line.Draw(buffer);
         }
+
     }
 }

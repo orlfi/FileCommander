@@ -9,7 +9,8 @@ namespace FileCommander
     public delegate string TextChangedHandler(Component sender);
     public class TextEdit : Control
     {
-        public event TextChangedHandler TextChangedEvent;
+        // TODO
+        //public event TextChangedHandler TextChangedEvent;
         public string Value { get; set; }
 
         public Point AbsolutePosition => GetAbsolutePosition(this);

@@ -8,7 +8,7 @@ namespace FileCommander
 {
     public class MainWindow: Panel
     {
-        public Window ModalWindow { get; set; } = null;
+        public Window ActiveWindow { get; set; } = null;
         public FilePanel LeftPanel { get; set; } = null;
         public FilePanel RightPanel { get; set; } = null;
         public CommandHistoryPanel HistoryPanel { get; set; } = null;
@@ -40,15 +40,21 @@ namespace FileCommander
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-            if (ModalWindow != null)
+            if (ActiveWindow != null)
             {
-                ModalWindow.OnKeyPress(keyInfo);
+                ActiveWindow.OnKeyPress(keyInfo);
                 return;
             }
 
             switch (keyInfo.Key)
             {
                 case ConsoleKey.F1:
+                    if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+                        SelectDrive(LeftPanel);
+                    break;
+                case ConsoleKey.F2:
+                    if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+                        SelectDrive(RightPanel);
                     break;
                 case ConsoleKey.F5:
                     OnCopy();
@@ -68,6 +74,15 @@ namespace FileCommander
                 default:
                     FocusedComponent.OnKeyPress(keyInfo);
                     break;
+            }
+        }
+        public void SelectDrive(FilePanel panel)
+        {
+            if (panel != null)
+            {
+                var window = new DriveSelectWindow(panel);
+                window.Parent = panel;
+                window.Open();
             }
         }
 
@@ -101,7 +116,14 @@ namespace FileCommander
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             base.Draw(buffer, targetX, targetY);
-            ModalWindow?.Draw(buffer, targetX, targetY);
+            ActiveWindow?.Draw(buffer, targetX + ActiveWindow.Parent.X, targetY + ActiveWindow.Parent.Y);
+        }
+
+        public override void UpdateRectangle(Size size)
+        {
+            base.UpdateRectangle(size);
+            ActiveWindow?.UpdateRectangle(ActiveWindow.Parent.Size);
+            ActiveWindow?.Align(ActiveWindow.Parent.Size);
         }
     }
 }
