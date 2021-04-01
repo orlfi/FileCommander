@@ -23,5 +23,13 @@ namespace FileCommander
             return text.Substring(0, Math.Min(width, text.Length));
         }
 
+        public static string[] LineBreak(this string text, int lineLength)
+        {
+            int lines = text.Length / lineLength + 1;
+            string[] result = new string[lines];
+            for (int i = 0; i < lines; i++)
+                result[i] = text.Substring(i*lineLength, Math.Min(lineLength, text.Length - i * lineLength));
+            return result;
+        }
     }
 }

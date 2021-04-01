@@ -54,7 +54,8 @@ namespace FileCommander
 
         public override void OnEnter()
         {
-            throw new NotImplementedException();
+            var errorWindow = new ErrorWindow(MainWindow.Size, "Error test message Error test message Error test message Error test message Error test messageError test message");
+             errorWindow.Open();
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)

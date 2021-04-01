@@ -73,7 +73,15 @@ namespace FileCommander
 
         public bool Disabled { get; set; }
 
-        public bool Visible { get; set; } = true;
+        private bool _visible = true;
+        public bool Visible 
+        { 
+            get => _visible;
+            set
+            {
+                _visible = value;
+            }
+        }
 
         private Component _parent;
 
@@ -148,11 +156,11 @@ namespace FileCommander
 
 
         /// <summary>
-        /// Переводит строковое выражение кординат и размеров в числовое
+        /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         /// </summary>
-        /// <param name="expression">выражение, например, 50%-2</param>
-        /// <param name="value">значение, от которого вычисляются проценты</param>
-        /// <returns>результат вычисления выражения</returns>
+        /// <param name="expression">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, 50%-2</param>
+        /// <param name="value">пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</param>
+        /// <returns>пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</returns>
         private int Parse(string expression, int value)
         {
             int result = 0;

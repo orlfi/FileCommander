@@ -79,7 +79,10 @@ namespace FileCommander
             if (FocusedComponent != component)
             {
                 if (FocusedComponent != null)
+                {
                     FocusedComponent.Focused = false;
+                    FocusedComponent.Update(false);
+                }
                 FocusedComponent = component;
                 component.Focused = true;
                 if (update)
@@ -96,7 +99,7 @@ namespace FileCommander
                 next++;
                 if (next > Components.Count - 1)
                     next = 0;
-            } while ((Components[next].Visible = true && Components[next].Disabled != false) || focusedIndex == next);
+            } while (Components[next].Visible == true && Components[next].Disabled != false);
 
             return Components[next];
         }

@@ -39,14 +39,20 @@ namespace FileCommander
 
             //try
             //{
-                string path = @"c:\";
 
-                if (args.Length > 0)
-                    path = args[0];
+            string homePath = (Environment.OSVersion.Platform == PlatformID.Unix ||
+                               Environment.OSVersion.Platform == PlatformID.MacOSX)
+                ? Environment.GetEnvironmentVariable("HOME")
+                : Environment.ExpandEnvironmentVariables("%HOMEDRIVE%%HOMEPATH%");
 
-                CommandManager manager = CommandManager.GetInstance();
-                manager.SetPath(path);
-                manager.Run();
+            string path = @"c:\";
+
+            if (args.Length > 0)
+                path = args[0];
+
+            CommandManager manager = CommandManager.GetInstance();
+            manager.SetPath(path);
+            manager.Run();
             //}
             //catch(Exception ex)
             //{

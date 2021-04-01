@@ -6,7 +6,7 @@ namespace FileCommander
 {
     public class Window : Panel
     {
-        List<Control> Buttons => Components.Where(item => item.GetType() == typeof(Control)).Cast<Control>().ToList();
+        List<Control> Buttons => Components.Where(item => item.GetType() == typeof(Button)).Cast<Control>().ToList();
 
         public bool Enter { get; set; } = true;
         

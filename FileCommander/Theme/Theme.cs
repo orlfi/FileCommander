@@ -28,6 +28,10 @@ namespace FileCommander
 
         public ConsoleColor WindowBackgroundColor { get; set; } = ConsoleColor.Gray;
 
+        public ConsoleColor ErrorWindowForegroundColor { get; set; } = ConsoleColor.Black;
+
+        public ConsoleColor ErrorWindowBackgroundColor { get; set; } = ConsoleColor.DarkRed;
+
         public ConsoleColor ButtonForegroundColor { get; set; } = ConsoleColor.Black;
         
         public ConsoleColor ButtonFocusedBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
