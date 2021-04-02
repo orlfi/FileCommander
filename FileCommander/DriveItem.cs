@@ -18,8 +18,8 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            BackgroundColor = Focused ? Theme.DriveItemFocusedBackgroundColor : Theme.DriveItemBackgroundColor;
-            buffer.WriteAt(Drive.Name.Fit(Width), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+                BackgroundColor = Focused ? Theme.DriveItemFocusedBackgroundColor : Theme.DriveItemBackgroundColor;
+                buffer.WriteAt(Drive.Name.Fit(Width), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
         }
     }
 }

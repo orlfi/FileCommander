@@ -256,6 +256,21 @@ namespace FileCommander
 
         public void Update(bool fullRepaint = false)
         {
+            Update(fullRepaint, new Point(0,0));
+            // if (fullRepaint)
+            // {
+            //     CommandManager.GetInstance().Refresh();
+            // }
+            // else 
+            // { 
+            //     var location = GetAbsolutePosition(this);
+            //     Update(location.X, location.Y, Width, Height);
+            // }
+            // OnPaint();
+        }
+
+        public void Update(bool fullRepaint, Point offset)
+        {
             if (fullRepaint)
             {
                 CommandManager.GetInstance().Refresh();
@@ -263,7 +278,7 @@ namespace FileCommander
             else 
             { 
                 var location = GetAbsolutePosition(this);
-                Update(location.X, location.Y, Width, Height);
+                Update(location.X + offset.X, location.Y + offset.Y, Width, Height);
             }
             OnPaint();
         }

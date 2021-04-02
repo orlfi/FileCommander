@@ -48,7 +48,7 @@ namespace FileCommander
             DrawChildren(buffer, targetX, targetY);
         }
 
-        protected void DrawChildren(Buffer buffer, int targetX, int targetY)
+        protected virtual void DrawChildren(Buffer buffer, int targetX, int targetY)
         {
             foreach (var component in Components)
             {
@@ -76,7 +76,7 @@ namespace FileCommander
             }
         }
 
-        public void SetFocus(Component component, bool update = true)
+        public virtual void SetFocus(Component component, bool update = true)
         {
             if (FocusedComponent != component)
             {
@@ -88,24 +88,48 @@ namespace FileCommander
                 FocusedComponent = component;
                 component.Focused = true;
                 if (update)
-                    Update(true);
+                    Update(false);
+                    //FocusedComponent.Update(false);
             }
         }
 
-        public Component FocusNext()
+        public Component FocusNext(bool round = true)
         {
             int focusedIndex = Components.IndexOf(FocusedComponent);
             int next = focusedIndex;
+            int lastAvailable = focusedIndex;
             do
             {
                 next++;
                 if (next > Components.Count - 1)
-                    next = 0;
+                {
+                    if (round)
+                        next = 0;
+                    else 
+                        next= lastAvailable;
+                        break;
+                }
+                else if (Components[next].Visible == true && Components[next].Disabled != false)
+                    lastAvailable = next;
             } while (Components[next].Visible == true && Components[next].Disabled != false);
 
             return Components[next];
         }
 
+        public Component FocusPrevious(bool round = true)
+        {
+            int focusedIndex = Components.IndexOf(FocusedComponent);
+            int next = focusedIndex;
+            do
+            {
+                next--;
+                if (next < 0)
+                    next = round?Components.Count - 1:0;
+                    
+            } while (Components[next].Visible == true && Components[next].Disabled != false);
+
+            return Components[next];
+        }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
