@@ -23,6 +23,12 @@ namespace FileCommander
             Disabled = true;
         }
 
+        public void SetText(string text)
+        {
+            Text = text;
+            Update();
+        }
+
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             if (Parent != null)

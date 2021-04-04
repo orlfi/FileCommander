@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace FileCommander
 {
@@ -59,9 +61,25 @@ namespace FileCommander
         public static Theme GetInstance()
         {
             if (instance == null)
-                instance = new Theme();
+                instance = Load();
 
             return instance;
+        }
+
+        private static Theme Load()
+        {
+            string fileName = "theme.json";
+            Theme result = new Theme();
+
+            if (File.Exists(fileName))
+                result = JsonSerializer.Deserialize<Theme>(File.ReadAllText(fileName));
+            else
+            {
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                File.WriteAllText(fileName, JsonSerializer.Serialize(result, options));
+            }
+
+            return result;
         }
     }
 }

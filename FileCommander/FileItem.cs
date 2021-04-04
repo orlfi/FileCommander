@@ -8,11 +8,11 @@ namespace FileCommander
 {
     public class FileItem : Control
     {
-        public const long KILOBYTE = 1024;
-        public const long MEGABYTE = KILOBYTE * 1024;
-        public const long GIGABYTE = MEGABYTE * 1024;
-        public const long TERABYTE = GIGABYTE * 1024;
-        public const long PETABYTE = TERABYTE * 1024;
+        //public const long KILOBYTE = 1024;
+        //public const long MEGABYTE = KILOBYTE * 1024;
+        //public const long GIGABYTE = MEGABYTE * 1024;
+        //public const long TERABYTE = GIGABYTE * 1024;
+        //public const long PETABYTE = TERABYTE * 1024;
 
         public bool Selected { get; set; }
 
@@ -54,13 +54,13 @@ namespace FileCommander
                         if (ItemType == FileTypes.File)
                         {
                             FileInfo fi = new FileInfo(Path);
-                            text = FormatFileSize(fi.Length);
+                            text = fi.Length.FormatFileSize();
                         }
                         break;
                     case FileColumnTypes.DateTime:
                         if (ItemType == FileTypes.File)
                         {
-                            text = File.GetLastWriteTime(Path).ToString("dd.MM.yy hh:mm").PadLeft(columnWidth);
+                            text = File.GetLastWriteTime(Path).ToString("dd.MM.yy HH:mm").PadLeft(columnWidth);
                         }
                         break;
                 }
@@ -78,22 +78,22 @@ namespace FileCommander
             }
         }
 
-        public static string FormatFileSize(long size)
-        {
+        //public static string FormatFileSize(long size)
+        //{
 
-            if (size >= PETABYTE)
-                return ((double)size / PETABYTE).ToString("###.###P").PadLeft(8);
-            else if(size > TERABYTE && size < PETABYTE)
-                return ((double)size / TERABYTE).ToString("###.###T").PadLeft(8);
-            else if (size > GIGABYTE && size < TERABYTE)
-                return ((double)size / GIGABYTE).ToString("###.###G").PadLeft(8);
-            else if (size > MEGABYTE && size < GIGABYTE)
-                return ((double)size / MEGABYTE).ToString("###.###M").PadLeft(8);
-            else if (size > KILOBYTE && size < MEGABYTE)
-                return ((double)size / KILOBYTE).ToString("###.###K").PadLeft(8);
-            else
-                return (size).ToString().PadLeft(8);
-        }
+        //    if (size >= PETABYTE)
+        //        return ((double)size / PETABYTE).ToString("###.###P").PadLeft(8);
+        //    else if(size > TERABYTE && size < PETABYTE)
+        //        return ((double)size / TERABYTE).ToString("###.###T").PadLeft(8);
+        //    else if (size > GIGABYTE && size < TERABYTE)
+        //        return ((double)size / GIGABYTE).ToString("###.###G").PadLeft(8);
+        //    else if (size > MEGABYTE && size < GIGABYTE)
+        //        return ((double)size / MEGABYTE).ToString("###.###M").PadLeft(8);
+        //    else if (size > KILOBYTE && size < MEGABYTE)
+        //        return ((double)size / KILOBYTE).ToString("###.###K").PadLeft(8);
+        //    else
+        //        return (size).ToString().PadLeft(8);
+        //}
 
         public ConsoleColor GetItemForegroundColor()
         {

@@ -26,7 +26,7 @@ namespace FileCommander
                 if (_startIndex != value)
                 {
                     _startIndex = value;
-                    this.Update(true);
+                    this.Update();
                 }
                 else
                     _startIndex = value;
@@ -200,7 +200,7 @@ namespace FileCommander
                     box.TopRight = '┬';
                     box.BottomLeft = '┴';
                     box.BottomRight = '┴';
-                    box.Border = true;
+                    box.Border = LineType.Single;
                     box.Fill = false;
                     box.Draw(buffer, targetX, targetY);
                 }

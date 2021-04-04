@@ -18,6 +18,7 @@ namespace FileCommander
 
         public ErrorWindow(Size targetSize, string message, string title) : base("50%-25, 50%-3, 50, 7", targetSize)
         {
+            Modal = true;
             Name = title;
             Message = message;
             ForegroundColor = Theme.ErrorWindowForegroundColor;
@@ -41,7 +42,6 @@ namespace FileCommander
             CloseButton = new Button("50%-5,100%-2, 10, 1", Size, Alignment.None, "Close");
             CloseButton.BackgroundColor = Theme.ErrorWindowBackgroundColor;
             CloseButton.ClickEvent += (button) => { OnEscape(); };
-            //CloseButton.Focused = true;
             SetFocus(CloseButton,false);
             Add(CloseButton);
         }
@@ -50,12 +50,12 @@ namespace FileCommander
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             base.Draw(buffer, targetX, targetY);
-            var box = new Box(X, Y + Height - 3, Width, 3, Border, false);
-            box.TopLeft = '├';
-            box.TopRight = '┤';
-            box.foregroundColor = ForegroundColor;
-            box.backgroundColor = BackgroundColor;
-            box.Draw(buffer, targetX, targetY);
+            var line = new Line(X, Y + Height - 3, Width, 1, Direction.Horizontal, LineType.Single);
+            line.FirstChar = '╟';
+            line.LastChar = '╢';
+            line.ForegroundColor = ForegroundColor;
+            line.BackgroundColor = BackgroundColor;
+            line.Draw(buffer, targetX, targetY);
         }
     }
 }

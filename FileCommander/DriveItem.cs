@@ -10,6 +10,7 @@ namespace FileCommander
     public class DriveItem: Control
     {
         public DriveInfo Drive { get; set; }
+        
         public DriveItem(string rectangle, Size size, DriveInfo driveInfo) : base(rectangle, size)
         {
             ForegroundColor = Theme.DriveItemForegroundColor;
@@ -18,8 +19,9 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-                BackgroundColor = Focused ? Theme.DriveItemFocusedBackgroundColor : Theme.DriveItemBackgroundColor;
-                buffer.WriteAt(Drive.Name.Fit(Width), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+            string name = $"{Drive.Name.Fit(2)} │ { Drive.VolumeLabel.Fit(12)} │ {Drive.TotalSize.FormatFileSize()}";
+            BackgroundColor = Focused ? Theme.DriveItemFocusedBackgroundColor : Theme.DriveItemBackgroundColor;
+            buffer.WriteAt(name, X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
         }
     }
 }

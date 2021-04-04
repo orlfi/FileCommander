@@ -10,7 +10,7 @@ namespace FileCommander
         
         public List<Component> Components { get; set; } = new List<Component>();
        
-        public bool Border { get; set; }
+        public LineType Border { get; set; }
         
         public bool Fill { get; set; }
         
@@ -38,7 +38,7 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            if (Border || Fill)
+            if (Border != LineType.None || Fill)
             {
                 var box = new Box(X, Y, Width, Height, Border, Fill);
                 box.foregroundColor = ForegroundColor;
@@ -105,13 +105,15 @@ namespace FileCommander
                 {
                     if (round)
                         next = 0;
-                    else 
-                        next= lastAvailable;
+                    else
+                    {
+                        next = lastAvailable;
                         break;
+                    }
                 }
                 else if (Components[next].Visible == true && Components[next].Disabled != false)
                     lastAvailable = next;
-            } while (Components[next].Visible == true && Components[next].Disabled != false);
+            } while (Components[next].Visible = false || Components[next].Disabled == true);
 
             return Components[next];
         }

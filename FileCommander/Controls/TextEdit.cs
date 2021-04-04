@@ -74,7 +74,7 @@ namespace FileCommander
                 Console.CursorVisible = true;
                 keyInfo = Console.ReadKey(true);
                 Console.CursorVisible = false;
-                if (keyInfo.KeyChar != '\u0000' && keyInfo.KeyChar != '\b' && keyInfo.Key != ConsoleKey.Tab && keyInfo.Key != ConsoleKey.Escape)
+                if (keyInfo.KeyChar != '\u0000' && keyInfo.KeyChar != '\b' && keyInfo.Key != ConsoleKey.Tab && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter)
                 {
                     AddChar(keyInfo.KeyChar);
 

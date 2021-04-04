@@ -146,7 +146,7 @@ namespace FileCommander
             var box = new Box(X, Y + Height - 3, Width, 3);
             box.TopLeft = '├';
             box.TopRight = '┤';
-            box.Border = true;
+            box.Border = LineType.Single;
             box.Draw(buffer, targetX, targetY);
         }
     }

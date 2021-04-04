@@ -3,24 +3,157 @@ namespace FileCommander
 {
     public class Box
     {
-        public ConsoleColor foregroundColor {get; set;}
-        public ConsoleColor backgroundColor { get; set; } 
+        public ConsoleColor foregroundColor { get; set; }
+        public ConsoleColor backgroundColor { get; set; }
 
-        public char TopLeft {get; set;} = '┌';
-        public char TopRight {get; set;} = '┐';
-        public char BottomLeft {get; set;} = '└';
-        public char BottomRight {get; set;} = '┘';
-        public char Vertical {get; set;} = '│';
-        public char Horizontal {get; set;} = '─';
+        private char _topLeft = '\0';
+        public char TopLeft
+        {
+            get
+            {
+                if (_topLeft == '\0')
+                {
+                    switch (Border)
+                    {
+                        case LineType.Single:
+                            return '┌';
+                        case LineType.Double:
+                            return '╔';
+                        default:
+                            return ' ';
+                    }
+                }
+                else
+                    return _topLeft;
+            }
+            set => _topLeft = value;
+        }
 
-        public int  X { get; set; }
+        private char _topRight = '\0';
+
+        public char TopRight
+        {
+            get
+            {
+                if (_topRight == '\0')
+                {
+                    switch (Border)
+                    {
+                        case LineType.Single:
+                            return '┐';
+                        case LineType.Double:
+                            return '╗';
+                        default:
+                            return ' ';
+                    }
+                }
+                else
+                    return _topRight;
+            }
+            set => _topRight = value;
+        }
+
+        private char _bottomLeft = '\0';
+        public char BottomLeft
+        {
+            get
+            {
+                if (_bottomLeft == '\0')
+                {
+                    switch (Border)
+                    {
+                        case LineType.Single:
+                            return '└';
+                        case LineType.Double:
+                            return '╚';
+                        default:
+                            return ' ';
+                    }
+                }
+                else
+                    return _bottomLeft;
+            }
+            set => _bottomLeft = value;
+        }
+
+        private char _bottomRight = '\0';
+        public char BottomRight
+        {
+            get
+            {
+                if (_bottomRight == '\0')
+                {
+                    switch (Border)
+                    {
+                        case LineType.Single:
+                            return '┘';
+                        case LineType.Double:
+                            return '╝';
+                        default:
+                            return ' ';
+                    }
+                }
+                else
+                    return _bottomRight;
+            }
+            set => _bottomRight = value;
+        }
+
+        private char _vertical = '\0';
+        public char Vertical
+        {
+            get
+            {
+                if (_vertical == '\0')
+                {
+                    switch (Border)
+                    {
+                        case LineType.Single:
+                            return '│';
+                        case LineType.Double:
+                            return '║';
+                        default:
+                            return ' ';
+                    }
+                }
+                else
+                    return _vertical;
+            }
+            set => _vertical = value;
+        }
+
+        private char _horizontal = '\0';
+        public char Horizontal
+        {
+            get
+            {
+                if (_horizontal == '\0')
+                {
+                    switch (Border)
+                    {
+                        case LineType.Single:
+                            return '─';
+                        case LineType.Double:
+                            return '═';
+                        default:
+                            return ' ';
+                    }
+                }
+                else
+                    return _horizontal;
+            }
+            set => _horizontal = value;
+        }
+
+        public int X { get; set; }
         public int Y { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public bool Border { get; set; } = false;
+        public LineType Border { get; set; }
+
         public bool Fill { get; set; } = false;
-        
+
         public Theme Theme => Theme.GetInstance();
 
         public Box(int x, int y, int width, int height)
@@ -33,13 +166,13 @@ namespace FileCommander
             backgroundColor = Theme.FilePanelBackgroundColor;
         }
 
-        public Box(int x, int y, int width, int height, bool border, bool fill) : this(x, y, width, height)
+        public Box(int x, int y, int width, int height, LineType border, bool fill) : this(x, y, width, height)
         {
             Border = border;
             Fill = fill;
         }
 
-        public Box(int x, int y, int width, int height, bool border, bool fill, char[] corners) :this(x, y,width,height, border, fill)
+        public Box(int x, int y, int width, int height, LineType border, bool fill, char[] corners) : this(x, y, width, height, border, fill)
         {
             if (corners == null || corners.Length != 4)
                 throw new ArgumentException("The length of the array must be 4 ", "coners");
@@ -58,82 +191,33 @@ namespace FileCommander
             int width = Width - 1;
             int height = Height - 1;
 
-            buffer.WriteAt(Border ? TopLeft : ' ', x, y, foregroundColor, backgroundColor);
+            buffer.WriteAt(TopLeft, x, y, foregroundColor, backgroundColor);
 
-            string text = new string(Border ? Horizontal : ' ', width-1);
+            string text = new string(Horizontal, width - 1);
             buffer.WriteAt(text, x + 1, y, foregroundColor, backgroundColor);
 
-            buffer.WriteAt(Border ? TopRight : ' ', x+width, y, foregroundColor, backgroundColor);
+            buffer.WriteAt(TopRight, x + width, y, foregroundColor, backgroundColor);
 
             for (int i = 1; i < height; i++)
             {
                 if (Fill)
                 {
-                    text = $"{(Border ? Vertical : ' ')}{new string(' ', width - 1)}{(Border ? Vertical : ' ')}";
+                    text = $"{(Vertical)}{new string(' ', width - 1)}{(Vertical)}";
                     buffer.WriteAt(text, x, y + i, foregroundColor, backgroundColor);
                 }
                 else
                 {
-                    buffer.WriteAt(Border ? Vertical : ' ', x, y + i, foregroundColor, backgroundColor);
+                    buffer.WriteAt(Vertical, x, y + i, foregroundColor, backgroundColor);
 
-                    buffer.WriteAt(Border ? Vertical : ' ', x + width, y + i, foregroundColor, backgroundColor);
+                    buffer.WriteAt(Vertical, x + width, y + i, foregroundColor, backgroundColor);
                 }
             }
-            buffer.WriteAt(Border ? BottomLeft : ' ', x, y + height, foregroundColor, backgroundColor);
+            buffer.WriteAt(BottomLeft, x, y + height, foregroundColor, backgroundColor);
 
-            text = new string(Border ? Horizontal : ' ', width - 1);
+            text = new string(Horizontal, width - 1);
             buffer.WriteAt(text, x + 1, y + height, foregroundColor, backgroundColor);
 
-            buffer.WriteAt(Border ? BottomRight : ' ', x + width, y + height, foregroundColor, backgroundColor);
+            buffer.WriteAt(BottomRight, x + width, y + height, foregroundColor, backgroundColor);
         }
-
-        //public void Draw(bool border = true, bool fill=true)
-        //{
-        //    Draw(Buffer,border, fill);
-        //}
-
-        //public void Draw(Buffer buffer,bool border = true, bool fill=true)
-        //{
-        //    int x = X;
-        //    int y = Y;
-        //    int width = Width-1;
-        //    int height = Height-1;
-
-        //    buffer.WriteAt(border?TopLeft:' ', x, y, foregroundColor, backgroundColor);
-        //    //WriteAt(border?TopLeft:' ', X, Y, foregroundColor, backgroundColor);
-
-        //    string text = new string(border?Horizontal:' ', width-1);
-        //    buffer.WriteAt(text, x+1, y, foregroundColor, backgroundColor);
-        //    //WriteAt(text, X+1, Y, foregroundColor, backgroundColor);
-
-        //    buffer.WriteAt(border?TopRight:' ', width, 0, foregroundColor, backgroundColor);
-        //    //WriteAt(border?TopRight:' ', X+width, Y, foregroundColor, backgroundColor);
-        //    for(int i=1; i < height;i++)
-        //    {
-        //        if (fill)
-        //        {
-        //            text = $"{(border?Vertical:' ')}{new string(' ', width - 1)}{(border?Vertical:' ')}";
-        //            buffer.WriteAt(text, x, y+i, foregroundColor, backgroundColor);
-        //            //WriteAt(text, X, Y+i, foregroundColor, backgroundColor);
-        //        }
-        //        else
-        //        {
-        //            buffer.WriteAt(border?Vertical:' ', x, y+i, foregroundColor, backgroundColor);
-        //            //WriteAt(border?Vertical:' ', X, Y+i, foregroundColor, backgroundColor);
-
-        //            buffer.WriteAt(border?Vertical:' ', width, y+i, foregroundColor, backgroundColor);
-        //            //WriteAt(border?Vertical:' ', X+width, Y+i, foregroundColor, backgroundColor);
-        //        }
-        //    }
-        //    buffer.WriteAt(border?BottomLeft:' ', x, height, foregroundColor, backgroundColor);
-        //    //WriteAt(border?BottomLeft:' ', X, Y+height, foregroundColor, backgroundColor);
-
-        //    text = new string(border?Horizontal:' ',width-1);
-        //    buffer.WriteAt(text, 1, height, foregroundColor, backgroundColor);
-        //    //WriteAt(text, X+1, Y+height, foregroundColor, backgroundColor);
-
-        //    buffer.WriteAt(border?BottomRight:' ', width, height, foregroundColor, backgroundColor);
-        //    //WriteAt(border?BottomRight:' ', X+width, Y+height, foregroundColor, backgroundColor);
-        //}
     }
 }
