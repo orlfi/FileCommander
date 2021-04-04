@@ -56,7 +56,7 @@ namespace FileCommander
 
         private static Theme instance;
 
-        private Theme() { }
+        public Theme() { }
 
         public static Theme GetInstance()
         {
