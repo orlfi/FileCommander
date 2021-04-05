@@ -6,6 +6,8 @@ namespace FileCommander
 {
     public class Settings
     {
+        public const int DEFAULT_CONSOLE_WINDOW_WIDTH = 80;
+        public const int DEFAULT_CONSOLE_WINDOW_HEIGHT = 24;
         public const string SETTINGS_FILE = "settings.json";
        
         public string Path {get; set;}
@@ -16,6 +18,8 @@ namespace FileCommander
 
         public string FocusedPanel {get; set;}
 
+        public Size Size {get; set;}
+
         private static Settings instance;
 
         public Settings() 
@@ -25,6 +29,7 @@ namespace FileCommander
             LeftPanelPath = Path;
             RightPanelPath = Path;
             FocusedPanel = "LeftPanel";
+            Size = new Size(DEFAULT_CONSOLE_WINDOW_WIDTH, DEFAULT_CONSOLE_WINDOW_HEIGHT);
         }
 
         public static Settings GetInstance()

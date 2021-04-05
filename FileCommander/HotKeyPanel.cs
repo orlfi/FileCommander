@@ -35,7 +35,7 @@ namespace FileCommander
             item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Delete", 8);
             Add(item);
             x+=HotKeyItem.DEFAULT_WIDTH;
-            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "", 0);
+            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Drive", 9);
             Add(item);
             x+=HotKeyItem.DEFAULT_WIDTH;
             item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Quit", 10);

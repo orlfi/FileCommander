@@ -53,11 +53,11 @@ namespace FileCommander
         }
         public void Initialize()
         {
+            Size = Settings.Size;
             //ErrorEvent += OnError;
             Console.Title = APP_NAME;
             Console.BufferWidth = Console.WindowWidth = Size.Width;
-            Console.WindowHeight = Size.Height;
-            Console.BufferHeight = Size.Height;
+            Console.BufferHeight = Console.WindowHeight = Size.Height;
             Console.SetWindowPosition(0, 0);
             MainWindow = new MainWindow("0, 0, 100%, 100%-1", Size);
             Screen = new Buffer(Size.Width, Size.Height, true);
@@ -121,6 +121,7 @@ namespace FileCommander
             Settings.LeftPanelPath = MainWindow.LeftPanel.Path;
             Settings.RightPanelPath = MainWindow.RightPanel.Path;
             Settings.Path = MainWindow.FocusedComponent.Path;
+            Settings.Size = new Size(Console.WindowWidth, Console.WindowHeight);
         }
 
         private void CheckKeyPress(int wait)

@@ -90,7 +90,8 @@ namespace FileCommander
                     OnDelete();
                     break;
                 case ConsoleKey.F9:
-                    //OnChangeView();
+                    if (FocusedComponent is FilePanel)
+                        SelectDrive(FocusedComponent as FilePanel);
                     break;
                 case ConsoleKey.Tab:
                     SetFocus(FocusNext());

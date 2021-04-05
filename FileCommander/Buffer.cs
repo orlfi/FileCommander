@@ -233,6 +233,7 @@ namespace FileCommander
             // Write whole text lines
         }
 
+        // TODO change code
         public void PaintEsc(int x, int y, int width, int height)
         {
             int bufferHeight = _buffer.GetLength(1);
