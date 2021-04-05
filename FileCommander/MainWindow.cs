@@ -18,11 +18,13 @@ namespace FileCommander
         public MainWindow(string rectangle, Size size) : base(rectangle, size)
         {
             LeftPanel = new FilePanel("0,0,50%,100%-2", Size);
+            LeftPanel.Name = "LeftPanel";
             LeftPanel.Border = LineType.Single;
             LeftPanel.Fill = true;
             Add(LeftPanel);
 
             RightPanel = new FilePanel("50%,0,50%,100%-2", Size);
+            RightPanel.Name = "RightPanel";
             RightPanel.Fill = true;
             RightPanel.Border = LineType.Single;
             Add(RightPanel);
@@ -34,10 +36,30 @@ namespace FileCommander
             var hotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
             hotKeyPanel.Disabled = true;
             Add(hotKeyPanel);
-
-            SetFocus(LeftPanel, false);
+            
+            CommandManager.ErrorEvent += OnErrorHandler;
+            RestoreSettings();
         }
 
+        public void RestoreSettings()
+        {
+            LeftPanel.SetPath(Settings.LeftPanelPath);
+            RightPanel.SetPath(Settings.RightPanelPath);
+
+            if (Settings.FocusedPanel == "LeftPanel")
+                SetFocus(LeftPanel, false);
+            else if (Settings.FocusedPanel == "RightPanel")
+                SetFocus(RightPanel, false);
+        }
+
+        public override void SetPath(string path)
+        {
+            foreach (var component in Components.Where(item => !(item is FilePanel && item != FocusedComponent)))
+            {
+                component.SetPath(path);
+            }
+        }
+        
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
             if (ActiveWindow != null)
@@ -62,7 +84,7 @@ namespace FileCommander
                     ShowCopyWindow();
                     break;
                 case ConsoleKey.F6:
-                    OnMove();
+                    ShowCopyWindow(true);
                     break;
                 case ConsoleKey.F8:
                     OnDelete();
@@ -74,7 +96,7 @@ namespace FileCommander
                     SetFocus(FocusNext());
                     break;
                 default:
-                    FocusedComponent.OnKeyPress(keyInfo);
+                    FocusedComponent?.OnKeyPress(keyInfo);
                     break;
             }
         }
@@ -107,16 +129,17 @@ namespace FileCommander
             confirmationWindow.Open();
         }
 
-        public void ShowCopyWindow()
+        public void ShowCopyWindow(bool move = false)
         {
             if (FocusedComponent is FilePanel sourcePanel)
             {
                 string sourcePath = sourcePanel.View.FocusedItem.Path;
                 var destinationPanel = (FilePanel)Components.Where(item => item is FilePanel && !item.Focused).SingleOrDefault();
                 string destinationPath = sourcePath;
-                if (destinationPanel != null && sourcePanel.Path != destinationPanel.Path)
+                if (destinationPanel != null)
                     destinationPath = destinationPanel.Path;
-                var window = new CopyWindow(Size, sourcePath, destinationPath);
+                var window = move? new MoveWindow(Size, sourcePath, destinationPath) : new CopyWindow(Size, sourcePath, destinationPath);
+                window.DestinationPanel = destinationPanel;
                 window.CopyEvent += OnCopy;
                 window.Open();
             }
@@ -128,6 +151,7 @@ namespace FileCommander
             //progressWindow.FileDestinationInfo.Text = "fwefe";
             var progressWindow = new ProgressWindow(Size, true);
             progressWindow.FileDestinationInfo.Text = destination;
+            progressWindow.Name = sender is MoveWindow ? MoveWindow.DEFAULT_NAME: CopyWindow.DEFAULT_NAME;
             progressWindow.Open();
             progressWindow.CancelEvent += () => 
             {
@@ -139,7 +163,7 @@ namespace FileCommander
 
             CommandManager.ConfirmationEvent += OnConfirmation;
 
-            CommandManager.Copy(new[] { source }, destination);
+            CommandManager.Copy(new[] { source }, destination, sender is MoveWindow ? true: false);
         }
 
         private void OnConfirmation(CommandManager sender, ConfirmationEventArgs args)
@@ -159,19 +183,22 @@ namespace FileCommander
             {
                 CommandManager.ProgressEvent -= OnProgress;
                 CommandManager.ConfirmationEvent -= OnConfirmation;
+                foreach(var panel in Components.Where(item => item is FilePanel))
+                {
+                    ((FilePanel)panel).Refresh();
+                }
             }
-        }
-
-        public void OnMove()
-        {
-            var window = new MoveWindow(Size);
-            window.Open();
         }
 
         public void OnDelete()
         {
             var window = new DeleteWindow(Size);
             window.Open();
+        }
+        public void OnErrorHandler(string message)
+        {
+            var errorWindow = new ErrorWindow(Size, message);
+            errorWindow.Open();
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)

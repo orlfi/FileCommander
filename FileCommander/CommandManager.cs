@@ -10,13 +10,14 @@ namespace FileCommander
 {
     public delegate void OnKeyPressHandler(ConsoleKeyInfo keyInfo);
     public delegate void OnProgressHandler(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo);
-    public delegate void OnErrorHandler(Exception error);
+    public delegate void OnErrorHandler(string error);
     public delegate void OnWindowResizeHandler(Size size);
     public delegate void OnConfirmationHandler(CommandManager sender, ConfirmationEventArgs args);
 
 
     public class CommandManager
     {
+        public Settings Settings => Settings.GetInstance();
         public event OnKeyPressHandler KeyPressEvent;
         public event OnProgressHandler ProgressEvent;
         public event OnErrorHandler ErrorEvent;
@@ -48,12 +49,11 @@ namespace FileCommander
         public Buffer Screen { get; set; }
         public CommandManager()
         {
-
-            Initialize();
+            // Initialize();
         }
         public void Initialize()
         {
-            ErrorEvent += OnError;
+            //ErrorEvent += OnError;
             Console.Title = APP_NAME;
             Console.BufferWidth = Console.WindowWidth = Size.Width;
             Console.WindowHeight = Size.Height;
@@ -91,7 +91,10 @@ namespace FileCommander
         public static CommandManager GetInstance()
         {
             if (instance == null)
+            {
                 instance = new CommandManager();
+                instance.Initialize();
+            }
             return instance;
         }
 
@@ -108,6 +111,16 @@ namespace FileCommander
             {
                 CheckKeyPress(10);
             }
+            SaveSettings();
+        }
+
+
+        public void SaveSettings()
+        {
+            Settings.FocusedPanel = MainWindow.FocusedComponent.Name;
+            Settings.LeftPanelPath = MainWindow.LeftPanel.Path;
+            Settings.RightPanelPath = MainWindow.RightPanel.Path;
+            Settings.Path = MainWindow.FocusedComponent.Path;
         }
 
         private void CheckKeyPress(int wait)
@@ -182,14 +195,14 @@ namespace FileCommander
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
         }
-        public void OnError(Exception error)
-        {
-            Console.ResetColor();
-            Console.SetCursorPosition(0, Console.WindowHeight - 1);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write(error.Message);
-            Console.ResetColor();
-        }
+        // public void OnError(Exception error)
+        // {
+        //     Console.ResetColor();
+        //     Console.SetCursorPosition(0, Console.WindowHeight - 1);
+        //     Console.ForegroundColor = ConsoleColor.Red;
+        //     Console.Write(error.Message);
+        //     Console.ResetColor();
+        // }
         public void OnCopy()
         {
 
@@ -230,154 +243,40 @@ namespace FileCommander
             Console.ResetColor();
         }
 
-        public async void CopyAsync(string source, string destination)
+        public void Copy(string[] source, string destination, bool move = false)
         {
-            FileStream writeStream = null;
-            FileStream readStream = null;
             try
             {
-                FileInfo fileInfo = new FileInfo(source);
-                long fileSize = fileInfo.Length;
-                long total = 0;
-                int bytesRead = -1;
-                int buffLength = 1024 * 1024;
-                byte[] buff = new byte[buffLength];
+                _skipAll = false;
+                _overwriteAll = false;
+                (long Count, double Size) info = CalculateFileSystemEntries(source);
+                ProgressInfo itemProgress = new ProgressInfo(0, 0, "");
+                ProgressInfo totalProgress = new ProgressInfo(0, info.Size, "", 0, info.Count);
 
-                writeStream = new FileStream(destination, FileMode.CreateNew, FileAccess.Write);
-                readStream = new FileStream(source, FileMode.Open, FileAccess.Read);
-                do
+                for (int i = 0; i < source.Length; i++)
                 {
-                    bytesRead = await readStream.ReadAsync(buff, 0, buffLength);
-                    await writeStream.WriteAsync(buff, 0, bytesRead);
-                    total += bytesRead;
-                    ProgressEvent?.Invoke(this, new ProgressInfo(total, fileSize, fileInfo.Name), new ProgressInfo(total, fileSize, fileInfo.Name));
-                } while (bytesRead > 0);
-                writeStream.Flush();
-                ProgressEvent?.Invoke(this, new ProgressInfo(total, fileSize, fileInfo.Name, 0,0, true ), new ProgressInfo(total, fileSize, fileInfo.Name, 0,0, true));
+                    if (Directory.Exists(source[i]))
+                    {
+                        if (System.IO.Path.GetDirectoryName(source[i]).ToLower() == destination.ToLower())
+                        {
+                            ErrorEvent?.Invoke("The destination folder is a source folder");
+                            continue;
+                        }
+                        CopyDirectory(source[i], destination, itemProgress, totalProgress, move);
+                    }
+                    else if (File.Exists(source[i]))
+                    {
+                        CopyFile(source[i], System.IO.Path.Combine(destination, source[i]), itemProgress, totalProgress, move);
+                    }
+                }
+                totalProgress.Done = true;
+                ProgressEvent?.Invoke(this, itemProgress, totalProgress);
             }
             catch (Exception ex)
             {
-                ErrorEvent?.Invoke(ex);
-            }
-            finally
-            {
-                writeStream?.Close();
-                readStream?.Close();
-            }
-        }
-
-        public void CopyTest(string source, string destination)
-        {
-            CancelOperation = false;
-            int totalProgress = 0;
-            bool confirmAll = false;
-            bool skipAll = false;
-
-            for (int j = 0; j < 10; j++)
-            {
-                if (j == 1)
-                {
-                    if (!(confirmAll || skipAll))
-                    {
-                        var args = new ConfirmationEventArgs($"File {j} already exist.");
-                        ConfirmationEvent?.Invoke(this, args);
-                        confirmAll = args.Result == ModalWindowResult.ConfirmAll;
-                        skipAll = args.Result == ModalWindowResult.SkipAll;
-                    }
-                }
-
-                if (j == 3)
-                {
-                    if (!(confirmAll || skipAll))
-                    {
-                        var args = new ConfirmationEventArgs($"File {j} already exist.");
-                        ConfirmationEvent?.Invoke(this, args);
-                        confirmAll = args.Result == ModalWindowResult.ConfirmAll;
-                        skipAll = args.Result == ModalWindowResult.SkipAll;
-                    }
-                }
-
-                for (int i = 0; i < 10; i++)
-                {
-                    CheckKeyPress(10);
-
-                    if (CancelOperation)
-                    {
-                        Console.SetCursorPosition(40, Size.Height - 1);
-                        Console.Write($"Сopy canceled");
-                        return;
-                    }
-
-                    totalProgress++;
-                    ProgressEvent?.Invoke(this, new ProgressInfo(i * 50, 10 * 50, $"File {j}"), new ProgressInfo(totalProgress, 10 * 10, $"File {j} from {10}"));
-                }
-            }
-            ProgressEvent?.Invoke(this, new ProgressInfo(10, 10 * 50, "File 1"), new ProgressInfo(10, 10, $"File {10} from {10}"));
-
-            Console.SetCursorPosition(40, Size.Height - 1);
-            Console.Write($"Сopy completed");
-
-        }
-
-        public void CopyTestAsync(string source, string destination)
-        {
-
-            if (_task != null && _task.Status.Equals(TaskStatus.Running))
-            {
-                _task.Wait();
+                ErrorEvent?.Invoke(ex.Message);
             }
 
-            CancelTokenSource = new CancellationTokenSource();
-            CancelToken = CancelTokenSource.Token;
-
-            _task = Task.Run(() =>
-            {
-
-                int totalProgress = 0;
-                for (int j = 0; j < 10; j++)
-                {
-                    for (int i = 0; i < 10; i++)
-                    {
-                        Thread.Sleep(100);
-                        if (CancelToken.IsCancellationRequested)
-                        {
-                            Console.SetCursorPosition(40, Size.Height - 1);
-                            Console.Write($"Сopy canceled");
-                            return;
-                        }
-                        totalProgress++;
-                        ProgressEvent?.Invoke(this, new ProgressInfo(i * 50, 10 * 50, $"File {j}"), new ProgressInfo(totalProgress, 10 * 10, $"File {j} from {10}"));
-                    }
-                }
-                ProgressEvent?.Invoke(this, new ProgressInfo(10, 10 * 50, "File 1"), new ProgressInfo(10, 10, $"File {10} from {10}"));
-
-                Console.SetCursorPosition(40, Size.Height - 1);
-                Console.Write($"Сopy completed");
-            });
-
-        }
-
-        public void Copy(string[] source, string destination)
-        {
-            _skipAll = false;
-            _overwriteAll = false;
-            (long Count, double Size) info = CalculateFileSystemEntries(source);
-            ProgressInfo itemProgress = new ProgressInfo(0, 0, "");
-            ProgressInfo totalProgress = new ProgressInfo(0, info.Size, "", 0, info.Count);
-
-            for (int i = 0; i < source.Length; i++)
-            {
-                if (Directory.Exists(source[i]))
-                {
-                    CopyDirectory(source[i], destination, itemProgress, totalProgress);
-                }
-                else if (File.Exists(source[i]))
-                {
-                    CopyFile(source[i], System.IO.Path.Combine(destination, source[i]), itemProgress, totalProgress);
-                }
-            }
-            totalProgress.Done = true;
-            ProgressEvent?.Invoke(this, itemProgress, totalProgress);
         }
 
         private (long Count, double Size) CalculateFileSystemEntries(string[] source)
@@ -403,8 +302,14 @@ namespace FileCommander
             return (count, size);
         }
 
-        private void CopyDirectory(string source, string destination, ProgressInfo itemProgress, ProgressInfo totalProgress)
+        private void CopyDirectory(string source, string destination, ProgressInfo itemProgress, ProgressInfo totalProgress, bool move)
         {
+            if (move && $"{destination.ToLower()}\\".StartsWith($"{source.ToLower()}\\"))
+            {   
+                ErrorEvent?.Invoke("The destination folder is a subfolder of the source folder");
+                return;
+            }
+
             CreateDirectory(System.IO.Path.Combine(destination, System.IO.Path.GetFileName(source)));
             string root = System.IO.Path.GetDirectoryName(source);
             IEnumerable<string> fileSystemEntries = Directory.EnumerateFileSystemEntries(source, "*.*", SearchOption.AllDirectories);
@@ -422,9 +327,11 @@ namespace FileCommander
                 if (File.Exists(item))
                 {
                     CreateDirectory(System.IO.Path.GetDirectoryName(destinationFullName));
-                    CopyFile(item, destinationFullName, itemProgress, totalProgress);
+                    CopyFile(item, destinationFullName, itemProgress, totalProgress, move);
                 }
             }
+            if (move)
+                Directory.Delete(source, true);
         }
 
         private void CreateDirectory(string path)
@@ -433,7 +340,7 @@ namespace FileCommander
                 Directory.CreateDirectory(path);
         }
 
-        private void CopyFile(string source, string destination, ProgressInfo itemProgress, ProgressInfo totalProgress)
+        private void CopyFile(string source, string destination, ProgressInfo itemProgress, ProgressInfo totalProgress, bool move)
         {
             bool skip = _skipAll;
             bool overwrite = _overwriteAll;
@@ -475,31 +382,39 @@ namespace FileCommander
                         return;
                     }
                 }
-                writeStream = new FileStream(destination, FileMode.CreateNew, FileAccess.Write);
-                readStream = new FileStream(source, FileMode.Open, FileAccess.Read);
-                do
+                if (move && System.IO.Path.GetPathRoot(source.ToLower()) == System.IO.Path.GetPathRoot(destination).ToLower())
                 {
-                    bytesRead = readStream.Read(buff, 0, buffLength);
-                    writeStream.Write(buff, 0, bytesRead);
+                        fileInfo.MoveTo(destination);
+                }
+                else
+                {
+                    writeStream = new FileStream(destination, FileMode.CreateNew, FileAccess.Write);
+                    readStream = new FileStream(source, FileMode.Open, FileAccess.Read);
+                    do
+                    {
+                        bytesRead = readStream.Read(buff, 0, buffLength);
+                        writeStream.Write(buff, 0, bytesRead);
 
-                    total += bytesRead;
+                        total += bytesRead;
 
-                    totalProgress.Proceded += bytesRead;
-                    itemProgress.Proceded = total;
-                    itemProgress.Done = false;
+                        totalProgress.Proceded += bytesRead;
+                        itemProgress.Proceded = total;
+                        itemProgress.Done = false;
 
-                    ProgressEvent?.Invoke(this, itemProgress, totalProgress);
-                } while (bytesRead > 0);
-                writeStream.Flush();
+                        ProgressEvent?.Invoke(this, itemProgress, totalProgress);
+                    } while (bytesRead > 0);
+                    writeStream.Flush();
+                    if (move)
+                    {
+                        fileInfo.Delete();
+                    }
+                }
                 itemProgress.Done = true;
                 ProgressEvent?.Invoke(this, itemProgress, totalProgress);
             }
             catch (Exception ex)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"\t{ex.Message}");
-                Console.ResetColor();
-                ErrorEvent?.Invoke(ex);
+                ErrorEvent?.Invoke(ex.Message);
             }
             finally
             {
@@ -508,12 +423,6 @@ namespace FileCommander
                 totalProgress.Count++;
             }
         }
-
-        public void Move(string source, string destination)
-        {
-
-        }
-
 
         //private bool IsCommandKey(ConsoleKeyInfo keyInfo)
         //{

@@ -90,6 +90,8 @@ namespace FileCommander
             try
             {
                 path += path[path.Length - 1] == ':' ? "\\" : "";
+                if (!Directory.Exists(path))
+                    path = Settings.GetDefaultPath();
                 DirectoryInfo di = new DirectoryInfo(path);
                 Files.Clear();
                 Files.AddRange(di.GetDirectories());
@@ -104,6 +106,12 @@ namespace FileCommander
             {
                 throw new Exception("Set path error", ex);
             }
+        }
+        
+        public void Refresh()
+        {
+            SetPath(Path);
+            Update();
         }
 
         public void ChangePath()

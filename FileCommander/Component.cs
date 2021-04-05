@@ -10,6 +10,7 @@ namespace FileCommander
     public abstract class Component
     {
 
+        public Settings Settings => Settings.GetInstance();
         public event FocusHandler FocusEvent;
         public event PaintHandler PaintEvent;
 
@@ -26,7 +27,7 @@ namespace FileCommander
         #region Properties
         public virtual string Path { get => _path; set => _path = value; }
 
-        public virtual string Name { get; set; } = "";
+        public virtual string Name { get; set; }
 
         private Rectangle _rectangle;
         public Rectangle Rectangle
@@ -115,6 +116,7 @@ namespace FileCommander
         #region Constructors
         public Component(string rectangle, Size size, Alignment alignment = Alignment.None)
         {
+            Name = this.GetType().Name;
             _rectangleString = rectangle;
             _alignment = alignment;
             SetRectangle(size);

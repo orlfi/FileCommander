@@ -30,12 +30,12 @@ namespace FileCommander
             
         }
 
-        public override void OnPaint()
-        {
-            base.OnPaint();
-            // if (FocusedComponent == null)
-            //     SetFocus(Destination);
-        }
+        // public override void OnPaint()
+        // {
+        //     base.OnPaint();
+        //     // if (FocusedComponent == null)
+        //     //     SetFocus(Destination);
+        // }
 
         private void AddButtons()
         {

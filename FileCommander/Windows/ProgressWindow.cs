@@ -24,6 +24,7 @@ namespace FileCommander
         public Label ProgressInfo { get; set; }
 
         public Button CancelButton { get; set; }
+        public List<Component> UpdateComponents { get; set; } = new List<Component>();
 
         private bool _showTotal;
 

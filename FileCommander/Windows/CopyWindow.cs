@@ -9,7 +9,9 @@ namespace FileCommander
     {
         public event CopyHandler CopyEvent;
 
-        public const string SOURCE_TEMPLATE = "Copy {0} to:";
+        public const string SOURCE_TEMPLATE = "{0} {1} to:";
+        public bool Move { get; set;}
+
         public Button SaveButton { get; set;}
         
         public Button CancelButton { get; set;}
@@ -17,14 +19,16 @@ namespace FileCommander
         public Label Source { get; set; }
         public TextEdit Destination { get; set; }
 
-        const string DEFAULT_NAME = "Copy";
+        public FilePanel DestinationPanel {get;set;}
+
+        public const string DEFAULT_NAME = "Copy";
         
-        public CopyWindow(Size targetSize, string sourcePath, string destinationPath) : base("50%-25, 50%-3, 50, 6", targetSize)
+        public CopyWindow(Size targetSize, string sourcePath, string destinationPath, string name = DEFAULT_NAME) : base("50%-25, 50%-3, 50, 6", targetSize)
         {
-            Name = DEFAULT_NAME;
+            Name = name;
 
             string sourceFileName = FileItem.GetFitName(System.IO.Path.GetFileName(sourcePath), Width - SOURCE_TEMPLATE.Length - 2);
-            Source = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "Source" , string.Format(SOURCE_TEMPLATE, sourceFileName));
+            Source = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "Source" , string.Format(SOURCE_TEMPLATE, Name, sourceFileName));
             Source.Path = sourcePath;
             Add(Source);
             
@@ -43,7 +47,7 @@ namespace FileCommander
 
         private void AddButtons()
         {
-            SaveButton = new Button("14,100%-2, 10, 1", Size, Alignment.None, "Copy");
+            SaveButton = new Button("14,100%-2, 10, 1", Size, Alignment.None, Name);
             SaveButton.ClickEvent += (button)=> 
             { 
                 OnEnter(); 
@@ -63,7 +67,6 @@ namespace FileCommander
         {
             Close();
             CopyEvent?.Invoke(this, Source.Path, Destination.Value);
-            //var errorWindow = new ErrorWindow(MainWindow.Size, "Error test message Error test message Error test message Error test message Error test messageError test message");
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)

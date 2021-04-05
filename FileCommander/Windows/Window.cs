@@ -63,15 +63,13 @@ namespace FileCommander
             }
         }
 
-        public virtual void OnEnter()
-        {
-        }
+        public virtual void OnEnter() { }
 
         public virtual void OnButtonClick(Button button)
         {
             if (button != null)
             {
-                ModalResult = button.ModalResult;
+                ModalResult = button.ModalResult == ModalWindowResult.None?ModalWindowResult.Cancel: button.ModalResult;
                 if (MainWindow.ActiveWindow == this)
                     Close();
                 ButtonClickEvent?.Invoke(button);
