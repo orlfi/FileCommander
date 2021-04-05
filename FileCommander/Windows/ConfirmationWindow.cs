@@ -6,14 +6,10 @@ namespace FileCommander
 {
     public class ConfirmationWindow : Window
     {
-        // public const string SOURCE_TEMPLATE = "Copy {0} to:";
+        public Button YesButton { get; set; }
 
-        public Button ReplaceButton { get; set; }
-        public Button ReplaceAllButton { get; set; }
+        public Button NoButton { get; set;}
 
-        public Button SkipButton { get; set;}
-
-        public Button SkipAllButton { get; set; }
 
         const string DEFAULT_NAME = "Confirmation";
 
@@ -35,47 +31,23 @@ namespace FileCommander
             
         }
 
-        //public override void OnPaint()
-        //{
-        //    base.OnPaint();
-        //    // if (FocusedComponent == null)
-        //    //     SetFocus(Destination);
-        //}
-
         private void AddButtons()
         {
-            ReplaceButton = new Button("4,100%-2, 10, 1", Size, Alignment.None, "Replace") 
+            YesButton = new Button("4,100%-2, 10, 1", Size, Alignment.None, "Yes") 
             { 
                 BackgroundColor = Theme.ErrorWindowBackgroundColor, 
-                ModalResult = ModalWindowResult.Confirm 
+                ModalResult = ModalWindowResult.Confirm
             };
-            Add(ReplaceButton);
+            Add(YesButton);
 
-            ReplaceAllButton = new Button("16,100%-2, 12, 1", Size, Alignment.None, "Replace All") 
+            NoButton = new Button("32,100%-2, 10, 1", Size, Alignment.None, "No")
             {
                 BackgroundColor = Theme.ErrorWindowBackgroundColor, 
-                ModalResult = ModalWindowResult.ConfirmAll 
+                ModalResult = ModalWindowResult.Cancel
             };
-            Add(ReplaceAllButton);
+            Add(NoButton);
 
-
-            SkipButton = new Button("32,100%-2, 10, 1", Size, Alignment.None, "Skip")
-            {
-                BackgroundColor = Theme.ErrorWindowBackgroundColor, 
-                ModalResult = ModalWindowResult.Skip
-            };
-
-            //CancelButton.ClickEvent += (button) => { OnEscape(); };
-            Add(SkipButton);
-
-            SkipAllButton = new Button("44,100%-2, 12, 1", Size, Alignment.None, "Skip All")
-            {
-                BackgroundColor = Theme.ErrorWindowBackgroundColor,
-                ModalResult = ModalWindowResult.SkipAll
-            };
-            Add(SkipAllButton);
-
-            SetFocus(ReplaceButton, false);
+            SetFocus(YesButton, false);
         }
 
 

@@ -27,19 +27,11 @@ namespace FileCommander
 
         static void Main(string[] args)
         {
-            // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            //     SetConsoleVirtualProcessing();
-            // Console.CursorVisible = false;
-            // Buffer buf = new Buffer(9,1);
-            // buf.Write("123456789");
-            // buf.Paint(10,9);
-            // Window win = new Window(10,10,9,4);
-            // win.Draw();
-            // win.Paint();
-
             //try
             //{
-
+            
+            // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            //     SetConsoleVirtualProcessing();
 
             string path = Settings.GetInstance().Path;
 
@@ -60,6 +52,11 @@ namespace FileCommander
             //}
         }
 
+        /// <summary>
+        /// Enable ConsoleVirtualProcessing to use the esc sequence
+        /// </summary>
+        /// <param name="input">for console input</param>
+        /// <param name="output">for console output</param>
         static void SetConsoleVirtualProcessing(bool input = false, bool output = true)
         {
             if (input)

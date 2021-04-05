@@ -6,6 +6,7 @@ namespace FileCommander
         public HotKeyPanel(string rectangle, Size size) : base(rectangle, size) 
         {
             Initialize();
+            Align(size);
         }
 
         public void Initialize()

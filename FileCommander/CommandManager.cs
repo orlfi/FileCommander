@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using System.Linq;
 using System.Diagnostics;
 
 namespace FileCommander
@@ -18,7 +17,6 @@ namespace FileCommander
     public class CommandManager
     {
         public Settings Settings => Settings.GetInstance();
-        public event OnKeyPressHandler KeyPressEvent;
         public event OnProgressHandler ProgressEvent;
         public event OnErrorHandler ErrorEvent;
         public event OnWindowResizeHandler WindowResizeEvent;
@@ -28,52 +26,38 @@ namespace FileCommander
         bool _overwriteAll;
 
         public bool CancelOperation { get; set; }
-        public CancellationTokenSource CancelTokenSource { get; set; }
-        CancellationToken CancelToken { get; set; }
 
         public const int DAFAULT_WIDTH = 80;
-        public const int DAFAULT_HEIGHT = 24;
 
-        public Task _task;
+        public const int DAFAULT_HEIGHT = 24;
 
         public Size Size { get; set; } = new Size(DAFAULT_WIDTH, DAFAULT_HEIGHT);
 
         public const string APP_NAME = "File Commander";
+
         public bool Quit { get; set; }
+
         private static CommandManager instance;
+
         public string Path { get; private set; }
+
         public MainWindow MainWindow { get; set; }
-        public Window ModalWindow { get; set; } = null;
-        public Component Active { get; set; }
 
         public Buffer Screen { get; set; }
-        public CommandManager()
+
+        private CommandManager()
         {
-            // Initialize();
         }
-        public void Initialize()
+
+        private void Initialize()
         {
             Size = Settings.Size;
-            //ErrorEvent += OnError;
             Console.Title = APP_NAME;
             Console.BufferWidth = Console.WindowWidth = Size.Width;
             Console.BufferHeight = Console.WindowHeight = Size.Height;
             Console.SetWindowPosition(0, 0);
             MainWindow = new MainWindow("0, 0, 100%, 100%-1", Size);
             Screen = new Buffer(Size.Width, Size.Height, true);
-
-            //MainWindow.Add(сommandHistoryPanel);
-
-            // var hotKeyPanel = new HotKeyPanel(0, Size.Width-1, Size.Height, 1);
-            // MainWindow.Add(hotKeyPanel);
-
-            // var commandPanel = new CommandPanel(0, Size.Width-2, Size.Height, 1);
-            // MainWindow.Add(commandPanel);
-
-            //WindowResizeEvent += CommandManager_WindowResizeEvent;
-            //_task = Task.Run(() => { BackgroundWorker(); });
-
-            //KeyPressEvent += filePanelLeft.OnKeyPress;
         }
 
         private void CommandManager_WindowResizeEvent(Size size)
@@ -113,7 +97,6 @@ namespace FileCommander
             }
             SaveSettings();
         }
-
 
         public void SaveSettings()
         {
@@ -157,11 +140,9 @@ namespace FileCommander
 
                 case ConsoleKey.Spacebar:
                     CommandManager_WindowResizeEvent(Size);
-                    //Refresh();
                     break;
                 default:
                     MainWindow.OnKeyPress(keyInfo);
-                    //KeyPressEvent?.Invoke(keyInfo);
                     break;
             }
         }
@@ -173,7 +154,7 @@ namespace FileCommander
             sw.Start();
 
             MainWindow.Draw(Screen, 0, 0);
-            ModalWindow?.Draw(Screen, 0, 0);
+            //ModalWindow?.Draw(Screen, 0, 0);
 
             Screen.Paint();
 
@@ -196,53 +177,22 @@ namespace FileCommander
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
         }
-        // public void OnError(Exception error)
-        // {
-        //     Console.ResetColor();
-        //     Console.SetCursorPosition(0, Console.WindowHeight - 1);
-        //     Console.ForegroundColor = ConsoleColor.Red;
-        //     Console.Write(error.Message);
-        //     Console.ResetColor();
-        // }
-        
-        public void OnCopy()
+
+        public void OpenFile(string path)
         {
-
-            string source = "c:\\tmp\\1.zip";
-            string dest1 = "C:\\tmp\\2.zip";
-            string dest2 = "c:\\tmp\\3.zip";
-
-            //ProgressEvent += OnProgress;
-            if (File.Exists(dest1))
-                File.Delete(dest1);
-
-            if (File.Exists(dest2))
-                File.Delete(dest1);
-
-            Console.CursorVisible = false;
-            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            //Copy(source, dest1);
-            sw.Stop();
-            Console.WriteLine($"Elapsed: {sw.ElapsedMilliseconds}");
-            sw.Restart();
-            //Copy(source, dest2);
-            sw.Stop();
-            Console.WriteLine($"Elapsed: {sw.ElapsedMilliseconds}");
-
-            Console.CursorVisible = true;
-
-        }
-        public void OnProgress(ProgressInfo progress, bool done)
-        {
-            Console.SetCursorPosition(0, Console.WindowHeight - 1);
-            Console.Write($"Progress: { progress.Procent}% ");
-            if (done)
+            try
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("\tdone!");
+                var process = new Process();
+                process.StartInfo = new ProcessStartInfo(path)
+                {
+                    UseShellExecute = true
+                };
+                process.Start();
             }
-            Console.ResetColor();
+            catch (Exception ex)
+            {
+                ErrorEvent?.Invoke(ex.Message);
+            }
         }
 
         public void Rename(string source, string destination)
@@ -260,6 +210,7 @@ namespace FileCommander
                 ErrorEvent?.Invoke(ex.Message);
             }
         }
+        
         public void MakeDir(string path, string name)
         {
             try
@@ -270,6 +221,52 @@ namespace FileCommander
             {
                 ErrorEvent?.Invoke(ex.Message);
             }
+        }
+
+
+        public void Delete(string[] source)
+        {
+            try
+            {
+                (long Count, double Size) info = CalculateFileSystemEntries(source);
+                ProgressInfo progress = new ProgressInfo(0, 0, "");
+
+                for (int i = 0; i < source.Length; i++)
+                {
+                    if (Directory.Exists(source[i]))
+                    {
+                        DeleteDirectory(source[i], progress);
+                    }
+                    else if (File.Exists(source[i]))
+                    {
+                        File.Delete(source[i]);
+                        progress.Count++;
+                        ProgressEvent?.Invoke(this, progress, null);
+                    }
+                }
+                progress.Done = true;
+                ProgressEvent?.Invoke(this, progress, null);
+            }
+            catch (Exception ex)
+            {
+                ErrorEvent?.Invoke(ex.Message);
+            }
+        }
+
+        private void DeleteDirectory(string source, ProgressInfo progress)
+        {
+            IEnumerable<string> fileSystemEntries = Directory.EnumerateFileSystemEntries(source, "*.*", SearchOption.AllDirectories);
+
+            foreach (var item in fileSystemEntries)
+            {
+                if (File.Exists(item))
+                {
+                    File.Delete(item);
+                    progress.Count++;
+                    ProgressEvent?.Invoke(this, progress, null);
+                }
+            }
+            Directory.Delete(source, true);
         }
 
         public void Copy(string[] source, string destination, bool move = false)
@@ -295,7 +292,7 @@ namespace FileCommander
                     }
                     else if (File.Exists(source[i]))
                     {
-                        CopyFile(source[i], System.IO.Path.Combine(destination, source[i]), itemProgress, totalProgress, move);
+                        CopyFile(source[i], System.IO.Path.Combine(destination, System.IO.Path.GetFileName(source[i])), itemProgress, totalProgress, move);
                     }
                 }
                 totalProgress.Done = true;
@@ -314,18 +311,27 @@ namespace FileCommander
             double size = 0;
             foreach (var item in source)
             {
-                foreach (var entry in Directory.EnumerateFiles(item, "*.*", SearchOption.AllDirectories))
+                if (File.Exists(item))
                 {
-                    try
+                    count++;
+                    FileInfo fi = new FileInfo(item);
+                    size += fi.Length;
+                }
+                else
+                {
+                    foreach (var entry in Directory.EnumerateFiles(item, "*.*", SearchOption.AllDirectories))
                     {
-                        if (File.Exists(entry))
+                        try
                         {
-                            FileInfo fi = new FileInfo(entry);
-                            size += fi.Length;
+                            if (File.Exists(entry))
+                            {
+                                FileInfo fi = new FileInfo(entry);
+                                size += fi.Length;
+                            }
+                            count++;
                         }
-                        count++;
+                        catch { }
                     }
-                    catch { }
                 }
             }
             return (count, size);
@@ -452,34 +458,5 @@ namespace FileCommander
                 totalProgress.Count++;
             }
         }
-
-        //private bool IsCommandKey(ConsoleKeyInfo keyInfo)
-        //{
-        //    return keyInfo.KeyChar >= (char)48 || keyInfo.KeyChar == (char)8 ||
-        //        keyInfo.Key == ConsoleKey.LeftArrow || keyInfo.Key == ConsoleKey.RightArrow || keyInfo.Key == ConsoleKey.Delete ||
-        //        keyInfo.Key == ConsoleKey.Escape;
-        //}
-
-        public void BackgroundWorker()
-        {
-            int width = Console.WindowWidth;
-            int height = Console.WindowHeight;
-
-            while (true)
-            {
-                Thread.Sleep(100);
-                int currentWidth = Console.WindowWidth;
-                int currentHeight = Console.WindowHeight;
-                //WindowResizeEvent?.Invoke(new Size(currentWidth, currentHeight));
-
-                if (width != currentWidth || height != currentHeight)
-                {
-                    WindowResizeEvent?.Invoke(new Size(currentWidth, currentHeight));
-                    width = currentWidth;
-                    height = currentHeight;
-
-                }
-            }
-        }
-    }
+     }
 }

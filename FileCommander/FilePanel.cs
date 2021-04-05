@@ -29,10 +29,10 @@ namespace FileCommander
             FocusEvent += (focused)=> DirectoryPanel.SetBackgroundColor(focused); 
         }
 
-        private void FilePanel_FocusEvent(bool focus)
-        {
-            throw new NotImplementedException();
-        }
+        //private void FilePanel_FocusEvent(bool focus)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public override void SetFocus(bool focused)
         {
@@ -42,12 +42,6 @@ namespace FileCommander
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-            //if (keyInfo.Key == ConsoleKey.Tab)
-            //{
-            //    //DrawPath(Path);
-            //    //View.RefreshItems();
-            //}
-            //else 
             if (Focused)
             {
                 switch (keyInfo.Key)
@@ -59,7 +53,7 @@ namespace FileCommander
                         View.Next();
                         break;
                     case ConsoleKey.Enter:
-                        ChangePath();
+                        OnEnter();
                         break;
                     case ConsoleKey.Home:
                         View.Start();
@@ -114,7 +108,7 @@ namespace FileCommander
             Update();
         }
 
-        public void ChangePath()
+        public void OnEnter()
         {
             if (View.FocusedItem != null)
             {
@@ -129,15 +123,16 @@ namespace FileCommander
                 }
                 else if (View.FocusedItem.ItemType == FileTypes.ParentDirectory)
                 {
-
-                    string path = Path;
                     try
                     {
-                        SetPath(Path.Substring(0, Path.LastIndexOf('\\')));
+                        string path = Path;
+                        SetPath(System.IO.Path.GetDirectoryName(Path));
                         View.FocusItem(path);
                     }
                     catch (Exception) { }
                 }
+                else if (View.FocusedItem.ItemType == FileTypes.File)
+                    CommandManager.OpenFile(View.FocusedItem.Path);
             }
             Update();
         }

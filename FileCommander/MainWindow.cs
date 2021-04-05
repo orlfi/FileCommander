@@ -9,11 +9,12 @@ namespace FileCommander
     public class MainWindow : Panel
     {
         public Window ActiveWindow { get; set; } = null;
-        public FilePanel LeftPanel { get; set; } = null;
-        public FilePanel RightPanel { get; set; } = null;
-        public CommandHistoryPanel HistoryPanel { get; set; } = null;
 
-        //public FilePanel CommandPanel { get; set; } = null;
+        public FilePanel LeftPanel { get; set; } = null;
+
+        public FilePanel RightPanel { get; set; } = null;
+
+        public CommandHistoryPanel HistoryPanel { get; set; } = null;
 
         public MainWindow(string rectangle, Size size) : base(rectangle, size)
         {
@@ -89,8 +90,8 @@ namespace FileCommander
                 case ConsoleKey.F7:
                     ShowMakeDirWindow();
                     break;
-                case ConsoleKey.F8:
-                    OnDelete();
+                case ConsoleKey.F8 or ConsoleKey.Delete:
+                    ShowDeleteWindow();
                     break;
                 case ConsoleKey.F9:
                     if (FocusedComponent is FilePanel)
@@ -139,6 +140,47 @@ namespace FileCommander
         }
 
 
+        public void ShowDeleteWindow()
+        {
+            if (FocusedComponent is FilePanel sourcePanel)
+            {
+                string source = sourcePanel.View.FocusedItem.Path;
+                var window = new ConfirmationWindow(Size, source, "Delete");
+                if (window.Open() == ModalWindowResult.Confirm)
+                {
+                    OnDelete();
+
+
+                }
+            }
+        }
+
+        private void Delete(FilePanel sourcePanel, string[] source)
+        {
+            var progressWindow = new ProgressWindow(Size);
+            //progressWindow.FileDestinationInfo.Text = destination;
+            //progressWindow.Name = sender is MoveWindow ? MoveWindow.DEFAULT_NAME : CopyWindow.DEFAULT_NAME;
+            progressWindow.Open();
+            progressWindow.CancelEvent += () =>
+            {
+                CommandManager.ProgressEvent -= OnDeleteProgress;
+                CommandManager.CancelOperation = true;
+            };
+
+            CommandManager.ProgressEvent += OnDeleteProgress;
+            CommandManager.Delete(source);
+            CommandManager.ProgressEvent -= OnDeleteProgress;
+            sourcePanel.Refresh();
+        }
+
+
+        private void OnDeleteProgress(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo)
+        {
+            if (ActiveWindow is ProgressWindow progressWindow)
+                progressWindow.SetProgress(progressInfo);
+
+        }
+
         public void ShowMakeDirWindow()
         {
             if (FocusedComponent is FilePanel sourcePanel)
@@ -152,7 +194,9 @@ namespace FileCommander
         private void OnMakeDir(Component sender, string path, string name)
         {
             CommandManager.MakeDir(path, name);
-            ((MakeDirectoryWindow)sender).DestinationPanel?.Refresh();
+            var panel = ((MakeDirectoryWindow)sender).DestinationPanel;
+            panel?.Refresh();
+            panel?.View.FocusItem(System.IO.Path.Combine(path, name));
         }
         
         public void ShowCopyWindow(bool move = false)
@@ -173,42 +217,40 @@ namespace FileCommander
 
         private void OnCopy(Component sender, string source, string destination)
         {
-
-            //progressWindow.FileDestinationInfo.Text = "fwefe";
-            var progressWindow = new ProgressWindow(Size, true);
+            var progressWindow = new TotalProgressWindow(Size);
             progressWindow.FileDestinationInfo.Text = destination;
             progressWindow.Name = sender is MoveWindow ? MoveWindow.DEFAULT_NAME: CopyWindow.DEFAULT_NAME;
             progressWindow.Open();
             progressWindow.CancelEvent += () => 
             {
-                CommandManager.ProgressEvent -= OnProgress;
+                CommandManager.ProgressEvent -= OnCopyProgress;
                 CommandManager.CancelOperation = true;
             };
 
-            CommandManager.ProgressEvent += OnProgress;
+            CommandManager.ProgressEvent += OnCopyProgress;
 
-            CommandManager.ConfirmationEvent += OnConfirmation;
+            CommandManager.ConfirmationEvent += OnReplaceConfirmation;
 
             CommandManager.Copy(new[] { source }, destination, sender is MoveWindow ? true: false);
         }
 
-        private void OnConfirmation(CommandManager sender, ConfirmationEventArgs args)
+        private void OnReplaceConfirmation(CommandManager sender, ConfirmationEventArgs args)
         {
-            var confirmationWindow = new ConfirmationWindow(Size, args.Message) { Modal = true};
+            var confirmationWindow = new ReplaceConfirmationWindow(Size, args.Message) { Modal = true};
 
             args.Result = confirmationWindow.Open(true);
             confirmationWindow.RestoreActiveWindow();
         }
 
-        private void OnProgress(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo)
+        private void OnCopyProgress(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo)
         {
-            if (ActiveWindow is ProgressWindow progressWindow)
+            if (ActiveWindow is TotalProgressWindow progressWindow)
                 progressWindow.SetProgress(progressInfo, totalProgressInfo);
 
             if (totalProgressInfo.Done)
             {
-                CommandManager.ProgressEvent -= OnProgress;
-                CommandManager.ConfirmationEvent -= OnConfirmation;
+                CommandManager.ProgressEvent -= OnCopyProgress;
+                CommandManager.ConfirmationEvent -= OnReplaceConfirmation;
                 foreach(var panel in Components.Where(item => item is FilePanel))
                 {
                     ((FilePanel)panel).Refresh();

@@ -73,11 +73,8 @@ namespace FileCommander
     public enum ModalWindowResult
     {
         None,
-        Ok,
         Confirm,
         ConfirmAll,
-        Yes,
-        No,
         Break,
         Cancel,
         Skip,
