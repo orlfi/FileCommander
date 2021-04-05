@@ -86,6 +86,9 @@ namespace FileCommander
                 case ConsoleKey.F6:
                     ShowCopyWindow(true);
                     break;
+                case ConsoleKey.F7:
+                    ShowMakeDirWindow();
+                    break;
                 case ConsoleKey.F8:
                     OnDelete();
                     break;
@@ -120,16 +123,38 @@ namespace FileCommander
 
         public void ShowRenameWindow()
         {
-            //var errorWindow = new ErrorWindow(Size, "Ошибка");
-            //var result = errorWindow.Open();
-            //if (result == ModalWindowResult.Cancel)
-            //    return;
-
-            var confirmationWindow = new ConfirmationWindow(Size, "Test Error") { Modal = true };
-
-            confirmationWindow.Open();
+            if (FocusedComponent is FilePanel sourcePanel)
+            {
+                string sourcePath = sourcePanel.View.FocusedItem.Path;
+                var window = new RenameWindow(Size, sourcePath, System.IO.Path.GetFileName(sourcePath));
+                window.DestinationPanel = sourcePanel;
+                window.CopyEvent += OnRename;
+                window.Open();
+            }
+        }
+        private void OnRename(Component sender, string source, string destination)
+        {
+            CommandManager.Rename(source, destination);
+            ((RenameWindow)sender).DestinationPanel?.Refresh();
         }
 
+
+        public void ShowMakeDirWindow()
+        {
+            if (FocusedComponent is FilePanel sourcePanel)
+            {
+                var window = new MakeDirectoryWindow(Size, sourcePanel.Path);
+                window.DestinationPanel = sourcePanel;
+                window.CopyEvent += OnMakeDir;
+                window.Open();
+            }
+        }
+        private void OnMakeDir(Component sender, string path, string name)
+        {
+            CommandManager.MakeDir(path, name);
+            ((MakeDirectoryWindow)sender).DestinationPanel?.Refresh();
+        }
+        
         public void ShowCopyWindow(bool move = false)
         {
             if (FocusedComponent is FilePanel sourcePanel)

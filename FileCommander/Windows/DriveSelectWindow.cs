@@ -155,6 +155,5 @@ namespace FileCommander
                 Add(new DriveItem($"2,{i+PaddingTop}, 100% - 2, 1", size, drives[i]));
             }
         }
-       
     }
 }

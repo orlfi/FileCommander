@@ -2,5 +2,9 @@
   "Path": "D:\\TEMP",
   "LeftPanelPath": "D:\\TEMP",
   "RightPanelPath": "D:\\TEMP\\test1",
-  "FocusedPanel": "LeftPanel"
+  "FocusedPanel": "LeftPanel",
+  "Size": {
+    "Width": 80,
+    "Height": 24
+  }
 }

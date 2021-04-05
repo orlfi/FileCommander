@@ -204,6 +204,7 @@ namespace FileCommander
         //     Console.Write(error.Message);
         //     Console.ResetColor();
         // }
+        
         public void OnCopy()
         {
 
@@ -242,6 +243,33 @@ namespace FileCommander
                 Console.Write("\tdone!");
             }
             Console.ResetColor();
+        }
+
+        public void Rename(string source, string destination)
+        {
+            string directory = System.IO.Path.GetDirectoryName(source);
+            try
+            {
+                if (Directory.Exists(source))
+                    System.IO.Directory.Move(source, System.IO.Path.Combine(directory, System.IO.Path.GetFileName(destination)));
+                else 
+                    System.IO.File.Move(source, System.IO.Path.Combine(directory, System.IO.Path.GetFileName(destination)));
+            }
+            catch (Exception ex)
+            {
+                ErrorEvent?.Invoke(ex.Message);
+            }
+        }
+        public void MakeDir(string path, string name)
+        {
+            try
+            {
+                Directory.CreateDirectory(System.IO.Path.Combine(path, name));
+            }
+            catch (Exception ex)
+            {
+                ErrorEvent?.Invoke(ex.Message);
+            }
         }
 
         public void Copy(string[] source, string destination, bool move = false)
