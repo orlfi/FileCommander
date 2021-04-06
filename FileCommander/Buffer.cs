@@ -101,6 +101,7 @@ namespace FileCommander
         }
         public void Paint()
         {
+            bool saveCursor = Console.CursorVisible;
             Console.CursorVisible = false;
             List<string> strings = new List<String>();
             List<ColorPair> colors = new List<ColorPair>();
@@ -153,10 +154,13 @@ namespace FileCommander
                 Console.BackgroundColor = colors[i].BackgroundColor;
                 Console.Write(strings[i]);
             }
+            Console.CursorVisible = saveCursor;
         }
 
         public void Paint(int x, int y, int width, int height)
         {
+            bool saveCursor = Console.CursorVisible;
+            Console.CursorVisible = false;
             int bufferHeight = _buffer.GetLength(1);
             Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
@@ -222,7 +226,7 @@ namespace FileCommander
                 }
                 sb.Clear();
             }
-            
+
             // To avoid scrolling when writing character in the last column of a last row.
             //Console.SetCursorPosition(0,0);
             //var lastChar =_buffer[Width-1, Height-1]; 
@@ -231,11 +235,14 @@ namespace FileCommander
             //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
 
             // Write whole text lines
+            Console.CursorVisible = saveCursor;
         }
 
         // TODO change code
         public void PaintEsc(int x, int y, int width, int height)
         {
+            bool saveCursor = Console.CursorVisible;
+            Console.CursorVisible = false;
             int bufferHeight = _buffer.GetLength(1);
             Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
@@ -290,6 +297,8 @@ namespace FileCommander
                     Console.Write(strings[i]);
                 }
                 sb.Clear();
+                Console.CursorVisible = saveCursor;
+
             }
 
 

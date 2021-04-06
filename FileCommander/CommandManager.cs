@@ -149,6 +149,7 @@ namespace FileCommander
 
         public void Refresh()
         {
+            bool saveCursor = Console.CursorVisible;
             Console.CursorVisible = false;
             Stopwatch sw = new System.Diagnostics.Stopwatch();
 
@@ -160,11 +161,14 @@ namespace FileCommander
             Console.ResetColor();
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+            Console.CursorVisible = saveCursor;
         }
 
         public void Refresh(int x, int y, int width, int height)
         {
+            bool saveCursor = Console.CursorVisible;
             Console.CursorVisible = false;
+
             Stopwatch sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
@@ -175,6 +179,7 @@ namespace FileCommander
             Console.ResetColor();
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+            Console.CursorVisible = saveCursor;
         }
 
         public void OpenFile(string path)

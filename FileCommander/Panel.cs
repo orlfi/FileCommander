@@ -5,11 +5,12 @@ namespace FileCommander
 {
     public class Panel : Component
     {
+        public List<Component> Components { get; set; } = new List<Component>();
+
         protected CommandManager CommandManager => CommandManager.GetInstance();
         public Component FocusedComponent { get; set; } = null;
         
-        public List<Component> Components { get; set; } = new List<Component>();
-       
+      
         public LineType Border { get; set; }
         
         public bool Fill { get; set; }

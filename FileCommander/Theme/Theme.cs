@@ -16,7 +16,7 @@ namespace FileCommander
 
         public ConsoleColor FilePanelDirectoryForegroundColor { get; set; } = ConsoleColor.White;
          
-        public ConsoleColor FilePanelSelectedForegroundColor { get; set; } = ConsoleColor.Yellow;
+        public ConsoleColor FilePanelSelectedForegroundColor { get; set; } = ConsoleColor.Magenta;
 
         public ConsoleColor FilePanelColumnForegroundColor { get; set; } = ConsoleColor.Yellow;
 

@@ -162,7 +162,7 @@ namespace FileCommander
             Y = y;
             Width = width;
             Height = height;
-            foregroundColor = Theme.FilePanelSelectedForegroundColor;
+            foregroundColor = Theme.FilePanelForegroundColor;
             backgroundColor = Theme.FilePanelBackgroundColor;
         }
 

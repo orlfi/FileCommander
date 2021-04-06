@@ -123,7 +123,7 @@ namespace FileCommander
             Update(true);
             if (_restoreActiveWindow)
                 RestoreActiveWindow();
-            Console.CursorVisible = false;
+            //Console.CursorVisible = false;
         }
 
         public virtual void RestoreActiveWindow()

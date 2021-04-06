@@ -8,12 +8,6 @@ namespace FileCommander
 {
     public class FileItem : Control
     {
-        //public const long KILOBYTE = 1024;
-        //public const long MEGABYTE = KILOBYTE * 1024;
-        //public const long GIGABYTE = MEGABYTE * 1024;
-        //public const long TERABYTE = GIGABYTE * 1024;
-        //public const long PETABYTE = TERABYTE * 1024;
-
         public bool Selected { get; set; }
 
         public FilePanel FilePanel => (FilePanel)Parent.Parent;
@@ -24,10 +18,7 @@ namespace FileCommander
 
         public List<FilePanelColumn> Columns { get; set; }
 
-        public FileItem(string path, FileSystemInfo fileSystemInfo, string width, Size size, FileTypes itemType = FileTypes.File) : this($"0, 0, {width}, 1", size, path, fileSystemInfo, itemType)
-        {
-
-        }
+        public FileItem(string path, FileSystemInfo fileSystemInfo, string width, Size size, FileTypes itemType = FileTypes.File) : this($"0, 0, {width}, 1", size, path, fileSystemInfo, itemType) { }
 
         public FileItem(string rectangle, Size size, string path, FileSystemInfo fileSystemInfo, FileTypes itemType = FileTypes.File) : base(rectangle, size)
         {
@@ -77,23 +68,6 @@ namespace FileCommander
 
             }
         }
-
-        //public static string FormatFileSize(long size)
-        //{
-
-        //    if (size >= PETABYTE)
-        //        return ((double)size / PETABYTE).ToString("###.###P").PadLeft(8);
-        //    else if(size > TERABYTE && size < PETABYTE)
-        //        return ((double)size / TERABYTE).ToString("###.###T").PadLeft(8);
-        //    else if (size > GIGABYTE && size < TERABYTE)
-        //        return ((double)size / GIGABYTE).ToString("###.###G").PadLeft(8);
-        //    else if (size > MEGABYTE && size < GIGABYTE)
-        //        return ((double)size / MEGABYTE).ToString("###.###M").PadLeft(8);
-        //    else if (size > KILOBYTE && size < MEGABYTE)
-        //        return ((double)size / KILOBYTE).ToString("###.###K").PadLeft(8);
-        //    else
-        //        return (size).ToString().PadLeft(8);
-        //}
 
         public ConsoleColor GetItemForegroundColor()
         {

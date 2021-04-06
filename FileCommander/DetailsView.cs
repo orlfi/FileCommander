@@ -9,27 +9,17 @@ namespace FileCommander
 
     public class DetailsView: Panel
     {
-        public const ConsoleColor DEFAULT_PATH_FOREGROUND_COLOR = ConsoleColor.Black;
-        public const ConsoleColor DEFAULT_PATH_BACKGROUND_COLOR = ConsoleColor.DarkCyan;
-        public const ConsoleColor DEFAULT_COLUMN_NAME_FOREGROUND_COLOR = ConsoleColor.Yellow;
-        public const ConsoleColor DEFAULT_COLUMN_NAME_BACKGROUND_COLOR = ConsoleColor.Blue;
-
         public event ChangeFocusHandler  ChangeFocusEvent;
 
         private const int HEADER_HEIGHT = 1;
-        private int _startIndex;
+        private int _offsetY;
         public int OffsetY
         {
-            get => _startIndex;
+            get => _offsetY;
             set
             {
-                if (_startIndex != value)
-                {
-                    _startIndex = value;
-                    this.Update();
-                }
-                else
-                    _startIndex = value;
+                _offsetY = value;
+                this.Update();
             }
         }
 
@@ -92,16 +82,16 @@ namespace FileCommander
             if (files.Count > 0)
             {
                 AddRange(files.Select(item => new FileItem(item.FullName, item, "100%", Size, item is DirectoryInfo ? FileTypes.Directory : FileTypes.File)));
-                //RefreshItems();
-                //Redraw();
             }
         }
 
         public void Start()
         {
             CursorY= HeaderHeight;
-            OffsetY = 0;
-            //Update(true);
+            if (OffsetY == 0)
+                FocusItem();
+            else
+                OffsetY = 0;
         }
 
         public void Top()
@@ -119,8 +109,9 @@ namespace FileCommander
 
         public void End()
         {
-            _startIndex = 0;
-            CursorY=Components.Count;
+            _offsetY = 0;
+            CursorY = Components.Count;
+            Update();
         }
 
         public void Previous ()
@@ -139,8 +130,42 @@ namespace FileCommander
         {
             FocusedItem.SetFocus(false);
             FocusedItem.Update();
-            FocusedItem = (FileItem)Components.ElementAtOrDefault(CursorY + _startIndex - HeaderHeight);
+            FocusedItem = (FileItem)Components.ElementAtOrDefault(CursorY + _offsetY - HeaderHeight);
             FocusedItem.Update();
+        }
+
+        public void InvertItemSelection()
+        {
+            FocusedItem.Selected = !FocusedItem.Selected;
+            FocusedItem.Update();
+            Next();
+        }
+
+        public void SelectAll()
+        {
+            foreach (var item in Components)
+                if (item is FileItem fileItem && (fileItem.ItemType == FileTypes.File || fileItem.ItemType == FileTypes.Directory))
+                    fileItem.Selected = true;
+
+            Update();
+        }
+
+        public void DeselectAll()
+        {
+            foreach (var item in Components)
+                if (item is FileItem fileItem && (fileItem.ItemType == FileTypes.File || fileItem.ItemType == FileTypes.Directory))
+                    fileItem.Selected = false;
+
+            Update();
+        }
+
+        public void InvertSelection()
+        {
+            foreach (var item in Components)
+                if (item is FileItem fileItem && (fileItem.ItemType == FileTypes.File || fileItem.ItemType == FileTypes.Directory))
+                    fileItem.Selected = !fileItem.Selected;
+
+            Update();
         }
 
         public void FocusItem(string path)
@@ -149,7 +174,7 @@ namespace FileCommander
             int index = files.FindIndex(item => item.Path.ToLower() == path.ToLower());
             if (index >= 0)
             {
-                _startIndex = 0;
+                _offsetY = 0;
                 CursorY = index + HeaderHeight;
                 Update();
             }
@@ -163,7 +188,7 @@ namespace FileCommander
                 int x = 0;
                 int y = i + HeaderHeight;
 
-                var item = (FileItem)files.ElementAtOrDefault(i+_startIndex);
+                var item = (FileItem)files.ElementAtOrDefault(i+_offsetY);
                 if (item == null)
                     break;
 

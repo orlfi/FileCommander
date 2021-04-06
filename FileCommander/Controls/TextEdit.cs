@@ -22,13 +22,13 @@ namespace FileCommander
             set
             {
                 var cnt = StringBuilder.Length;
-                int max = Math.Min(Width-(_cursor+_offsetX+1<cnt?2:1), (cnt == 0 ? 0 : cnt));
+                int max = Math.Min(Width - (_cursor + _offsetX + 1 < cnt ? 2 : 1), (cnt == 0 ? 0 : cnt));
                 if (value < (_offsetX > 0 ? 1 : 0))
                 {
                     _cursor = _offsetX > 0 ? 1 : 0;
                     if (_offsetX > 0)
                         _offsetX--;
-                }   
+                }
                 else if (value > max)
                 {
                     _cursor = max;
@@ -58,55 +58,96 @@ namespace FileCommander
             {
                 Edit();
             }
+            else
+                Console.CursorVisible = false;
         }
 
-        public StringBuilder StringBuilder {get; set;}
+        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
+        {
+
+            if (keyInfo.KeyChar != '\u0000' && keyInfo.KeyChar != '\b' && keyInfo.Key != ConsoleKey.Tab && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter)
+            {
+                AddChar(keyInfo.KeyChar);
+
+            }
+            else if (keyInfo.KeyChar == '\b')
+            {
+                RemoveChar(TextRemoveDirection.Previous);
+            }
+            else if (keyInfo.Key == ConsoleKey.LeftArrow)
+            {
+                MoveLeft();
+            }
+            else if (keyInfo.Key == ConsoleKey.RightArrow)
+            {
+                MoveRight();
+            }
+            else if (keyInfo.Modifiers == ConsoleModifiers.Control && keyInfo.Key == ConsoleKey.RightArrow)
+            {
+                MoveWordRight();
+            }
+            else if (keyInfo.Key == ConsoleKey.Delete)
+            {
+                RemoveChar(TextRemoveDirection.Next);
+            }
+
+        }
+
+        public StringBuilder StringBuilder { get; set; }
+
         protected void Edit()
         {
-            
-            //Cursor = StringBuilder.Length;
+            Console.CursorVisible = true;
             Console.SetCursorPosition(AbsolutePosition.X + Cursor, AbsolutePosition.Y);
             Console.ForegroundColor = Theme.TextEditForegroundColor;
             Console.BackgroundColor = Theme.TextEditBackgroundColor;
-            ConsoleKeyInfo keyInfo;
-            do
-            {
-                Console.CursorVisible = true;
-                keyInfo = Console.ReadKey(true);
-                Console.CursorVisible = false;
-                if (keyInfo.KeyChar != '\u0000' && keyInfo.KeyChar != '\b' && keyInfo.Key != ConsoleKey.Tab && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter)
-                {
-                    AddChar(keyInfo.KeyChar);
-
-                }
-                else if (keyInfo.KeyChar == '\b')
-                {
-                    RemoveChar(TextRemoveDirection.Previous);
-                }
-                else if (keyInfo.Key == ConsoleKey.LeftArrow)
-                {
-                    MoveLeft();
-                }
-                else if (keyInfo.Key == ConsoleKey.RightArrow)
-                {
-                    MoveRight();
-                }
-                else if (keyInfo.Modifiers == ConsoleModifiers.Control && keyInfo.Key == ConsoleKey.RightArrow)
-                {
-                    MoveWordRight();
-                }
-                else if(keyInfo.Key == ConsoleKey.Delete)
-                {
-                    RemoveChar(TextRemoveDirection.Next);
-                }
-            } while (keyInfo.Key != ConsoleKey.Enter && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Tab);
-            Value = StringBuilder.ToString();
-            if (Parent != null)
-            {
-                Panel parent = (Panel)Parent;
-                parent.OnKeyPress(keyInfo);
-            }
         }
+
+        //protected void Edit()
+        //{
+
+        //    Console.SetCursorPosition(AbsolutePosition.X + Cursor, AbsolutePosition.Y);
+        //    Console.ForegroundColor = Theme.TextEditForegroundColor;
+        //    Console.BackgroundColor = Theme.TextEditBackgroundColor;
+        //    ConsoleKeyInfo keyInfo;
+        //    do
+        //    {
+        //        Console.CursorVisible = true;
+        //        keyInfo = Console.ReadKey(true);
+        //        Console.CursorVisible = false;
+        //        if (keyInfo.KeyChar != '\u0000' && keyInfo.KeyChar != '\b' && keyInfo.Key != ConsoleKey.Tab && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter)
+        //        {
+        //            AddChar(keyInfo.KeyChar);
+
+        //        }
+        //        else if (keyInfo.KeyChar == '\b')
+        //        {
+        //            RemoveChar(TextRemoveDirection.Previous);
+        //        }
+        //        else if (keyInfo.Key == ConsoleKey.LeftArrow)
+        //        {
+        //            MoveLeft();
+        //        }
+        //        else if (keyInfo.Key == ConsoleKey.RightArrow)
+        //        {
+        //            MoveRight();
+        //        }
+        //        else if (keyInfo.Modifiers == ConsoleModifiers.Control && keyInfo.Key == ConsoleKey.RightArrow)
+        //        {
+        //            MoveWordRight();
+        //        }
+        //        else if(keyInfo.Key == ConsoleKey.Delete)
+        //        {
+        //            RemoveChar(TextRemoveDirection.Next);
+        //        }
+        //    } while (keyInfo.Key != ConsoleKey.Enter && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Tab);
+        //    Value = StringBuilder.ToString();
+        //    if (Parent != null)
+        //    {
+        //        Panel parent = (Panel)Parent;
+        //        parent.OnKeyPress(keyInfo);
+        //    }
+        //}
 
         private void AddChar(char ch)
         {
@@ -116,7 +157,8 @@ namespace FileCommander
                 StringBuilder.Insert(Cursor + _offsetX, ch);
             
             Cursor++;
-            WriteString();
+            Update();
+            //WriteString();
         }
 
         private void RemoveChar(TextRemoveDirection direction)
@@ -128,34 +170,38 @@ namespace FileCommander
             }
             else if (direction == TextRemoveDirection.Next && StringBuilder.Length > 0 && Cursor + _offsetX < StringBuilder.Length)
                 StringBuilder.Remove(Cursor + _offsetX, 1);
-            WriteString();
+            Update(); 
+            //WriteString();
         }
 
         private void MoveLeft()
         {
             Cursor--;
-            WriteString();
+            Update();
+            //WriteString();
         }
 
         private void MoveRight()
         {
             Cursor++;
-            WriteString();
+            Update();
+            //WriteString();
         }
         private void MoveWordRight()
         {
             StringBuilder.ToString().IndexOf(' ');
             Cursor++;
-            WriteString();
+            Update();
+            //WriteString();
         }
 
-        private void WriteString()
-        {
-            var position = AbsolutePosition;
-            Console.SetCursorPosition(position.X, position.Y);
-            Console.Write(StringBuilder.ToString(_offsetX, StringBuilder.Length - _offsetX).PadRight(Width).Fit(Width));
-            Console.SetCursorPosition(position.X + Cursor, position.Y);
-        }
+        //private void WriteString()
+        //{
+        //    var position = AbsolutePosition;
+        //    Console.SetCursorPosition(position.X, position.Y);
+        //    Console.Write(StringBuilder.ToString(_offsetX, StringBuilder.Length - _offsetX).PadRight(Width).Fit(Width));
+        //    Console.SetCursorPosition(position.X + Cursor, position.Y);
+        //}
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {

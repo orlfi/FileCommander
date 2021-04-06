@@ -7,7 +7,8 @@ namespace FileCommander
 {
     public class FilePanel : Panel
     {
-        public int Order { get; set; }
+        // TODO order view
+        //public int Order { get; set; }
 
         DirectoryPanelItem DirectoryPanel { get; set; }
 
@@ -21,18 +22,16 @@ namespace FileCommander
         {
             View = new DetailsView("1,1,100%-2,100%-4", Size, Files);
             Add(View);
-            View.ChangeFocusEvent += OnChangeViewFocus;
+
             FileInfoPanel = new Control("1, 100%-2, 100% - 2, 1", this.Size, Alignment.None, "Test", Theme.FilePanelFileForegroundColor, Theme.FilePanelItemBackgroundColor);
             Add(FileInfoPanel);
+
             DirectoryPanel = new DirectoryPanelItem("0, 0, 0, 1", this.Size, Alignment.HorizontalCenter, "Test");
             Add(DirectoryPanel);
+
+            View.ChangeFocusEvent += OnChangeViewFocus;
             FocusEvent += (focused)=> DirectoryPanel.SetBackgroundColor(focused); 
         }
-
-        //private void FilePanel_FocusEvent(bool focus)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         public override void SetFocus(bool focused)
         {
@@ -66,6 +65,18 @@ namespace FileCommander
                         break;
                     case ConsoleKey.PageDown:
                         View.Bottom();
+                        break;
+                    case ConsoleKey.Insert:
+                        View.InvertItemSelection();
+                        break;
+                    case ConsoleKey.Multiply:
+                        View.InvertSelection();
+                        break;
+                    case ConsoleKey.Add:
+                        View.SelectAll();
+                        break;
+                    case ConsoleKey.Subtract:
+                        View.DeselectAll();
                         break;
                 }
             }
