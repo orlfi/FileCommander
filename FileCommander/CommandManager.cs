@@ -151,14 +151,12 @@ namespace FileCommander
         {
             Console.CursorVisible = false;
             Stopwatch sw = new System.Diagnostics.Stopwatch();
+
             sw.Start();
-
             MainWindow.Draw(Screen, 0, 0);
-            //ModalWindow?.Draw(Screen, 0, 0);
-
             Screen.Paint();
-
             sw.Stop();
+
             Console.ResetColor();
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
@@ -166,13 +164,14 @@ namespace FileCommander
 
         public void Refresh(int x, int y, int width, int height)
         {
-
             Console.CursorVisible = false;
             Stopwatch sw = new System.Diagnostics.Stopwatch();
+
             sw.Start();
             MainWindow.Draw(Screen, 0, 0);
             Screen.Paint(x, y, width, height);
             sw.Stop();
+
             Console.ResetColor();
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
@@ -202,7 +201,7 @@ namespace FileCommander
             {
                 if (Directory.Exists(source))
                     System.IO.Directory.Move(source, System.IO.Path.Combine(directory, System.IO.Path.GetFileName(destination)));
-                else 
+                else
                     System.IO.File.Move(source, System.IO.Path.Combine(directory, System.IO.Path.GetFileName(destination)));
             }
             catch (Exception ex)
@@ -210,7 +209,7 @@ namespace FileCommander
                 ErrorEvent?.Invoke(ex.Message);
             }
         }
-        
+
         public void MakeDir(string path, string name)
         {
             try
@@ -229,7 +228,7 @@ namespace FileCommander
             try
             {
                 (long Count, double Size) info = CalculateFileSystemEntries(source);
-                ProgressInfo progress = new ProgressInfo(0, 0, "");
+                ProgressInfo progress = new ProgressInfo(0, info.Count, "");
 
                 for (int i = 0; i < source.Length; i++)
                 {
@@ -240,7 +239,7 @@ namespace FileCommander
                     else if (File.Exists(source[i]))
                     {
                         File.Delete(source[i]);
-                        progress.Count++;
+                        progress.Proceded++;
                         ProgressEvent?.Invoke(this, progress, null);
                     }
                 }
@@ -259,11 +258,18 @@ namespace FileCommander
 
             foreach (var item in fileSystemEntries)
             {
-                if (File.Exists(item))
+                try
                 {
-                    File.Delete(item);
-                    progress.Count++;
-                    ProgressEvent?.Invoke(this, progress, null);
+                    if (File.Exists(item))
+                    {
+                        File.Delete(item);
+                        progress.Proceded++;
+                        ProgressEvent?.Invoke(this, progress, null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorEvent?.Invoke(ex.Message);
                 }
             }
             Directory.Delete(source, true);
@@ -340,7 +346,7 @@ namespace FileCommander
         private void CopyDirectory(string source, string destination, ProgressInfo itemProgress, ProgressInfo totalProgress, bool move)
         {
             if (move && $"{destination.ToLower()}\\".StartsWith($"{source.ToLower()}\\"))
-            {   
+            {
                 ErrorEvent?.Invoke("The destination folder is a subfolder of the source folder");
                 return;
             }
@@ -381,10 +387,10 @@ namespace FileCommander
             bool overwrite = _overwriteAll;
             FileStream writeStream = null;
             FileStream readStream = null;
+            FileInfo fileInfo = new FileInfo(source);
 
             try
             {
-                FileInfo fileInfo = new FileInfo(source);
                 long fileSize = fileInfo.Length;
                 long total = 0;
                 int bytesRead = -1;
@@ -419,7 +425,7 @@ namespace FileCommander
                 }
                 if (move && System.IO.Path.GetPathRoot(source.ToLower()) == System.IO.Path.GetPathRoot(destination).ToLower())
                 {
-                        fileInfo.MoveTo(destination);
+                    fileInfo.MoveTo(destination);
                 }
                 else
                 {
@@ -439,10 +445,6 @@ namespace FileCommander
                         ProgressEvent?.Invoke(this, itemProgress, totalProgress);
                     } while (bytesRead > 0);
                     writeStream.Flush();
-                    if (move)
-                    {
-                        fileInfo.Delete();
-                    }
                 }
                 itemProgress.Done = true;
                 ProgressEvent?.Invoke(this, itemProgress, totalProgress);
@@ -457,6 +459,11 @@ namespace FileCommander
                 readStream?.Close();
                 totalProgress.Count++;
             }
+
+            if (move)
+            {
+                fileInfo.Delete();
+            }
         }
-     }
+    }
 }

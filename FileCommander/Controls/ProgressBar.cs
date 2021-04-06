@@ -34,7 +34,7 @@ namespace FileCommander
                 BackgroundColor = Theme.DriveWindowBackgroundColor;
             }
 
-            int progressBars = (int)Math.Round(Progress.Proceded / Progress.Total * (Width - 4), 0, MidpointRounding.AwayFromZero);
+            int progressBars = (int)Math.Round(Progress.Procent/100 * (Width - 4), 0, MidpointRounding.AwayFromZero);
 
             int remainsBars = (Width - 4) - progressBars;
 

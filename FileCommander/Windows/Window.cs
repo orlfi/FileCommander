@@ -9,6 +9,8 @@ namespace FileCommander
     public class Window : Panel
     {
         private Window _saveWindow;
+        
+        private bool _restoreActiveWindow;
 
         public event ButtonClickHandler ButtonClickEvent;
 
@@ -84,11 +86,12 @@ namespace FileCommander
             CancelEvent?.Invoke();
         }
 
-        public virtual ModalWindowResult Open(bool saveActiveWindow = false)
+        public virtual ModalWindowResult Open(bool restoreActiveWindow = false)
         {
-            if (MainWindow.ActiveWindow != null && saveActiveWindow)
+            if (MainWindow.ActiveWindow != null && restoreActiveWindow)
             {
                 _saveWindow = MainWindow.ActiveWindow;
+                _restoreActiveWindow = restoreActiveWindow;
                 MainWindow.ActiveWindow.Close();
             }
 
@@ -118,6 +121,8 @@ namespace FileCommander
             MainWindow.ActiveWindow = null;
 
             Update(true);
+            if (_restoreActiveWindow)
+                RestoreActiveWindow();
             Console.CursorVisible = false;
         }
 

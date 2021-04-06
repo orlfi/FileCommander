@@ -18,14 +18,14 @@ namespace FileCommander
 
         const string DEFAULT_NAME = "Delete";
 
-        public ProgressWindow(Size targetSize) : base("50%-25, 50%-6, 50, 13", targetSize)
+        public ProgressWindow(Size targetSize) : base("50%-25, 50%-3, 50, 7", targetSize)
         {
             Name = DEFAULT_NAME;
 
-            FileInfo = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "FileInfo", "Test File");
+            FileInfo = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "FileInfo", "");
             Add(FileInfo);
 
-            FileProgress = new ProgressBar("2, 3, 100%-4, 1", Size, new ProgressInfo(9000, 12456, "File 1"));
+            FileProgress = new ProgressBar("2, 3, 100%-4, 1", Size, new ProgressInfo(0, 1, "File 1"));
             Add(FileProgress);
 
             AddButtons();

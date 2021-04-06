@@ -54,24 +54,24 @@ namespace FileCommander
                         if (ItemType == FileTypes.File)
                         {
                             FileInfo fi = new FileInfo(Path);
-                            text = fi.Length.FormatFileSize();
+                            text = fi.Exists ? fi.Length.FormatFileSize() : "";
                         }
                         break;
                     case FileColumnTypes.DateTime:
                         if (ItemType == FileTypes.File)
                         {
-                            text = File.GetLastWriteTime(Path).ToString("dd.MM.yy HH:mm").PadLeft(columnWidth);
+                            text = File.Exists(Path) ? File.GetLastWriteTime(Path).ToString("dd.MM.yy HH:mm").PadLeft(columnWidth) : "";
                         }
                         break;
                 }
 
-                buffer.WriteAt(text, x + targetX, Y + targetY, foreground, 
+                buffer.WriteAt(text, x + targetX, Y + targetY, foreground,
                     Focused && FilePanel.Focused ? Theme.FilePanelFocusedBackgroundColor : Theme.FilePanelItemBackgroundColor);
 
                 x += columnWidth;
                 if (i < Columns.Count - 1)
                 {
-                    buffer.WriteAt('│', x+ targetX, Y+targetY, Theme.FilePanelForegroundColor, Focused && FilePanel.Focused ? Theme.FilePanelFocusedBackgroundColor : Theme.FilePanelBackgroundColor);
+                    buffer.WriteAt('│', x + targetX, Y + targetY, Theme.FilePanelForegroundColor, Focused && FilePanel.Focused ? Theme.FilePanelFocusedBackgroundColor : Theme.FilePanelBackgroundColor);
                     x++;
                 }
 
@@ -104,7 +104,7 @@ namespace FileCommander
                     result = ConsoleColor.Cyan;
                     break;
                 case FileTypes.Directory:
-                    result =   Theme.FilePanelDirectoryForegroundColor;
+                    result = Theme.FilePanelDirectoryForegroundColor;
                     if (Selected)
                         result = Theme.FilePanelSelectedForegroundColor;
                     else if (Focused && FilePanel.Focused)
@@ -129,8 +129,9 @@ namespace FileCommander
                 if (extensionIndex > 0)
                 {
                     string extension = name.Substring(extensionIndex);
-                    result = $"{name.Substring(0, (width - extension.Length - 1)<0?0: (width - extension.Length - 1))}~{extension}";
-                } else
+                    result = $"{name.Substring(0, (width - extension.Length - 1) < 0 ? 0 : (width - extension.Length - 1))}~{extension}";
+                }
+                else
                     result = $"{name.Substring(0, width - 1)}~";
             }
             return result;

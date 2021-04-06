@@ -148,9 +148,7 @@ namespace FileCommander
                 var window = new ConfirmationWindow(Size, source, "Delete");
                 if (window.Open() == ModalWindowResult.Confirm)
                 {
-                    OnDelete();
-
-
+                    Delete(sourcePanel, new[] {source});
                 }
             }
         }
@@ -170,6 +168,8 @@ namespace FileCommander
             CommandManager.ProgressEvent += OnDeleteProgress;
             CommandManager.Delete(source);
             CommandManager.ProgressEvent -= OnDeleteProgress;
+            if (ActiveWindow is ProgressWindow)
+                progressWindow.Close();
             sourcePanel.Refresh();
         }
 
@@ -228,10 +228,18 @@ namespace FileCommander
             };
 
             CommandManager.ProgressEvent += OnCopyProgress;
-
             CommandManager.ConfirmationEvent += OnReplaceConfirmation;
 
             CommandManager.Copy(new[] { source }, destination, sender is MoveWindow ? true: false);
+
+            CommandManager.ProgressEvent -= OnCopyProgress;
+            CommandManager.ConfirmationEvent -= OnReplaceConfirmation;
+            
+            if (ActiveWindow is TotalProgressWindow)
+                progressWindow.Close();
+
+            foreach(var panel in Components.Where(item => item is FilePanel))
+                ((FilePanel)panel).Refresh();
         }
 
         private void OnReplaceConfirmation(CommandManager sender, ConfirmationEventArgs args)
@@ -246,27 +254,12 @@ namespace FileCommander
         {
             if (ActiveWindow is TotalProgressWindow progressWindow)
                 progressWindow.SetProgress(progressInfo, totalProgressInfo);
-
-            if (totalProgressInfo.Done)
-            {
-                CommandManager.ProgressEvent -= OnCopyProgress;
-                CommandManager.ConfirmationEvent -= OnReplaceConfirmation;
-                foreach(var panel in Components.Where(item => item is FilePanel))
-                {
-                    ((FilePanel)panel).Refresh();
-                }
-            }
         }
 
-        public void OnDelete()
-        {
-            var window = new DeleteWindow(Size);
-            window.Open();
-        }
         public void OnErrorHandler(string message)
         {
             var errorWindow = new ErrorWindow(Size, message);
-            errorWindow.Open();
+            errorWindow.Open(true);
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
