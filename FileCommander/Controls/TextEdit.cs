@@ -157,8 +157,7 @@ namespace FileCommander
                 StringBuilder.Insert(Cursor + _offsetX, ch);
             
             Cursor++;
-            Update();
-            //WriteString();
+            WriteString();
         }
 
         private void RemoveChar(TextRemoveDirection direction)
@@ -170,38 +169,36 @@ namespace FileCommander
             }
             else if (direction == TextRemoveDirection.Next && StringBuilder.Length > 0 && Cursor + _offsetX < StringBuilder.Length)
                 StringBuilder.Remove(Cursor + _offsetX, 1);
-            Update(); 
-            //WriteString();
+            WriteString();
         }
 
         private void MoveLeft()
         {
             Cursor--;
-            Update();
-            //WriteString();
+            WriteString();
         }
 
         private void MoveRight()
         {
             Cursor++;
-            Update();
-            //WriteString();
+            WriteString();
         }
         private void MoveWordRight()
         {
             StringBuilder.ToString().IndexOf(' ');
             Cursor++;
-            Update();
-            //WriteString();
+            WriteString();
         }
 
-        //private void WriteString()
-        //{
-        //    var position = AbsolutePosition;
-        //    Console.SetCursorPosition(position.X, position.Y);
-        //    Console.Write(StringBuilder.ToString(_offsetX, StringBuilder.Length - _offsetX).PadRight(Width).Fit(Width));
-        //    Console.SetCursorPosition(position.X + Cursor, position.Y);
-        //}
+        private void WriteString()
+        {
+            var position = AbsolutePosition;
+            //Console.SetCursorPosition(position.X, position.Y);
+            //Console.Write(StringBuilder.ToString(_offsetX, StringBuilder.Length - _offsetX).PadRight(Width).Fit(Width));
+            Console.SetCursorPosition(position.X + Cursor, position.Y);
+            Update();
+
+        }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {

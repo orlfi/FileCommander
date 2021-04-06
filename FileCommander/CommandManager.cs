@@ -51,6 +51,7 @@ namespace FileCommander
 
         private void Initialize()
         {
+            Console.CursorVisible = false;
             Size = Settings.Size;
             Console.Title = APP_NAME;
             Console.BufferWidth = Console.WindowWidth = Size.Width;
@@ -149,8 +150,7 @@ namespace FileCommander
 
         public void Refresh()
         {
-            bool saveCursor = Console.CursorVisible;
-            Console.CursorVisible = false;
+            Buffer.SaveCursor();
             Stopwatch sw = new System.Diagnostics.Stopwatch();
 
             sw.Start();
@@ -161,13 +161,12 @@ namespace FileCommander
             Console.ResetColor();
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
-            Console.CursorVisible = saveCursor;
+            Buffer.RestoreCursor();
         }
 
         public void Refresh(int x, int y, int width, int height)
         {
-            bool saveCursor = Console.CursorVisible;
-            Console.CursorVisible = false;
+            Buffer.SaveCursor();
 
             Stopwatch sw = new System.Diagnostics.Stopwatch();
 
@@ -179,7 +178,7 @@ namespace FileCommander
             Console.ResetColor();
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
-            Console.CursorVisible = saveCursor;
+            Buffer.RestoreCursor();
         }
 
         public void OpenFile(string path)

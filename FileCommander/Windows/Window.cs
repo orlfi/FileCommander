@@ -118,12 +118,13 @@ namespace FileCommander
 
         public virtual void Close()
         {
+            Console.CursorVisible = false;
+
             MainWindow.ActiveWindow = null;
 
             Update(true);
             if (_restoreActiveWindow)
                 RestoreActiveWindow();
-            //Console.CursorVisible = false;
         }
 
         public virtual void RestoreActiveWindow()

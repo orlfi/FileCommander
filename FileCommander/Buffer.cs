@@ -6,6 +6,22 @@ namespace FileCommander
 {
     public class Buffer
     {
+        private static int _cursorTop;
+        private static int _cursorLeft;
+        private static bool _cursorVivible;
+
+        public static void SaveCursor()
+        {
+            _cursorTop = Console.CursorTop;
+            _cursorLeft = Console.CursorLeft;
+            _cursorVivible = Console.CursorVisible;
+        }
+        public static void RestoreCursor()
+        {
+            Console.CursorTop = _cursorTop;
+            Console.CursorLeft = _cursorLeft;
+            Console.CursorVisible = _cursorVivible;
+        }
         private struct ColorPair
         {
             public ConsoleColor ForegroundColor { get; set; }
@@ -101,8 +117,7 @@ namespace FileCommander
         }
         public void Paint()
         {
-            bool saveCursor = Console.CursorVisible;
-            Console.CursorVisible = false;
+            SaveCursor();
             List<string> strings = new List<String>();
             List<ColorPair> colors = new List<ColorPair>();
             ConsoleColor foreground = Console.ForegroundColor;
@@ -154,13 +169,12 @@ namespace FileCommander
                 Console.BackgroundColor = colors[i].BackgroundColor;
                 Console.Write(strings[i]);
             }
-            Console.CursorVisible = saveCursor;
+            RestoreCursor();
         }
 
         public void Paint(int x, int y, int width, int height)
         {
-            bool saveCursor = Console.CursorVisible;
-            Console.CursorVisible = false;
+            SaveCursor();
             int bufferHeight = _buffer.GetLength(1);
             Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
@@ -235,14 +249,13 @@ namespace FileCommander
             //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
 
             // Write whole text lines
-            Console.CursorVisible = saveCursor;
+            RestoreCursor();
         }
 
         // TODO change code
         public void PaintEsc(int x, int y, int width, int height)
         {
-            bool saveCursor = Console.CursorVisible;
-            Console.CursorVisible = false;
+            SaveCursor();
             int bufferHeight = _buffer.GetLength(1);
             Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
@@ -297,7 +310,7 @@ namespace FileCommander
                     Console.Write(strings[i]);
                 }
                 sb.Clear();
-                Console.CursorVisible = saveCursor;
+
 
             }
 
@@ -310,6 +323,7 @@ namespace FileCommander
             //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
 
             // Write whole text lines
+            RestoreCursor();
         }
 
     }
