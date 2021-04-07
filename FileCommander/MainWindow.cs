@@ -23,16 +23,26 @@ namespace FileCommander
             LeftPanel.Border = LineType.Single;
             LeftPanel.Fill = true;
             Add(LeftPanel);
+            CommandManager.PathChange += LeftPanel.OnPathChange;
 
             RightPanel = new FilePanel("50%,0,50%,100%-2", Size);
             RightPanel.Name = "RightPanel";
             RightPanel.Fill = true;
             RightPanel.Border = LineType.Single;
             Add(RightPanel);
+            CommandManager.PathChange += RightPanel.OnPathChange;
 
             var сommandHistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-2", Size);
             сommandHistoryPanel.Border = LineType.Single;
             сommandHistoryPanel.Fill = true;
+
+            var сommandPanel = new CommandPanel("0, 100%-2, 100%, 1", Size, Alignment.None, "CommandPanel", Path);
+            Add(сommandPanel);
+            сommandPanel.Disabled = true;
+            CommandManager.PathChange += сommandPanel.OnPathChange;
+
+            //сommandHistoryPanel.Border = LineType.Single;
+            //сommandHistoryPanel.Fill = true;
 
             var hotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
             hotKeyPanel.Disabled = true;
@@ -53,13 +63,13 @@ namespace FileCommander
                 SetFocus(RightPanel, false);
         }
 
-        public override void SetPath(string path)
-        {
-            foreach (var component in Components.Where(item => !(item is FilePanel && item != FocusedComponent)))
-            {
-                component.SetPath(path);
-            }
-        }
+        // public override void SetPath(string path)
+        // {
+        //     foreach (var component in Components.Where(item => !(item is FilePanel && item != FocusedComponent)))
+        //     {
+        //         component.SetPath(path);
+        //     }
+        // }
         
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
@@ -109,13 +119,15 @@ namespace FileCommander
         {
             if (panel != null)
             {
+                SetFocus(panel);
                 var window = new DriveSelectWindow(panel);
                 window.Parent = panel;
                 window.SelectDriveEvent += (sender, driveInfo) =>
                 {
-                    panel.SetPath(driveInfo.Name);
-                    panel.View.Top();
-                    panel.Update();
+                    CommandManager.SetPath(driveInfo.Name);
+                    //panel.SetPath(driveInfo.Name);
+                    // panel.View.Top();
+                    // panel.Update();
                     ((Window)sender).Close();
                 };
                 window.Open();

@@ -54,6 +54,10 @@ namespace FileCommander
 
         public ConsoleColor TextEditBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
 
+        public ConsoleColor CommandForegroundColor { get; set; } = ConsoleColor.Gray;
+
+        public ConsoleColor CommandBackgroundColor { get; set; } = ConsoleColor.Black;
+
         private static Theme instance;
 
         public Theme() { }

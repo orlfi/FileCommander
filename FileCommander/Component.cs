@@ -9,6 +9,7 @@ namespace FileCommander
     
     public abstract class Component
     {
+        protected CursorState cursorState = new CursorState();
 
         public Settings Settings => Settings.GetInstance();
         public event FocusHandler FocusEvent;
@@ -205,47 +206,47 @@ namespace FileCommander
             CommandManager.GetInstance().Refresh(x, y, width, height);
         }
 
-        public static void SaveCursor()
-        {
-            saveForegroundColor = Console.ForegroundColor;
-            saveBackgroundColor = Console.BackgroundColor;
-        }
+        // public static void SaveCursor()
+        // {
+        //     saveForegroundColor = Console.ForegroundColor;
+        //     saveBackgroundColor = Console.BackgroundColor;
+        // }
 
-        public static void RestoreCursor()
-        {
-            Console.ForegroundColor = saveForegroundColor;
-            Console.BackgroundColor = saveBackgroundColor;
-        }
+        // public static void RestoreCursor()
+        // {
+        //     Console.ForegroundColor = saveForegroundColor;
+        //     Console.BackgroundColor = saveBackgroundColor;
+        // }
 
-        public static void SetColor(ConsoleColor foreground, ConsoleColor background)
-        {
-            Console.ForegroundColor = foreground;
-            Console.BackgroundColor = background;
-        }
+        // public static void SetColor(ConsoleColor foreground, ConsoleColor background)
+        // {
+        //     Console.ForegroundColor = foreground;
+        //     Console.BackgroundColor = background;
+        // }
 
-        public static void WriteAt(string text, int x, int y)
-        {
-            Console.SetCursorPosition(x, y);
-            Console.Write(text);
-        }
+        // public static void WriteAt(string text, int x, int y)
+        // {
+        //     Console.SetCursorPosition(x, y);
+        //     Console.Write(text);
+        // }
 
-        public static void WriteAt(string text, int x, int y, ConsoleColor foreground, ConsoleColor background)
-        {
-            SetColor(foreground, background);
-            WriteAt(text, x, y);
-        }
+        // public static void WriteAt(string text, int x, int y, ConsoleColor foreground, ConsoleColor background)
+        // {
+        //     SetColor(foreground, background);
+        //     WriteAt(text, x, y);
+        // }
 
-        public static void WriteAt(char ch, int x, int y, ConsoleColor foreground, ConsoleColor background)
-        {
-            SetColor(foreground, background);
-            WriteAt(ch, x, y);
-        }
+        // public static void WriteAt(char ch, int x, int y, ConsoleColor foreground, ConsoleColor background)
+        // {
+        //     SetColor(foreground, background);
+        //     WriteAt(ch, x, y);
+        // }
 
-        public static void WriteAt(char ch, int x, int y)
-        {
-            Console.SetCursorPosition(x, y);
-            Console.Write(ch);
-        }
+        // public static void WriteAt(char ch, int x, int y)
+        // {
+        //     Console.SetCursorPosition(x, y);
+        //     Console.Write(ch);
+        // }
         #endregion
 
         #region Methods
@@ -285,10 +286,10 @@ namespace FileCommander
             OnPaint();
         }
 
-        public virtual void SetPath(string path)
-        {
-            Path = path;
-        }
+        // public virtual void SetPath(string path)
+        // {
+        //     Path = path;
+        // }
 
         public abstract void OnKeyPress(ConsoleKeyInfo keyInfo);
 

@@ -88,6 +88,7 @@ namespace FileCommander
 
         public virtual ModalWindowResult Open(bool restoreActiveWindow = false)
         {
+            cursorState.Save();
             if (MainWindow.ActiveWindow != null && restoreActiveWindow)
             {
                 _saveWindow = MainWindow.ActiveWindow;
@@ -118,7 +119,7 @@ namespace FileCommander
 
         public virtual void Close()
         {
-            Console.CursorVisible = false;
+            cursorState.Restore();
 
             MainWindow.ActiveWindow = null;
 

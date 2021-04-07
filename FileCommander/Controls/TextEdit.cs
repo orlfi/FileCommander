@@ -9,10 +9,24 @@ namespace FileCommander
     public delegate string TextChangedHandler(Component sender);
     public class TextEdit : Control
     {
+        public bool HideCursorOnFocuseLeft {get ;set;} = true;
+        public string Label {get; set;} = "TEST";
         // TODO
         //public event TextChangedHandler TextChangedEvent;
-        public string Value { get; set; }
-
+        public string Value 
+        { 
+            get => StringBuilder.ToString();
+        set
+        {
+            if (value != StringBuilder.ToString())
+            {
+            StringBuilder.Clear();
+            StringBuilder.Append(value);
+            Cursor = StringBuilder.Length + Label.Length;                
+            }
+        }
+        }
+        public StringBuilder StringBuilder { get; set; }
         public Point AbsolutePosition => GetAbsolutePosition(this);
 
         private int _cursor;
@@ -46,9 +60,9 @@ namespace FileCommander
         {
             ForegroundColor = Theme.TextEditForegroundColor;
             BackgroundColor = Theme.TextEditBackgroundColor;
+            StringBuilder = new StringBuilder();
             Value = value;
-            StringBuilder = new StringBuilder(Value);
-            Cursor = StringBuilder.Length;
+            //Cursor = StringBuilder.Length;
         }
 
         public override void OnFocusChange(bool focused)
@@ -58,7 +72,7 @@ namespace FileCommander
             {
                 Edit();
             }
-            else
+            else if (HideCursorOnFocuseLeft)
                 Console.CursorVisible = false;
         }
 
@@ -93,61 +107,13 @@ namespace FileCommander
 
         }
 
-        public StringBuilder StringBuilder { get; set; }
-
         protected void Edit()
         {
             Console.CursorVisible = true;
-            Console.SetCursorPosition(AbsolutePosition.X + Cursor, AbsolutePosition.Y);
-            Console.ForegroundColor = Theme.TextEditForegroundColor;
-            Console.BackgroundColor = Theme.TextEditBackgroundColor;
+            Console.SetCursorPosition(AbsolutePosition.X + Cursor + Label.Length, AbsolutePosition.Y);
+            // Console.ForegroundColor = Theme.TextEditForegroundColor;
+            // Console.BackgroundColor = Theme.TextEditBackgroundColor;
         }
-
-        //protected void Edit()
-        //{
-
-        //    Console.SetCursorPosition(AbsolutePosition.X + Cursor, AbsolutePosition.Y);
-        //    Console.ForegroundColor = Theme.TextEditForegroundColor;
-        //    Console.BackgroundColor = Theme.TextEditBackgroundColor;
-        //    ConsoleKeyInfo keyInfo;
-        //    do
-        //    {
-        //        Console.CursorVisible = true;
-        //        keyInfo = Console.ReadKey(true);
-        //        Console.CursorVisible = false;
-        //        if (keyInfo.KeyChar != '\u0000' && keyInfo.KeyChar != '\b' && keyInfo.Key != ConsoleKey.Tab && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter)
-        //        {
-        //            AddChar(keyInfo.KeyChar);
-
-        //        }
-        //        else if (keyInfo.KeyChar == '\b')
-        //        {
-        //            RemoveChar(TextRemoveDirection.Previous);
-        //        }
-        //        else if (keyInfo.Key == ConsoleKey.LeftArrow)
-        //        {
-        //            MoveLeft();
-        //        }
-        //        else if (keyInfo.Key == ConsoleKey.RightArrow)
-        //        {
-        //            MoveRight();
-        //        }
-        //        else if (keyInfo.Modifiers == ConsoleModifiers.Control && keyInfo.Key == ConsoleKey.RightArrow)
-        //        {
-        //            MoveWordRight();
-        //        }
-        //        else if(keyInfo.Key == ConsoleKey.Delete)
-        //        {
-        //            RemoveChar(TextRemoveDirection.Next);
-        //        }
-        //    } while (keyInfo.Key != ConsoleKey.Enter && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Tab);
-        //    Value = StringBuilder.ToString();
-        //    if (Parent != null)
-        //    {
-        //        Panel parent = (Panel)Parent;
-        //        parent.OnKeyPress(keyInfo);
-        //    }
-        //}
 
         private void AddChar(char ch)
         {
@@ -190,19 +156,17 @@ namespace FileCommander
             WriteString();
         }
 
-        private void WriteString()
+        protected void WriteString()
         {
             var position = AbsolutePosition;
-            //Console.SetCursorPosition(position.X, position.Y);
-            //Console.Write(StringBuilder.ToString(_offsetX, StringBuilder.Length - _offsetX).PadRight(Width).Fit(Width));
-            Console.SetCursorPosition(position.X + Cursor, position.Y);
+            Console.SetCursorPosition(position.X + Cursor + Label.Length, position.Y);
             Update();
 
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            buffer.WriteAt(StringBuilder.ToString(_offsetX, StringBuilder.Length - _offsetX).PadRight(Width).Fit(Width), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+            buffer.WriteAt(Label+StringBuilder.ToString(_offsetX, StringBuilder.Length - (_offsetX)).PadRight(Width-Label.Length).Fit(Width-Label.Length), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
         }
     }
 }

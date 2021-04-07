@@ -1,29 +1,26 @@
 using System;
+using System.IO;
 namespace FileCommander
 {
-    public class CommandPanel: Component
+    public class CommandPanel: TextEdit
     {
-        public const ConsoleColor DEFAULT_COMMAND_FOREGROUND_COLOR = ConsoleColor.Gray;
-        public const ConsoleColor DEFAULT_COMMAND_BACKGROUND_COLOR = ConsoleColor.Black;
 
-        public CommandPanel(string rectangle, Size size) : base(rectangle, size) { }
-        //public override void Draw()
-        //{
-        //    Console.ForegroundColor = DEFAULT_COMMAND_FOREGROUND_COLOR;
-        //    Console.BackgroundColor = DEFAULT_COMMAND_BACKGROUND_COLOR;
-
-        //    Console.SetCursorPosition(X, Y);
-        //    Console.Write(Path+"\\");
-        //}
-
-        public override void Draw(Buffer buffer, int targetX, int targetY)
-        {
-            throw new NotImplementedException();
+        public CommandPanel(string rectangle, Size size, Alignment alignment, string name, string value) : base(rectangle, size, alignment, name, value) 
+        { 
+            HideCursorOnFocuseLeft = false;
+            ForegroundColor = Theme.CommandForegroundColor;
+            BackgroundColor = Theme.CommandBackgroundColor;
+            Console.CursorVisible = true;
+            Console.SetCursorPosition(AbsolutePosition.X + Cursor + Label.Length, AbsolutePosition.Y);
         }
 
-        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
+        public void OnPathChange(string path)
         {
-            throw new NotImplementedException();
+            if (path != Value)
+            {
+                Label = path + ">";
+                WriteString();
+            }
         }
     }
 }

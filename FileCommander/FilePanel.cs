@@ -66,7 +66,7 @@ namespace FileCommander
                     case ConsoleKey.PageDown:
                         View.Bottom();
                         break;
-                    case ConsoleKey.Insert:
+                    case ConsoleKey.Insert or ConsoleKey.Spacebar:
                         View.InvertItemSelection();
                         break;
                     case ConsoleKey.Multiply:
@@ -90,7 +90,13 @@ namespace FileCommander
             }
         }
 
-        public override void SetPath(string path)
+        public void OnPathChange(string path)
+        {
+            if (Focused && path != Path)
+                SetPath(path);
+        }
+
+        public void SetPath(string path)
         {
             try
             {
@@ -106,6 +112,7 @@ namespace FileCommander
                 DirectoryPanel.SetName(Path, Size);
                 View.Path = Path;
                 View.SetFiles(Files);
+                //Update();
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -127,7 +134,8 @@ namespace FileCommander
                 {
                     try
                     {
-                        SetPath(View.FocusedItem.Path);
+                        CommandManager.SetPath(View.FocusedItem.Path);
+                        //SetPath(View.FocusedItem.Path);
                         View.Start();
                     }
                     catch (Exception) { }
@@ -137,7 +145,8 @@ namespace FileCommander
                     try
                     {
                         string path = Path;
-                        SetPath(System.IO.Path.GetDirectoryName(Path));
+                        CommandManager.SetPath(System.IO.Path.GetDirectoryName(Path));
+                        //SetPath(System.IO.Path.GetDirectoryName(Path));
                         View.FocusItem(path);
                     }
                     catch (Exception) { }

@@ -69,13 +69,13 @@ namespace FileCommander
                 Add(item);
         }
 
-        public override void SetPath(string path)
-        {
-            foreach (var item in Components)
-            {
-                item.SetPath(path);
-            }
-        }
+        // public override void SetPath(string path)
+        // {
+        //     foreach (var item in Components)
+        //     {
+        //         item.SetPath(path);
+        //     }
+        // }
 
         public virtual void SetFocus(Component component, bool update = true)
         {

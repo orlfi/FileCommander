@@ -13,6 +13,7 @@ namespace FileCommander
     public delegate void OnWindowResizeHandler(Size size);
     public delegate void OnConfirmationHandler(CommandManager sender, ConfirmationEventArgs args);
 
+    public delegate void PathChangeHandler(string path);
 
     public class CommandManager
     {
@@ -21,6 +22,7 @@ namespace FileCommander
         public event OnErrorHandler ErrorEvent;
         public event OnWindowResizeHandler WindowResizeEvent;
         public event OnConfirmationHandler ConfirmationEvent;
+        public event PathChangeHandler PathChange;
 
         bool _skipAll;
         bool _overwriteAll;
@@ -39,7 +41,18 @@ namespace FileCommander
 
         private static CommandManager instance;
 
-        public string Path { get; private set; }
+        private string _path;
+        public string Path { 
+            get => _path; 
+            set 
+            {
+                if (_path != value)
+                {
+                 _path = value;   
+                 PathChange?.Invoke(_path);
+                }
+            }
+        }
 
         public MainWindow MainWindow { get; set; }
 
@@ -86,7 +99,7 @@ namespace FileCommander
         public void SetPath(string path)
         {
             Path = path;
-            MainWindow.SetPath(path);
+            //MainWindow.SetPath(path);
         }
 
         public void Run()
@@ -94,7 +107,7 @@ namespace FileCommander
             Refresh();
             while (!Quit)
             {
-                CheckKeyPress(10);
+                CheckKeyPress(30);
             }
             SaveSettings();
         }
@@ -139,7 +152,7 @@ namespace FileCommander
                     Quit = true;
                     break;
 
-                case ConsoleKey.Spacebar:
+                case ConsoleKey.F11:
                     CommandManager_WindowResizeEvent(Size);
                     break;
                 default:
