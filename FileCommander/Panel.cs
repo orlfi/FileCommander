@@ -8,6 +8,7 @@ namespace FileCommander
         public List<Component> Components { get; set; } = new List<Component>();
 
         protected CommandManager CommandManager => CommandManager.GetInstance();
+        
         public Component FocusedComponent { get; set; } = null;
         
       

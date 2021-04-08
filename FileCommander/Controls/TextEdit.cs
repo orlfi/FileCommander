@@ -9,22 +9,22 @@ namespace FileCommander
     public delegate string TextChangedHandler(Component sender);
     public class TextEdit : Control
     {
-        public bool HideCursorOnFocuseLeft {get ;set;} = true;
-        public string Label {get; set;} = "TEST";
+        public bool HideCursorOnFocuseLeft { get; set; } = true;
+        public string Label { get; set; } = "";
         // TODO
         //public event TextChangedHandler TextChangedEvent;
-        public string Value 
-        { 
-            get => StringBuilder.ToString();
-        set
+        public string Value
         {
-            if (value != StringBuilder.ToString())
+            get => StringBuilder.ToString();
+            set
             {
-            StringBuilder.Clear();
-            StringBuilder.Append(value);
-            Cursor = StringBuilder.Length + Label.Length;                
+                if (value != StringBuilder.ToString())
+                {
+                    StringBuilder.Clear();
+                    StringBuilder.Append(value);
+                    Cursor = StringBuilder.Length + Label.Length;
+                }
             }
-        }
         }
         public StringBuilder StringBuilder { get; set; }
         public Point AbsolutePosition => GetAbsolutePosition(this);
@@ -78,11 +78,10 @@ namespace FileCommander
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-
             if (keyInfo.KeyChar != '\u0000' && keyInfo.KeyChar != '\b' && keyInfo.Key != ConsoleKey.Tab && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter)
             {
-                AddChar(keyInfo.KeyChar);
-
+                if (!System.IO.Path.InvalidPathChars.Contains(keyInfo.KeyChar))
+                    AddChar(keyInfo.KeyChar);
             }
             else if (keyInfo.KeyChar == '\b')
             {
@@ -121,7 +120,7 @@ namespace FileCommander
                 StringBuilder.Append(ch);
             else
                 StringBuilder.Insert(Cursor + _offsetX, ch);
-            
+
             Cursor++;
             WriteString();
         }
@@ -161,12 +160,11 @@ namespace FileCommander
             var position = AbsolutePosition;
             Console.SetCursorPosition(position.X + Cursor + Label.Length, position.Y);
             Update();
-
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            buffer.WriteAt(Label+StringBuilder.ToString(_offsetX, StringBuilder.Length - (_offsetX)).PadRight(Width-Label.Length).Fit(Width-Label.Length), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+            buffer.WriteAt(Label + StringBuilder.ToString(_offsetX, StringBuilder.Length - (_offsetX)).PadRight(Width - Label.Length).Fit(Width - Label.Length), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
         }
     }
 }

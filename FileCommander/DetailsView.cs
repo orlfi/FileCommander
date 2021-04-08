@@ -128,8 +128,8 @@ namespace FileCommander
 
         public void FocusItem()
         {
-            FocusedItem.SetFocus(false);
-            FocusedItem.Update();
+            FocusedItem?.SetFocus(false);
+            FocusedItem?.Update();
             FocusedItem = (FileItem)Components.ElementAtOrDefault(CursorY + _offsetY - HeaderHeight);
             FocusedItem.Update();
         }
@@ -178,6 +178,11 @@ namespace FileCommander
                 CursorY = index + HeaderHeight;
                 Update();
             }
+            else
+            {
+                Start();
+            }
+
         }
         public void DrawItems(Buffer buffer, int targetX, int targetY)
         {

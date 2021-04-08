@@ -75,17 +75,8 @@ namespace FileCommander
 
         public bool Disabled { get; set; }
 
-        private bool _visible = true;
-        public bool Visible 
-        { 
-            get => _visible;
-            set
-            {
-                _visible = value;
-            }
-        }
+        public bool Visible { get; set;}
 
-        private Component _parent;
 
         public Component Parent { get; set; }
 

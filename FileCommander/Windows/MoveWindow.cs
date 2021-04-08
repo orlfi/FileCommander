@@ -10,6 +10,7 @@ namespace FileCommander
         
         public MoveWindow(Size targetSize, string sourcePath, string destinationPath) : base(targetSize, sourcePath, destinationPath, DEFAULT_NAME) 
         {
+            Move = true;
         }
     }
 }

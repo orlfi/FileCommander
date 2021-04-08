@@ -93,16 +93,17 @@ namespace FileCommander
         public void OnPathChange(string path)
         {
             if (Focused && path != Path)
+            {
                 SetPath(path);
+                View.FocusItem(View.FocusedItem.Path);
+                Update();
+            }
         }
 
         public void SetPath(string path)
         {
             try
             {
-                path += path[path.Length - 1] == ':' ? "\\" : "";
-                if (!Directory.Exists(path))
-                    path = Settings.GetDefaultPath();
                 DirectoryInfo di = new DirectoryInfo(path);
                 Files.Clear();
                 Files.AddRange(di.GetDirectories());
@@ -112,7 +113,6 @@ namespace FileCommander
                 DirectoryPanel.SetName(Path, Size);
                 View.Path = Path;
                 View.SetFiles(Files);
-                //Update();
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -134,9 +134,9 @@ namespace FileCommander
                 {
                     try
                     {
-                        CommandManager.SetPath(View.FocusedItem.Path);
-                        //SetPath(View.FocusedItem.Path);
-                        View.Start();
+                        string path = View.FocusedItem.Path;
+                        CommandManager.SetPath(path);
+                        View.FocusItem(path);
                     }
                     catch (Exception) { }
                 }
@@ -146,7 +146,6 @@ namespace FileCommander
                     {
                         string path = Path;
                         CommandManager.SetPath(System.IO.Path.GetDirectoryName(Path));
-                        //SetPath(System.IO.Path.GetDirectoryName(Path));
                         View.FocusItem(path);
                     }
                     catch (Exception) { }

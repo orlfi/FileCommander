@@ -32,13 +32,13 @@ namespace FileCommander
         {
             Name = DEFAULT_NAME;
 
-            FileSourceInfo = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "FileInfo", "Test File");
+            FileSourceInfo = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "FileInfo", "");
             Add(FileSourceInfo);
 
             FileDestinationInfo = new Label("2, 2, 100%-4, 1", Size, Alignment.None, "FileInfo", "File Destination Path");
             Add(FileDestinationInfo);
 
-            FileProgress = new ProgressBar("2, 3, 100%-4, 1", Size, new ProgressInfo(9000, 12456, "File 1"));
+            FileProgress = new ProgressBar("2, 3, 100%-4, 1", Size, new ProgressInfo(0, 1, ""));
             Add(FileProgress);
 
             TotalFilesCount = new Label("2, 5, 100%-4, 1", Size, Alignment.None, "TotalFilesCount", "Total Files Count");
@@ -47,7 +47,7 @@ namespace FileCommander
             TotalBytesCount = new Label("2, 6, 100%-4, 1", Size, Alignment.None, "TotalBytesCount", "Total Bytes Count");
             Add(TotalBytesCount);
 
-            TotalProgress = new ProgressBar("2, 7, 100%-4, 1", Size, new ProgressInfo(500, 1024, "Total info"));
+            TotalProgress = new ProgressBar("2, 7, 100%-4, 1", Size, new ProgressInfo(0, 1, "Total info"));
             Add(TotalProgress);
 
             ProgressInfo = new Label("2, 9, 100%-4, 1", Size, Alignment.None, "ProgressInfo", "Progress Info");

@@ -4,13 +4,13 @@ using System.Numerics;
 
 namespace FileCommander
 {
-    public delegate void CopyHandler(Component sender, string source, string destination);
+    public delegate void CopyHandler(Component sender, string source, string destination, bool move);
     public class CopyWindow: Window
     {
         public event CopyHandler CopyEvent;
 
         public const string SOURCE_TEMPLATE = "{0} {1} to:";
-        public bool Move { get; set;}
+        public bool Move { get; set;} = false;
 
         public Button SaveButton { get; set;}
         
@@ -66,7 +66,7 @@ namespace FileCommander
         public override void OnEnter()
         {
             Close();
-            CopyEvent?.Invoke(this, Source.Path, Destination.Value);
+            CopyEvent?.Invoke(this, Source.Path, Destination.Value, Move);
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)

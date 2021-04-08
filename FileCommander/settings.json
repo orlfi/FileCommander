@@ -1,8 +1,8 @@
 {
-  "Path": "D:\\Energo",
-  "LeftPanelPath": "D:\\Energo",
-  "RightPanelPath": "D:\\TEMP\\test1",
-  "FocusedPanel": "LeftPanel",
+  "Path": "D:\\",
+  "LeftPanelPath": "C:\\Tmp",
+  "RightPanelPath": "D:\\",
+  "FocusedPanel": "RightPanel",
   "Size": {
     "Width": 80,
     "Height": 24

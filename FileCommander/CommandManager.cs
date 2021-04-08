@@ -42,14 +42,20 @@ namespace FileCommander
         private static CommandManager instance;
 
         private string _path;
-        public string Path { 
-            get => _path; 
-            set 
+        public string Path
+        {
+            get => _path;
+            set
             {
                 if (_path != value)
                 {
-                 _path = value;   
-                 PathChange?.Invoke(_path);
+                    if (!Directory.Exists(value))
+                        _path = Settings.GetDefaultPath();
+                    else
+                    {
+                        _path = (new DirectoryInfo(value)).FullName;
+                        PathChange?.Invoke(_path);
+                    }
                 }
             }
         }
@@ -227,11 +233,11 @@ namespace FileCommander
             }
         }
 
-        public void MakeDir(string path, string name)
+        public void MakeDir(string path)
         {
             try
             {
-                Directory.CreateDirectory(System.IO.Path.Combine(path, name));
+                Directory.CreateDirectory(path);
             }
             catch (Exception ex)
             {

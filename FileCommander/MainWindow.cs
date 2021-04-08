@@ -14,6 +14,7 @@ namespace FileCommander
 
         public FilePanel RightPanel { get; set; } = null;
 
+        public CommandPanel CommandPanel { get; set; } = null;
         public CommandHistoryPanel HistoryPanel { get; set; } = null;
 
         public MainWindow(string rectangle, Size size) : base(rectangle, size)
@@ -36,10 +37,10 @@ namespace FileCommander
             сommandHistoryPanel.Border = LineType.Single;
             сommandHistoryPanel.Fill = true;
 
-            var сommandPanel = new CommandPanel("0, 100%-2, 100%, 1", Size, Alignment.None, "CommandPanel", Path);
-            Add(сommandPanel);
-            сommandPanel.Disabled = true;
-            CommandManager.PathChange += сommandPanel.OnPathChange;
+            CommandPanel = new CommandPanel("0, 100%-2, 100%, 1", Size, Alignment.None, "CommandPanel", Path);
+            Add(CommandPanel);
+            CommandPanel.Disabled = true;
+            CommandManager.PathChange += CommandPanel.OnPathChange;
 
             //сommandHistoryPanel.Border = LineType.Single;
             //сommandHistoryPanel.Fill = true;
@@ -47,7 +48,7 @@ namespace FileCommander
             var hotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
             hotKeyPanel.Disabled = true;
             Add(hotKeyPanel);
-            
+
             CommandManager.ErrorEvent += OnErrorHandler;
             RestoreSettings();
         }
@@ -70,7 +71,7 @@ namespace FileCommander
         //         component.SetPath(path);
         //     }
         // }
-        
+
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
             if (ActiveWindow != null)
@@ -109,8 +110,40 @@ namespace FileCommander
                     break;
                 case ConsoleKey.Tab:
                     SetFocus(FocusNext());
+                    if (FocusedComponent is FilePanel filePanel)
+                        CommandManager.Path = filePanel.Path;
                     break;
                 default:
+                    if (keyInfo.Modifiers == ConsoleModifiers.Control && keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        if (FocusedComponent is FilePanel filepanel && filepanel.View.FocusedItem is FileItem fileItem &&
+                            (fileItem.ItemType != FileTypes.Empty))
+                        {
+                            string path = fileItem.Path;
+                            if (fileItem.ItemType == FileTypes.ParentDirectory)
+                                path = filepanel.Path;
+                            CommandPanel.AddPath(path);
+
+                            if (FocusedComponent != CommandPanel)
+                            {
+                                CommandPanel.FocusedFilePanel = FocusedComponent is FilePanel?FocusedComponent as FilePanel: null;
+                                SetFocus(CommandPanel);
+                            }
+                            return;
+                        }
+                    }
+                    else if (keyInfo.KeyChar != '\u0000' && keyInfo.Key != ConsoleKey.Tab
+                        && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter &&  keyInfo.Key != ConsoleKey.Spacebar)
+                    {
+
+
+                        if (FocusedComponent != CommandPanel)
+                        {
+                            CommandPanel.FocusedFilePanel = FocusedComponent is FilePanel?FocusedComponent as FilePanel: null;
+                            SetFocus(CommandPanel);
+                        }
+                    }
+
                     FocusedComponent?.OnKeyPress(keyInfo);
                     break;
             }
@@ -145,7 +178,7 @@ namespace FileCommander
                 window.Open();
             }
         }
-        private void OnRename(Component sender, string source, string destination)
+        private void OnRename(Component sender, string source, string destination, bool move)
         {
             CommandManager.Rename(source, destination);
             ((RenameWindow)sender).DestinationPanel?.Refresh();
@@ -160,12 +193,12 @@ namespace FileCommander
                 var window = new ConfirmationWindow(Size, source, "Delete");
                 if (window.Open() == ModalWindowResult.Confirm)
                 {
-                    Delete(sourcePanel, new[] {source});
+                    Delete(sourcePanel, new[] { source });
                 }
             }
         }
 
-        private void Delete(FilePanel sourcePanel, string[] source)
+        public void Delete(FilePanel sourcePanel, string[] source)
         {
             var progressWindow = new ProgressWindow(Size);
             //progressWindow.FileDestinationInfo.Text = destination;
@@ -203,14 +236,14 @@ namespace FileCommander
                 window.Open();
             }
         }
-        private void OnMakeDir(Component sender, string path, string name)
+        private void OnMakeDir(Component sender, string path, string name, bool move)
         {
-            CommandManager.MakeDir(path, name);
+            CommandManager.MakeDir(System.IO.Path.Combine(path, name));
             var panel = ((MakeDirectoryWindow)sender).DestinationPanel;
             panel?.Refresh();
             panel?.View.FocusItem(System.IO.Path.Combine(path, name));
         }
-        
+
         public void ShowCopyWindow(bool move = false)
         {
             if (FocusedComponent is FilePanel sourcePanel)
@@ -220,20 +253,20 @@ namespace FileCommander
                 string destinationPath = sourcePath;
                 if (destinationPanel != null)
                     destinationPath = destinationPanel.Path;
-                var window = move? new MoveWindow(Size, sourcePath, destinationPath) : new CopyWindow(Size, sourcePath, destinationPath);
+                var window = move ? new MoveWindow(Size, sourcePath, destinationPath) : new CopyWindow(Size, sourcePath, destinationPath);
                 window.DestinationPanel = destinationPanel;
                 window.CopyEvent += OnCopy;
                 window.Open();
             }
         }
 
-        private void OnCopy(Component sender, string source, string destination)
+        public void OnCopy(Component sender, string source, string destination, bool move)
         {
             var progressWindow = new TotalProgressWindow(Size);
             progressWindow.FileDestinationInfo.Text = destination;
-            progressWindow.Name = sender is MoveWindow ? MoveWindow.DEFAULT_NAME: CopyWindow.DEFAULT_NAME;
+            progressWindow.Name = move ? MoveWindow.DEFAULT_NAME : CopyWindow.DEFAULT_NAME;
             progressWindow.Open();
-            progressWindow.CancelEvent += () => 
+            progressWindow.CancelEvent += () =>
             {
                 CommandManager.ProgressEvent -= OnCopyProgress;
                 CommandManager.CancelOperation = true;
@@ -242,21 +275,21 @@ namespace FileCommander
             CommandManager.ProgressEvent += OnCopyProgress;
             CommandManager.ConfirmationEvent += OnReplaceConfirmation;
 
-            CommandManager.Copy(new[] { source }, destination, sender is MoveWindow ? true: false);
+            CommandManager.Copy(new[] { source }, destination, move);
 
             CommandManager.ProgressEvent -= OnCopyProgress;
             CommandManager.ConfirmationEvent -= OnReplaceConfirmation;
-            
+
             if (ActiveWindow is TotalProgressWindow)
                 progressWindow.Close();
 
-            foreach(var panel in Components.Where(item => item is FilePanel))
+            foreach (var panel in Components.Where(item => item is FilePanel))
                 ((FilePanel)panel).Refresh();
         }
 
         private void OnReplaceConfirmation(CommandManager sender, ConfirmationEventArgs args)
         {
-            var confirmationWindow = new ReplaceConfirmationWindow(Size, args.Message) { Modal = true};
+            var confirmationWindow = new ReplaceConfirmationWindow(Size, args.Message) { Modal = true };
 
             args.Result = confirmationWindow.Open(true);
             confirmationWindow.RestoreActiveWindow();
@@ -271,6 +304,12 @@ namespace FileCommander
         public void OnErrorHandler(string message)
         {
             var errorWindow = new ErrorWindow(Size, message);
+            errorWindow.Open(true);
+        }
+
+        public static void ShowError(string message, Size parentSize)
+        {
+            var errorWindow = new ErrorWindow(parentSize, message);
             errorWindow.Open(true);
         }
 
