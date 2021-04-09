@@ -30,8 +30,8 @@ namespace FileCommander
             //try
             //{
             
-            // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            //     SetConsoleVirtualProcessing();
+             if (CommandManager.CheckWindows())
+                 SetConsoleVirtualProcessing();
 
             string path = Settings.GetInstance().Path;
 

@@ -113,7 +113,7 @@ namespace FileCommander
             Refresh();
             while (!Quit)
             {
-                CheckKeyPress(30);
+                CheckKeyPress(5);
             }
             SaveSettings();
         }
@@ -180,6 +180,8 @@ namespace FileCommander
             Console.ResetColor();
             Console.SetCursorPosition(0, Size.Height - 1);
             Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+            Console.SetCursorPosition(40, Size.Height - 1);
+            Console.Write(System.Environment.OSVersion.VersionString);
             Buffer.RestoreCursor();
         }
 
@@ -487,6 +489,12 @@ namespace FileCommander
             {
                 fileInfo.Delete();
             }
+        }
+
+        public static bool CheckWindows()
+        {
+            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) && 
+                System.Environment.OSVersion.Version.Major >= 10;
         }
     }
 }
