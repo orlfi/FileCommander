@@ -1,6 +1,8 @@
 # FileCommander
 
-FileCommander is an entry-level for console two-panel file manager .NET Core.
+FileCommander is an entry-level console two-panel file manager for .NET Core.
+
+![Sample app](https://raw.githubusercontent.com/orlfi/FileCommander/master/screenshots/sample.gif)
 
 ## Features
 * Navigate through the file structure separately in each panel
@@ -21,7 +23,7 @@ FileCommander is an entry-level for console two-panel file manager .NET Core.
 * **rm** - deleting files and directories
 * Navigate through the team history
 * Save the last state when exiting
-* Ability to set a color scheme using a theme file
+* Ability to set a color scheme using a theme file theme.json in in the program directory
 * Logging critical errors in a file errors.txt
 
 ## Running and Building
