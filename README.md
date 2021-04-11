@@ -16,11 +16,11 @@ FileCommander is an entry-level console two-panel file manager for .NET Core.
 * Creating directories
 * Rename files and directories
 * Support for entering console commands in the command line:
-* **help** - open the help window
-* **cd** - change directory
-* **cp** - copy files and directories
-* **mv** - move files and directories
-* **rm** - deleting files and directories
+  * **help** - open the help window
+  * **cd** - change directory
+  * **cp** - copy files and directories
+  * **mv** - move files and directories
+  * **rm** - deleting files and directories
 * Navigate through the team history
 * Save the last state when exiting
 * Ability to set a color scheme using a theme file theme.json in in the program directory
