@@ -39,7 +39,7 @@ namespace FileCommander
                 path = args[0];
 
             CommandManager manager = CommandManager.GetInstance();
-            manager.SetPath(path);
+            manager.Path = path;
             manager.Run();
             Settings.GetInstance().Save();
             //}

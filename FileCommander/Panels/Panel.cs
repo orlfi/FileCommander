@@ -31,12 +31,12 @@ namespace FileCommander
                 size = Parent.Size;
 
             SetRectangle(size);
+            Align(size);
             foreach (var component in Components)
             {
                 component.UpdateRectangle(Size);
             }
         }
-
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
@@ -54,7 +54,8 @@ namespace FileCommander
         {
             foreach (var component in Components)
             {
-                component.Draw(buffer, targetX + X, targetY + Y);
+                if (component.Visible)
+                    component.Draw(buffer, targetX + X, targetY + Y);
             }
         }
 
@@ -70,14 +71,6 @@ namespace FileCommander
                 Add(item);
         }
 
-        // public override void SetPath(string path)
-        // {
-        //     foreach (var item in Components)
-        //     {
-        //         item.SetPath(path);
-        //     }
-        // }
-
         public virtual void SetFocus(Component component, bool update = true)
         {
             if (FocusedComponent != component)
@@ -91,7 +84,6 @@ namespace FileCommander
                 component.Focused = true;
                 if (update)
                     Update(false);
-                    //FocusedComponent.Update(false);
             }
         }
 
@@ -115,7 +107,7 @@ namespace FileCommander
                 }
                 else if (Components[next].Visible == true && Components[next].Disabled != false)
                     lastAvailable = next;
-            } while (Components[next].Visible = false || Components[next].Disabled == true);
+            } while (Components[next].Visible == false || Components[next].Disabled == true);
 
             return Components[next];
         }
@@ -135,8 +127,6 @@ namespace FileCommander
             return Components[next];
         }
 
-        public override void OnKeyPress(ConsoleKeyInfo keyInfo)
-        {
-        }
+        public override void OnKeyPress(ConsoleKeyInfo keyInfo) { }
     }
 }

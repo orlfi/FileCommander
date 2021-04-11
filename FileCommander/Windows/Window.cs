@@ -26,6 +26,8 @@ namespace FileCommander
 
         public bool Escape { get; set; } = true;
 
+        public string Footer { get; set; }
+
         public MainWindow MainWindow => CommandManager.MainWindow;
 
         public Window(string rectangle, Size size) : this(rectangle, size, Alignment.None) { }
@@ -60,7 +62,7 @@ namespace FileCommander
                         OnEscape();
                     break;
                 default:
-                    FocusedComponent.OnKeyPress(keyInfo);
+                    FocusedComponent?.OnKeyPress(keyInfo);
                     break;
             }
         }
@@ -140,7 +142,10 @@ namespace FileCommander
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             base.Draw(buffer, targetX, targetY);
-            buffer.WriteAt($" {Name} ", targetX + X + Width/2 - Name.Length/2 , targetY + Y, ForegroundColor, BackgroundColor);
+            if (!string.IsNullOrEmpty(Name))
+                buffer.WriteAt($" {Name} ", targetX + X + Width/2 - Name.Length/2 , targetY + Y, ForegroundColor, BackgroundColor);
+            if (!string.IsNullOrEmpty(Footer))
+                buffer.WriteAt($" {Footer} ", targetX + X + Width / 2 - Footer.Length / 2, targetY + Y + Height-1, ForegroundColor, BackgroundColor);
             DrawShadow(buffer, targetX, targetY);
         }
 

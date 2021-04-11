@@ -20,6 +20,7 @@ namespace FileCommander
             _cursorLeft = Console.CursorLeft;
             _cursorVivible = Console.CursorVisible;
         }
+
         public void Restore()
         {
             Console.CursorTop = _cursorTop;

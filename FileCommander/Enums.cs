@@ -80,4 +80,25 @@ namespace FileCommander
         Skip,
         SkipAll
     }
+
+    public enum TextAlignment
+    {
+        None,
+        Left,
+        Right,
+        Center,
+        Width
+    }
+
+    public enum InfoPanelPosition
+    {
+        Left,
+        Right
+    }
+    public enum FileSizeAcronim—utting
+    {
+        SingleChar,
+        TwoChar
+    }
+
 }

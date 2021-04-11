@@ -18,10 +18,10 @@ namespace FileCommander
             item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Rename", 2);
             Add(item);
             x+=HotKeyItem.DEFAULT_WIDTH;
-            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "View", 3);
+            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Refresh", 3);
             Add(item);
             x+=HotKeyItem.DEFAULT_WIDTH;
-            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Edit", 4);
+            item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Info", 4);
             Add(item);
             x+=HotKeyItem.DEFAULT_WIDTH;
             item = new HotKeyItem($"{x}, 0, {HotKeyItem.DEFAULT_WIDTH}, 1", Size, "Copy", 5);

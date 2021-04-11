@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FileCommander
 {
-    public delegate void ChangeFocusHandler(FileItem item);
+    public delegate void ChangeFocusHandler(Component sender, FileItem item);
 
     public class DetailsView: Panel
     {
@@ -58,7 +58,7 @@ namespace FileCommander
                 if (value != _focusedItem)
                 {
                     _focusedItem = value;
-                    ChangeFocusEvent?.Invoke(_focusedItem);
+                    ChangeFocusEvent?.Invoke(this, _focusedItem);
                 }
             }
         } 
@@ -184,6 +184,7 @@ namespace FileCommander
             }
 
         }
+
         public void DrawItems(Buffer buffer, int targetX, int targetY)
         {
             var files = Components;
@@ -213,6 +214,7 @@ namespace FileCommander
             }
 
         }
+
         public void DrawColumns(Buffer buffer, int targetX, int targetY)
         {
             int x = X;

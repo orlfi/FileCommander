@@ -14,7 +14,7 @@ namespace FileCommander
 
         public string LeftPanelPath {get; set;}
 
-        public string RightPanelPath {get; set;}
+        public string RightPanelPath { get; set; }
 
         public string FocusedPanel {get; set;}
 

@@ -58,6 +58,10 @@ namespace FileCommander
 
         public ConsoleColor CommandBackgroundColor { get; set; } = ConsoleColor.Black;
 
+        public ConsoleColor HelpWindowForegroundColor { get; set; } = ConsoleColor.White;
+
+        public ConsoleColor HelpWindowBackgroundColor { get; set; } = ConsoleColor.DarkCyan;
+
         private static Theme instance;
 
         public Theme() { }

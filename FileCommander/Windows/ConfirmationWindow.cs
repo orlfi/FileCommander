@@ -24,8 +24,9 @@ namespace FileCommander
             Message = message;
             ForegroundColor = Theme.ErrorWindowForegroundColor;
             BackgroundColor = Theme.ErrorWindowBackgroundColor;
-            var label = new Label("2, 1, 100%-4, 100%-4", Size, Alignment.None, "ErrorText", message);
-            label.Break = true;
+            var label = new Label("2, 2, 100%-4, 100%-4", Size, Alignment.None, "ConfirmationText", message);
+            //label.TextAlignment = TextAlignment.Center;
+            label.Wrap = true;
             Add(label);
             AddButtons();
             
@@ -33,14 +34,14 @@ namespace FileCommander
 
         private void AddButtons()
         {
-            YesButton = new Button("4,100%-2, 10, 1", Size, Alignment.None, "Yes") 
+            YesButton = new Button("17,100%-2, 10, 1", Size, Alignment.None, "Yes") 
             { 
                 BackgroundColor = Theme.ErrorWindowBackgroundColor, 
                 ModalResult = ModalWindowResult.Confirm
             };
             Add(YesButton);
 
-            NoButton = new Button("32,100%-2, 10, 1", Size, Alignment.None, "No")
+            NoButton = new Button("34,100%-2, 10, 1", Size, Alignment.None, "No")
             {
                 BackgroundColor = Theme.ErrorWindowBackgroundColor, 
                 ModalResult = ModalWindowResult.Cancel

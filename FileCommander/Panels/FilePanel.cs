@@ -10,6 +10,8 @@ namespace FileCommander
         // TODO order view
         //public int Order { get; set; }
 
+        public event ChangeFocusHandler SelectFileEvent;
+
         DirectoryPanelItem DirectoryPanel { get; set; }
 
         Control FileInfoPanel { get; set; }
@@ -20,6 +22,10 @@ namespace FileCommander
 
         public FilePanel(string rectangle, Size size) : base(rectangle, size)
         {
+            Path = Settings.GetDefaultPath();
+            Border = LineType.Single;
+            Fill = true;
+
             View = new DetailsView("1,1,100%-2,100%-4", Size, Files);
             Add(View);
 
@@ -81,12 +87,14 @@ namespace FileCommander
                 }
             }
         }
-        private void OnChangeViewFocus(FileItem item)
+        private void OnChangeViewFocus(Component sender, FileItem item)
         {
             if (item != null)
             {
                 FileInfoPanel?.SetName(FileItem.GetFitName(item.Name, Width - 2).PadRight(Width - 2, ' '), Parent.Size);
                 FileInfoPanel?.Update();
+                if (item.ItemType == FileTypes.File || item.ItemType == FileTypes.Directory)
+                    SelectFileEvent?.Invoke(this, item);
             }
         }
 
@@ -135,7 +143,8 @@ namespace FileCommander
                     try
                     {
                         string path = View.FocusedItem.Path;
-                        CommandManager.SetPath(path);
+                        CommandManager.Path = path;
+                        //CommandManager.SetPath(path);
                         View.FocusItem(path);
                     }
                     catch (Exception) { }
@@ -145,7 +154,8 @@ namespace FileCommander
                     try
                     {
                         string path = Path;
-                        CommandManager.SetPath(System.IO.Path.GetDirectoryName(Path));
+                        CommandManager.Path = System.IO.Path.GetDirectoryName(Path);
+                        //CommandManager.SetPath(System.IO.Path.GetDirectoryName(Path));
                         View.FocusItem(path);
                     }
                     catch (Exception) { }

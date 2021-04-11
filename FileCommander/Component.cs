@@ -75,7 +75,7 @@ namespace FileCommander
 
         public bool Disabled { get; set; }
 
-        public bool Visible { get; set;}
+        public bool Visible { get; set; } = true;
 
 
         public Component Parent { get; set; }
@@ -96,8 +96,9 @@ namespace FileCommander
             }
         }
 
-        private string _rectangleString = "";
-        private Alignment _alignment;
+        protected string _rectangleString = "";
+
+        protected Alignment _alignment;
 
         public ConsoleColor ForegroundColor { get; set; }
         public ConsoleColor BackgroundColor { get; set; }
@@ -148,13 +149,6 @@ namespace FileCommander
                 Y = size.Height / 2 - Height / 2;
         }
 
-
-        /// <summary>
-        /// ��������� ��������� ��������� �������� � �������� � ��������
-        /// </summary>
-        /// <param name="expression">���������, ��������, 50%-2</param>
-        /// <param name="value">��������, �� �������� ����������� ��������</param>
-        /// <returns>��������� ���������� ���������</returns>
         private int Parse(string expression, int value)
         {
             int result = 0;
@@ -196,51 +190,21 @@ namespace FileCommander
         {
             CommandManager.GetInstance().Refresh(x, y, width, height);
         }
-
-        // public static void SaveCursor()
-        // {
-        //     saveForegroundColor = Console.ForegroundColor;
-        //     saveBackgroundColor = Console.BackgroundColor;
-        // }
-
-        // public static void RestoreCursor()
-        // {
-        //     Console.ForegroundColor = saveForegroundColor;
-        //     Console.BackgroundColor = saveBackgroundColor;
-        // }
-
-        // public static void SetColor(ConsoleColor foreground, ConsoleColor background)
-        // {
-        //     Console.ForegroundColor = foreground;
-        //     Console.BackgroundColor = background;
-        // }
-
-        // public static void WriteAt(string text, int x, int y)
-        // {
-        //     Console.SetCursorPosition(x, y);
-        //     Console.Write(text);
-        // }
-
-        // public static void WriteAt(string text, int x, int y, ConsoleColor foreground, ConsoleColor background)
-        // {
-        //     SetColor(foreground, background);
-        //     WriteAt(text, x, y);
-        // }
-
-        // public static void WriteAt(char ch, int x, int y, ConsoleColor foreground, ConsoleColor background)
-        // {
-        //     SetColor(foreground, background);
-        //     WriteAt(ch, x, y);
-        // }
-
-        // public static void WriteAt(char ch, int x, int y)
-        // {
-        //     Console.SetCursorPosition(x, y);
-        //     Console.Write(ch);
-        // }
+         
         #endregion
 
         #region Methods
+        public void Hide()
+        {
+            Disabled = true;
+            Visible = false;
+        }
+        public void Show()
+        {
+            Disabled = false;
+            Visible = true;
+        }
+
         public virtual void SetFocus(bool focused)
         {
             Focused = focused;
@@ -251,16 +215,6 @@ namespace FileCommander
         public void Update(bool fullRepaint = false)
         {
             Update(fullRepaint, new Point(0,0));
-            // if (fullRepaint)
-            // {
-            //     CommandManager.GetInstance().Refresh();
-            // }
-            // else 
-            // { 
-            //     var location = GetAbsolutePosition(this);
-            //     Update(location.X, location.Y, Width, Height);
-            // }
-            // OnPaint();
         }
 
         public void Update(bool fullRepaint, Point offset)
@@ -276,11 +230,6 @@ namespace FileCommander
             }
             OnPaint();
         }
-
-        // public virtual void SetPath(string path)
-        // {
-        //     Path = path;
-        // }
 
         public abstract void OnKeyPress(ConsoleKeyInfo keyInfo);
 

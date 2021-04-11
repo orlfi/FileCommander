@@ -22,8 +22,9 @@ namespace FileCommander
             ForegroundColor = Theme.CommandForegroundColor;
             BackgroundColor = Theme.CommandBackgroundColor;
             Console.CursorVisible = true;
-            Console.SetCursorPosition(AbsolutePosition.X + Cursor + Label.Length, AbsolutePosition.Y);
+            UpdateCursorPosition();
         }
+
 
         public void OnPathChange(string path)
         {
@@ -33,6 +34,11 @@ namespace FileCommander
                 Cursor = Value.Length;
                 WriteString();
             }
+        }
+
+        public void UpdateCursorPosition()
+        {
+            Console.SetCursorPosition(AbsolutePosition.X + Cursor + Label.Length, AbsolutePosition.Y);
         }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)

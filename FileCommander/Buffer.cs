@@ -18,8 +18,8 @@ namespace FileCommander
         }
         public static void RestoreCursor()
         {
-            Console.CursorTop = Math.Min(_cursorTop, Console.WindowHeight);
-            Console.CursorLeft = Math.Min(_cursorLeft, Console.WindowWidth); 
+            Console.CursorTop = Math.Min(_cursorTop, Console.BufferHeight);
+            Console.CursorLeft = Math.Min(_cursorLeft, Console.BufferWidth); 
             Console.CursorVisible = _cursorVivible;
         }
         private struct ColorPair
@@ -77,7 +77,9 @@ namespace FileCommander
         private Pixel[,] _buffer;
 
         public int Width { get => _buffer.GetLength(0); }
+
         public int Height { get => _buffer.GetLength(1); }
+
         public Buffer(int width, int height)
         {
             _buffer = new Pixel[width, height];
@@ -96,6 +98,7 @@ namespace FileCommander
                 for (int i = 0; i < _buffer.GetLength(0); i++)
                     _buffer[i, j] = new Pixel(' ', ConsoleColor.White, backgroudColor);
         }
+
         public Pixel[,] GetBuffer()
         {
             return _buffer;
@@ -112,6 +115,7 @@ namespace FileCommander
             return result;
 
         }
+
         public void Merge(int x, int y, Buffer buffer)
         {
             for (int j = 0; j < buffer.Height; j++)
@@ -123,6 +127,7 @@ namespace FileCommander
         {
             WriteAt(text, 0, 0);
         }
+
         public void Write(string text, ConsoleColor foreground, ConsoleColor background)
         {
             WriteAt(text, 0, 0, foreground, background);
@@ -205,13 +210,6 @@ namespace FileCommander
                 }
             strings.Add(sb.ToString());
             
-            // To avoid scrolling when writing character in the last column of a last row.
-            //Console.SetCursorPosition(0,0);
-            //var lastChar =_buffer[Width-1, Height-1]; 
-            //Console.BackgroundColor = lastChar.Background;
-            //Console.Write(lastChar.Char);
-            //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
-
             // Write whole text lines
             Console.SetCursorPosition(0,0);
             for(int i=0;i< strings.Count; i++)
@@ -220,6 +218,9 @@ namespace FileCommander
                 Console.BackgroundColor = colors[i].BackgroundColor;
                 Console.Write(strings[i]);
             }
+
+            WriteLastChar();
+
             RestoreCursor();
         }
 
@@ -257,24 +258,6 @@ namespace FileCommander
                             sb.Clear();
                         }
 
-                        //if (_buffer[i, j].ForegroundColor != background)
-                        //{
-
-                        //    strings.Add(sb.ToString());
-                        //    colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
-                        //    background =_buffer[i, j].BackgroundColor;
-                        //    sb.Clear();
-                        //}
-
-                        //if (_buffer[i, j].ForegroundColor != foreground)
-                        //{
-
-                        //    strings.Add(sb.ToString());
-                        //    colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
-                        //    foreground = _buffer[i, j].ForegroundColor;
-                        //    sb.Clear();
-                        //}
-
                         // Without last character to avoid scrolling
                         if (i != Width-1 || j != bufferHeight-1)
                             sb.Append(_buffer[i, j].Char);
@@ -292,18 +275,14 @@ namespace FileCommander
                 sb.Clear();
             }
 
-            // To avoid scrolling when writing character in the last column of a last row.
-            //Console.SetCursorPosition(0,0);
-            //var lastChar =_buffer[Width-1, Height-1]; 
-            //Console.BackgroundColor = lastChar.Background;
-            //Console.Write(lastChar.Char);
-            //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
+            WriteLastChar();
 
-            // Write whole text lines
             RestoreCursor();
         }
 
-        // TODO change code
+        /// <summary>
+        /// Write whole buffer with esc codes
+        /// </summary>
         public void PaintEsc()
         {
             SaveCursor();
@@ -325,14 +304,10 @@ namespace FileCommander
 
                         if (_buffer[i, j].BackgroundColor != background || _buffer[i, j].ForegroundColor != foreground)
                         {
-                            //sb.Append(sb.ToString());
-                            //colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
                             foreground = _buffer[i, j].ForegroundColor;
                             background = _buffer[i, j].BackgroundColor;
                             sb.Append(ForegroundEscCodes[foreground]);
                             sb.Append(BackgroundEscCodes[background]);
-
-                            //sb.Clear();
                         }
 
 
@@ -341,28 +316,23 @@ namespace FileCommander
                             sb.Append(_buffer[i, j].Char);
                     }
                 }
-            //sb.Append(sb.ToString());
-
-            // To avoid scrolling when writing character in the last column of a last row.
-            //Console.SetCursorPosition(0,0);
-            //var lastChar =_buffer[Width-1, Height-1]; 
-            //Console.BackgroundColor = lastChar.Background;
-            //Console.Write(lastChar.Char);
-            //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
 
             // Write whole text lines
             Console.SetCursorPosition(0, 0);
-            //for (int i = 0; i < strings.Count; i++)
-            //{
-            //    Console.ForegroundColor = colors[i].ForegroundColor;
-            //    Console.BackgroundColor = colors[i].BackgroundColor;
-            //    Console.Write(strings[i]);
-            //}
             Console.Write(sb.ToString());
-            RestoreCursor();
 
+            WriteLastChar();
+
+            RestoreCursor();
         }
 
+        /// <summary>
+        /// Write buffer rectangle with esc codes
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public void PaintEsc(int x, int y, int width, int height)
         {
             SaveCursor();
@@ -395,28 +365,9 @@ namespace FileCommander
                             sb.Append(BackgroundEscCodes[background]);
                         }
 
-                        //if (_buffer[i, j].ForegroundColor != background)
-                        //{
-
-                        //    strings.Add(sb.ToString());
-                        //    colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
-                        //    background =_buffer[i, j].BackgroundColor;
-                        //    sb.Clear();
-                        //}
-
-                        //if (_buffer[i, j].ForegroundColor != foreground)
-                        //{
-
-                        //    strings.Add(sb.ToString());
-                        //    colors.Add(new ColorPair(_buffer[i, j].ForegroundColor, _buffer[i, j].BackgroundColor));
-                        //    foreground = _buffer[i, j].ForegroundColor;
-                        //    sb.Clear();
-                        //}
-
                         // Without last character to avoid scrolling
                         if (i != Width - 1 || j != bufferHeight - 1)
                             sb.Append(_buffer[i, j].Char);
-                        //sb.Append('*');
                     }
                 }
                 Console.SetCursorPosition(x, j);
@@ -424,15 +375,23 @@ namespace FileCommander
                 sb.Clear();
             }
 
-            // To avoid scrolling when writing character in the last column of a last row.
-            //Console.SetCursorPosition(0,0);
-            //var lastChar =_buffer[Width-1, Height-1]; 
-            //Console.BackgroundColor = lastChar.Background;
-            //Console.Write(lastChar.Char);
-            //Console.MoveBufferArea(0, 0, 1,1, Width-1,Height-1);
+            WriteLastChar();
 
             // Write whole text lines
             RestoreCursor();
+        }
+
+        /// <summary>
+        /// To avoid scrolling when writing character in the last column of a last row.
+        /// </summary>
+        private void WriteLastChar()
+        {
+            //Console.MoveBufferArea(Width - 2, Height - 1, 1, 1, Width - 1, Height - 1);
+            //var lastChar = _buffer[Width - 2, Height - 1];
+            //Console.SetCursorPosition(Width - 2, Height - 1);
+            //Console.ForegroundColor = lastChar.ForegroundColor;
+            //Console.BackgroundColor = lastChar.BackgroundColor;
+            //Console.Write(lastChar.Char);
         }
 
     }

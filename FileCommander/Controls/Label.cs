@@ -8,11 +8,16 @@ namespace FileCommander
 {
     public class Label : Control
     {
-        public bool Break { get; set; } = false;
+        public bool Wrap { get; set; } = false;
         public string Text { get; set; }
-        public string[] TextLines
+
+        public bool UseParentForegroundColor { get; set; } = true;
+        public bool UseParentBackgroundColor { get; set; } = true;
+
+        public TextAlignment TextAlignment { get; set; } = TextAlignment.Left;
+        public List<string> TextLines
         {
-            get => Text.LineBreak(Width);
+            get => Text.WrapParagraph(Width, TextAlignment);
         }
 
         public Point AbsolutePosition => GetAbsolutePosition(this);
@@ -25,24 +30,58 @@ namespace FileCommander
 
         public void SetText(string text)
         {
+
             Text = text;
             Update();
+        }
+
+        public void SetText(string text, bool update)
+        {
+
+            Text = text;
+            if (update)
+                Update();
+        }
+
+        public void SetText(string text, Size size, bool update = false)
+        {
+
+            Text = text;
+            if (_alignment != Alignment.None)
+            {
+                SetRectangle(size);
+                Width = text.Length;
+                Align(size);
+            }
+
+            if (update)
+                Update();
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             if (Parent != null)
             {
-                ForegroundColor = Parent.ForegroundColor;
-                BackgroundColor = Parent.BackgroundColor;
+                if (UseParentForegroundColor)
+                    ForegroundColor = Parent.ForegroundColor;
+                if (UseParentBackgroundColor)
+                    BackgroundColor = Parent.BackgroundColor;
             }
-            if (Break)
+            if (Wrap)
             {
-                for (int i = 0; i < Math.Min(TextLines.Length, Height); i++)
-                    buffer.WriteAt(TextLines[i], X + targetX, Y + targetY + i, ForegroundColor, BackgroundColor);
+                for (int i = 0; i < Math.Min(TextLines.Count, Height); i++)
+                    buffer.WriteAt(TextLines[i].PadRight(Width), X + targetX, Y + targetY + i, ForegroundColor, BackgroundColor);
             }
             else
-                buffer.WriteAt(Text.Fit(Width), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+            {
+                if (_alignment == Alignment.HorizontalCenter)
+                {
+                    string text = Text.Fit(Width, TextAlignment.None);
+                    buffer.WriteAt(text, X + targetX + Width/2 - text.Length / 2, Y + targetY, ForegroundColor, BackgroundColor);
+                }
+                else
+                    buffer.WriteAt(Text.Fit(Width, TextAlignment), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+            }
         }
     }
 

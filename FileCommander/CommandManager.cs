@@ -8,32 +8,42 @@ using System.Diagnostics;
 namespace FileCommander
 {
     public delegate void OnKeyPressHandler(ConsoleKeyInfo keyInfo);
+    
     public delegate void OnProgressHandler(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo);
+
     public delegate void OnErrorHandler(string error);
+
     public delegate void OnWindowResizeHandler(Size size);
+
     public delegate void OnConfirmationHandler(CommandManager sender, ConfirmationEventArgs args);
 
     public delegate void PathChangeHandler(string path);
 
     public class CommandManager
     {
-        public Settings Settings => Settings.GetInstance();
         public event OnProgressHandler ProgressEvent;
+        
         public event OnErrorHandler ErrorEvent;
+        
         public event OnWindowResizeHandler WindowResizeEvent;
+        
         public event OnConfirmationHandler ConfirmationEvent;
+        
         public event PathChangeHandler PathChange;
 
+        public Settings Settings => Settings.GetInstance();
+
         bool _skipAll;
+        
         bool _overwriteAll;
 
         public bool CancelOperation { get; set; }
 
-        public const int DAFAULT_WIDTH = 80;
+        public const int DEFAULT_WIDTH = 80;
 
-        public const int DAFAULT_HEIGHT = 24;
+        public const int DEFAULT_HEIGHT = 24;
 
-        public Size Size { get; set; } = new Size(DAFAULT_WIDTH, DAFAULT_HEIGHT);
+        public Size Size { get; set; } = new Size(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
         public const string APP_NAME = "File Commander";
 
@@ -64,9 +74,7 @@ namespace FileCommander
 
         public Buffer Screen { get; set; }
 
-        private CommandManager()
-        {
-        }
+        private CommandManager() { }
 
         private void Initialize()
         {
@@ -76,7 +84,7 @@ namespace FileCommander
             Console.BufferWidth = Console.WindowWidth = Size.Width;
             Console.BufferHeight = Console.WindowHeight = Size.Height;
             Console.SetWindowPosition(0, 0);
-            MainWindow = new MainWindow("0, 0, 100%, 100%-1", Size);
+            MainWindow = new MainWindow("0, 0, 100%, 100%", Size);
             Screen = new Buffer(Size.Width, Size.Height, true);
         }
 
@@ -85,12 +93,23 @@ namespace FileCommander
             ResizeWindow(size);
         }
 
+
         private void ResizeWindow(Size size)
         {
-            Size = size;
-            Screen = new Buffer(Size.Width, Size.Height, true);
-            MainWindow.UpdateRectangle(Size);
+            Console.SetWindowPosition(0, 0);
+            if (size.Width >= DEFAULT_WIDTH && size.Height >= DEFAULT_HEIGHT)
+            {
+                Size = size;
+                Screen = new Buffer(Size.Width, Size.Height, true);
+                MainWindow.UpdateRectangle(Size);
+                MainWindow.UpdateCursorPosition();
+            }
+            else
+            {
+                Console.SetCursorPosition(0, 0);
+            }
             Refresh();
+
         }
         public static CommandManager GetInstance()
         {
@@ -100,12 +119,6 @@ namespace FileCommander
                 instance.Initialize();
             }
             return instance;
-        }
-
-        public void SetPath(string path)
-        {
-            Path = path;
-            //MainWindow.SetPath(path);
         }
 
         public void Run()
@@ -121,8 +134,8 @@ namespace FileCommander
         public void SaveSettings()
         {
             Settings.FocusedPanel = MainWindow.FocusedComponent.Name;
-            Settings.LeftPanelPath = MainWindow.LeftPanel.Path;
-            Settings.RightPanelPath = MainWindow.RightPanel.Path;
+            Settings.LeftPanelPath = MainWindow.LeftFilePanel.Path;
+            Settings.RightPanelPath = MainWindow.RightFilePanel.Path;
             Settings.Path = MainWindow.FocusedComponent.Path;
             Settings.Size = new Size(Console.WindowWidth, Console.WindowHeight);
         }
@@ -171,17 +184,26 @@ namespace FileCommander
         {
             Buffer.SaveCursor();
             Stopwatch sw = new System.Diagnostics.Stopwatch();
+            if (Console.WindowWidth >= DEFAULT_WIDTH && Console.WindowHeight >= DEFAULT_HEIGHT)
+            {
+                sw.Start();
+                MainWindow.Draw(Screen, 0, 0);
+                Screen.Paint();
+                sw.Stop();
+            }
+            else
+            {
+                Console.ResetColor();
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Clear();
+                Console.Write($"The console window should be larger than {DEFAULT_WIDTH}x{DEFAULT_HEIGHT}");
+            }
 
-            sw.Start();
-            MainWindow.Draw(Screen, 0, 0);
-            Screen.Paint();
-            sw.Stop();
-
-            Console.ResetColor();
-            Console.SetCursorPosition(0, Size.Height - 1);
-            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
-            Console.SetCursorPosition(40, Size.Height - 1);
-            Console.Write(System.Environment.OSVersion.VersionString);
+            //Console.ResetColor();
+            //Console.SetCursorPosition(0, Size.Height - 1);
+            //Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+            //Console.SetCursorPosition(40, Size.Height - 1);
+            //Console.Write(System.Environment.OSVersion.VersionString);
             Buffer.RestoreCursor();
         }
 
@@ -190,15 +212,24 @@ namespace FileCommander
             Buffer.SaveCursor();
 
             Stopwatch sw = new System.Diagnostics.Stopwatch();
+            if (Console.WindowWidth >= DEFAULT_WIDTH && Console.WindowHeight >= DEFAULT_HEIGHT)
+            {
+                sw.Start();
+                MainWindow.Draw(Screen, 0, 0);
+                Screen.Paint(x, y, width, height);
+                sw.Stop();
+            }
+            else
+            {
+                Console.ResetColor();
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.Clear();
+                Console.Write($"The console window should be larger than {DEFAULT_WIDTH}x{DEFAULT_HEIGHT}");
+            }
 
-            sw.Start();
-            MainWindow.Draw(Screen, 0, 0);
-            Screen.Paint(x, y, width, height);
-            sw.Stop();
-
-            Console.ResetColor();
-            Console.SetCursorPosition(0, Size.Height - 1);
-            Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
+            //Console.ResetColor();
+            //Console.SetCursorPosition(0, Size.Height - 1);
+            //Console.Write($"{DateTime.Now.ToLongTimeString()} Время отрисовки: {sw.ElapsedMilliseconds:D3} мс");
             Buffer.RestoreCursor();
         }
 
@@ -493,8 +524,39 @@ namespace FileCommander
 
         public static bool CheckWindows()
         {
-            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) && 
+            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) &&
                 System.Environment.OSVersion.Version.Major >= 10;
+        }
+
+        public static  MemoryMetrics GetWindowsMetrics()
+        {
+            MemoryMetrics metrics = null;
+
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                {
+                var output = "";
+
+                var info = new ProcessStartInfo();
+                info.FileName = "wmic";
+                info.Arguments = "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value";
+                info.RedirectStandardOutput = true;
+
+                using (var process = Process.Start(info))
+                {
+                    output = process.StandardOutput.ReadToEnd();
+                }
+
+                var lines = output.Trim().Split("\n");
+                var freeMemoryParts = lines[0].Split("=", StringSplitOptions.RemoveEmptyEntries);
+                var totalMemoryParts = lines[1].Split("=", StringSplitOptions.RemoveEmptyEntries);
+
+                metrics = new MemoryMetrics();
+
+                metrics.Total = Math.Round(double.Parse(totalMemoryParts[1]), 0);
+                metrics.Free = Math.Round(double.Parse(freeMemoryParts[1]), 0);
+                metrics.Used = metrics.Total - metrics.Free;
+            }
+            return metrics;
         }
     }
 }

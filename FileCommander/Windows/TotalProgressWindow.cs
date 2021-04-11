@@ -21,14 +21,12 @@ namespace FileCommander
 
         public ProgressBar TotalProgress { get; set; }
 
-        public Label ProgressInfo { get; set; }
-
         public Button CancelButton { get; set; }
         public List<Component> UpdateComponents { get; set; } = new List<Component>();
 
         const string DEFAULT_NAME = "Copy";
 
-        public TotalProgressWindow(Size targetSize) : base("50%-25, 50%-6, 50, 13", targetSize)
+        public TotalProgressWindow(Size targetSize) : base("50%-25, 50%-6, 50, 11", targetSize)
         {
             Name = DEFAULT_NAME;
 
@@ -49,9 +47,6 @@ namespace FileCommander
 
             TotalProgress = new ProgressBar("2, 7, 100%-4, 1", Size, new ProgressInfo(0, 1, "Total info"));
             Add(TotalProgress);
-
-            ProgressInfo = new Label("2, 9, 100%-4, 1", Size, Alignment.None, "ProgressInfo", "Progress Info");
-            Add(ProgressInfo);
 
             AddButtons();
         }
@@ -88,12 +83,9 @@ namespace FileCommander
             line.BackgroundColor = BackgroundColor;
             line.Draw(buffer, targetX, targetY);
 
-            line.Y = Y + Height - 5;
+            line.Y = Y + Height - 7;
             line.Draw(buffer, targetX, targetY);
-
-            line.Y = Y + Height - 9;
-            line.Draw(buffer, targetX, targetY);
-            buffer.WriteAt(" Total ", targetX + X + Width / 2 - 4, targetY + Y + 8, ForegroundColor, BackgroundColor);
+            buffer.WriteAt(" Total ", targetX + X + Width / 2 - 4, targetY + Y + 4, ForegroundColor, BackgroundColor);
         }
 
     }

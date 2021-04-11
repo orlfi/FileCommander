@@ -24,7 +24,8 @@ namespace FileCommander
             ForegroundColor = Theme.ErrorWindowForegroundColor;
             BackgroundColor = Theme.ErrorWindowBackgroundColor;
             var label = new Label("2, 1, 100%-4, 100%-4", Size, Alignment.None, "ErrorText", message);
-            label.Break = true;
+            label.TextAlignment = TextAlignment.Center;
+            label.Wrap = true;
             Add(label);
             AddButtons();
             

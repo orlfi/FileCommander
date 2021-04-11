@@ -8,42 +8,56 @@ namespace FileCommander
 {
     public class MainWindow : Panel
     {
+        public const string LEFT_PANEL_POSITION = "0,0,50%,100%-2";
+
+        public const string RIGHT_PANEL_POSITION = "50%,0,50%,100%-2";
         public Window ActiveWindow { get; set; } = null;
 
-        public FilePanel LeftPanel { get; set; } = null;
+        public FilePanel LeftFilePanel { get; set; } = null;
 
-        public FilePanel RightPanel { get; set; } = null;
+        public FilePanel RightFilePanel { get; set; } = null;
+
+        public Panel LeftPanel { get; set; } = null;
+
+        public Panel RightPanel { get; set; } = null;
+
+        public InfoPanel InfoPanel { get; set; } = null;
 
         public CommandPanel CommandPanel { get; set; } = null;
+        
         public CommandHistoryPanel HistoryPanel { get; set; } = null;
 
         public MainWindow(string rectangle, Size size) : base(rectangle, size)
         {
-            LeftPanel = new FilePanel("0,0,50%,100%-2", Size);
-            LeftPanel.Name = "LeftPanel";
-            LeftPanel.Border = LineType.Single;
-            LeftPanel.Fill = true;
-            Add(LeftPanel);
-            CommandManager.PathChange += LeftPanel.OnPathChange;
+            LeftFilePanel = new FilePanel(LEFT_PANEL_POSITION, Size);
+            LeftFilePanel.Name = "LeftPanel";
+            Add(LeftFilePanel);
+            CommandManager.PathChange += LeftFilePanel.OnPathChange;
+            LeftPanel = LeftFilePanel;
 
-            RightPanel = new FilePanel("50%,0,50%,100%-2", Size);
-            RightPanel.Name = "RightPanel";
-            RightPanel.Fill = true;
-            RightPanel.Border = LineType.Single;
-            Add(RightPanel);
-            CommandManager.PathChange += RightPanel.OnPathChange;
+            RightFilePanel = new FilePanel(RIGHT_PANEL_POSITION, Size);
+            RightFilePanel.Name = "RightPanel";
+            Add(RightFilePanel);
+            CommandManager.PathChange += RightFilePanel.OnPathChange;
+            RightPanel = RightFilePanel;
 
-            var сommandHistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-2", Size);
-            сommandHistoryPanel.Border = LineType.Single;
-            сommandHistoryPanel.Fill = true;
+            InfoPanel = new InfoPanel(RIGHT_PANEL_POSITION, Size);
+            InfoPanel.Visible = false;
+            InfoPanel.Disabled = true;
+            Add(InfoPanel);
+            CommandManager.PathChange += InfoPanel.OnPathChange;
+            LeftFilePanel.SelectFileEvent += InfoPanel.OnSelectFile;
+            RightFilePanel.SelectFileEvent += InfoPanel.OnSelectFile;
+            //RightPanel = InfoPanel;
+
+            HistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-2", Size);
+            HistoryPanel.Border = LineType.Single;
+            HistoryPanel.Fill = true;
 
             CommandPanel = new CommandPanel("0, 100%-2, 100%, 1", Size, Alignment.None, "CommandPanel", Path);
             Add(CommandPanel);
             CommandPanel.Disabled = true;
             CommandManager.PathChange += CommandPanel.OnPathChange;
-
-            //сommandHistoryPanel.Border = LineType.Single;
-            //сommandHistoryPanel.Fill = true;
 
             var hotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
             hotKeyPanel.Disabled = true;
@@ -55,22 +69,14 @@ namespace FileCommander
 
         public void RestoreSettings()
         {
-            LeftPanel.SetPath(Settings.LeftPanelPath);
-            RightPanel.SetPath(Settings.RightPanelPath);
+            LeftFilePanel.SetPath(Settings.LeftPanelPath);
+            RightFilePanel.SetPath(Settings.RightPanelPath);
 
             if (Settings.FocusedPanel == "LeftPanel")
                 SetFocus(LeftPanel, false);
             else if (Settings.FocusedPanel == "RightPanel")
                 SetFocus(RightPanel, false);
         }
-
-        // public override void SetPath(string path)
-        // {
-        //     foreach (var component in Components.Where(item => !(item is FilePanel && item != FocusedComponent)))
-        //     {
-        //         component.SetPath(path);
-        //     }
-        // }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
@@ -83,14 +89,22 @@ namespace FileCommander
             switch (keyInfo.Key)
             {
                 case ConsoleKey.F1:
-                    if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-                        SelectDrive(LeftPanel);
+                    if (keyInfo.Modifiers == ConsoleModifiers.Shift && LeftPanel is FilePanel leftFilePanel && leftFilePanel.Visible)
+                        SelectDrive(leftFilePanel);
+                    else if(keyInfo.Modifiers != ConsoleModifiers.Shift)
+                        ShowHelpWindow();
                     break;
                 case ConsoleKey.F2:
-                    if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-                        SelectDrive(RightPanel);
-                    else
+                    if (keyInfo.Modifiers == ConsoleModifiers.Shift && RightPanel is FilePanel rightFilePanel && rightFilePanel.Visible)
+                        SelectDrive(rightFilePanel);
+                    else if (keyInfo.Modifiers != ConsoleModifiers.Shift)
                         ShowRenameWindow();
+                    break;
+                case ConsoleKey.F3:
+                    RefreshFilePanel();
+                    break;
+                case ConsoleKey.F4:
+                    InvertInfoPanel();
                     break;
                 case ConsoleKey.F5:
                     ShowCopyWindow();
@@ -157,14 +171,56 @@ namespace FileCommander
                 window.Parent = panel;
                 window.SelectDriveEvent += (sender, driveInfo) =>
                 {
-                    CommandManager.SetPath(driveInfo.Name);
-                    //panel.SetPath(driveInfo.Name);
-                    // panel.View.Top();
-                    // panel.Update();
+                    CommandManager.Path = driveInfo.Name;
                     ((Window)sender).Close();
                 };
                 window.Open();
             }
+        }
+
+        public void ShowHelpWindow()
+        {
+            var window = new HelpWindow(Size, "Test");
+            window.Open();
+        }
+
+        private void RefreshFilePanel()
+        {
+            if (FocusedComponent is FilePanel filePanel)
+            {
+                filePanel.Refresh();
+            }
+        }
+
+        private void InvertInfoPanel()
+        {
+            if (LeftPanel is InfoPanel leftInfoPanel)
+            {
+                leftInfoPanel.Hide();
+                LeftPanel = LeftFilePanel;
+                LeftFilePanel.Show();
+            }
+            else if (RightPanel is InfoPanel rightInfoPanel)
+            {
+                rightInfoPanel.Hide();
+                RightPanel = RightFilePanel;
+                RightFilePanel.Show();
+            }
+            else if (FocusedComponent == LeftFilePanel)
+            {
+                RightFilePanel.Hide();
+                RightPanel = InfoPanel;
+                InfoPanel.Show();
+                InfoPanel.SetRectangle(RIGHT_PANEL_POSITION, Size);
+            }
+            else
+            {
+                LeftFilePanel.Hide();
+                LeftPanel = InfoPanel;
+                InfoPanel.Show();
+                InfoPanel.SetRectangle(LEFT_PANEL_POSITION, Size);
+            }
+            Update();
         }
 
         public void ShowRenameWindow()
@@ -178,12 +234,12 @@ namespace FileCommander
                 window.Open();
             }
         }
+
         private void OnRename(Component sender, string source, string destination, bool move)
         {
             CommandManager.Rename(source, destination);
             ((RenameWindow)sender).DestinationPanel?.Refresh();
         }
-
 
         public void ShowDeleteWindow()
         {
@@ -201,8 +257,7 @@ namespace FileCommander
         public void Delete(FilePanel sourcePanel, string[] source)
         {
             var progressWindow = new ProgressWindow(Size);
-            //progressWindow.FileDestinationInfo.Text = destination;
-            //progressWindow.Name = sender is MoveWindow ? MoveWindow.DEFAULT_NAME : CopyWindow.DEFAULT_NAME;
+
             progressWindow.Open();
             progressWindow.CancelEvent += () =>
             {
@@ -217,7 +272,6 @@ namespace FileCommander
                 progressWindow.Close();
             sourcePanel.Refresh();
         }
-
 
         private void OnDeleteProgress(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo)
         {
@@ -236,6 +290,7 @@ namespace FileCommander
                 window.Open();
             }
         }
+
         private void OnMakeDir(Component sender, string path, string name, bool move)
         {
             CommandManager.MakeDir(System.IO.Path.Combine(path, name));
@@ -324,6 +379,11 @@ namespace FileCommander
             base.UpdateRectangle(size);
             ActiveWindow?.UpdateRectangle(ActiveWindow.Parent.Size);
             ActiveWindow?.Align(ActiveWindow.Parent.Size);
+        }
+
+        public void UpdateCursorPosition()
+        {
+            CommandPanel.UpdateCursorPosition();
         }
     }
 }
