@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Resources;
 using System.Threading;
 using System.Diagnostics;
 
@@ -559,6 +559,12 @@ namespace FileCommander
                     metrics.Free = free;
             }
             return metrics;
+        }
+
+        public static string GetHelp()
+        {
+            ResourceManager rm = new ResourceManager("FileCommander.Properties.Resources", typeof(Program).Assembly);
+            return rm.GetString("Help");
         }
     }
 }

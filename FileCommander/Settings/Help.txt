@@ -1,38 +1,38 @@
-﻿FileCommander is an entry-level console two-panel file manager for .NET Core.
+﻿FileCommander is an entry-level console two-panel file manager.
 
-Управление:
-Enter      Вход в каталог, запуск программы
-Shift+F1   Смена диска в левой панели
-Shift+F2   Смена диска в правой панели
-F9         Смена диска в активной панели
-UP         Перемещение по каталогу вверх, история команд в командной строке
-DOWN       Перемещение по каталогу вниз, история команд в командной строке
-Page UP    Перемещение на страницу вверх
-Page Down  Перемещение на страницу вниз
-HOME       Перемещение в начало каталога
-END        Перемещение в конец каталога
+Management:
+Enter      Change a directory, start the program
+Shift+F1   Change the disk in the left panel
+Shift+F2   Change the disk in the right panel
+F9         Change the disk in the active panel
+UP         Directory navigation up, command history up
+DOWN       Directory navigation down, command history down
+Page UP    Move to page up
+Page Down  Move to page down
+HOME       Move to the beginning of the folder
+END        Move to the end of the folder
 
-Выделение файлов:
-SPACE      Выбор/отмена выбора файла или каталога
-NUM +      Выбор всех файлов и каталогов в активной панели
-NUM -      Отмена выбора всех файлов и каталогов в активной панели
-NUM *      Инверсия выбора файлов и каталогов
+Selecting files:
+SPACE      Select / deselect a file or directory
+NUM +      Select all files and directories in the active panel
+NUM-       Deselect all files and directories in the active panel
+NUM *      Inversion of file and directory selection
 
-Операции с файлами:
-F5         Копирование файлов и каталогов рекурсивно
-F6         Перемещение файлов и каталогов рекурсивно
-F7         Создание каталога
-F8         Удаление файлов и каталогов рекурсивно
+File operations:
+F5         Copy files and directories recursively
+F6         Move files and directories recursively
+F7         Creating a folder
+F8         Delete files and directories recursively
 
-Командная строка:
-Ctrl+Enter Копирование имени файла под курсором в командную строку
-A-Z,1-0    Переход к набору команды в командной строке
-ESC        Выход из командной строки
-Enter      Выполнение команды
+Command line:
+Ctrl+Enter Copy the file name under the cursor to the command line
+A-Z, 1-0   Go to the command set on the command line
+ESC        Exit from the command line
+Enter      Command execution
 
-Команды командной строки:
-HELP       Вывод окна помощи
-CD         Переход в другой каталог
-CP         Копирование файлов и каталогов
-MV         Перемещение файлов и каталогов
-RM         Удаление файлов и каталогов
+Command line commands:
+HELP       Output of the help window
+CD         Move to another folder
+CP         Copying files and directories
+MV         Moving files and directories
+RM         Deleting files and directories

@@ -13,8 +13,14 @@ namespace FileCommander
     public class MainWindow : Panel
     {
         #region Constants
+        /// <summary>
+        /// Left panel position and size
+        /// </summary>
         public const string LEFT_PANEL_POSITION = "0,0,50%,100%-2";
 
+        /// <summary>
+        /// Right panel position and size
+        /// </summary>
         public const string RIGHT_PANEL_POSITION = "50%,0,50%,100%-2";
         #endregion
 

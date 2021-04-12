@@ -59,5 +59,26 @@ namespace FileCommander.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FileCommander is an entry-level console two-panel file manager.
+        ///
+        ///Management:
+        ///Enter      Change a directory, start the program
+        ///Shift+F1   Change the disk in the left panel
+        ///Shift+F2   Change the disk in the right panel
+        ///F9         Change the disk in the active panel
+        ///UP         Directory navigation up, command history up
+        ///DOWN       Directory navigation down, command history down
+        ///Page UP    Move to page up
+        ///Page Down  Move to page down
+        ///HOME       Move to the beginning of the folder
+        ///END        Move to  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
     }
 }

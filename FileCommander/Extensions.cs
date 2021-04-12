@@ -111,12 +111,12 @@ namespace FileCommander
         }
 
         /// <summary>
-        /// Returns a list of lines with word wrapping by paragraph
+        /// Returns a list of rows with word wrapping by paragraph
         /// </summary>
         /// <param name="text">Text instance</param>
         /// <param name="lineWidth">Text instance</param>
         /// <param name="alignment">Align type</param>
-        /// <returns>A list of wraped lines</returns>
+        /// <returns>A list of wraped rows</returns>
         public static List<string> WrapParagraph(this string text, int lineWidth, TextAlignment alignment)
         {
             List<string> lines = new List<string>();
@@ -125,6 +125,16 @@ namespace FileCommander
                 lines.AddRange(WrapText(paragraph, lineWidth, alignment));
             }
             return lines;
+        }
+
+        /// <summary>
+        /// Returns a list of rows
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <returns>A list of rows</returns>
+        public static List<string> Multiline(this string text)
+        {
+            return text.Replace('\r', ' ').Split('\n').ToList();
         }
 
         /// <summary>
