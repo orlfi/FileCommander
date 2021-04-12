@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Main window class
+    /// Draws interface and layout all controls
+    /// </summary>
     public class MainWindow : Panel
     {
+        #region Constants
         public const string LEFT_PANEL_POSITION = "0,0,50%,100%-2";
 
         public const string RIGHT_PANEL_POSITION = "50%,0,50%,100%-2";
+        #endregion
+
+        #region Fields && Properties
         public Window ActiveWindow { get; set; } = null;
 
         public FilePanel LeftFilePanel { get; set; } = null;
@@ -26,7 +34,10 @@ namespace FileCommander
         public CommandPanel CommandPanel { get; set; } = null;
         
         public CommandHistoryPanel HistoryPanel { get; set; } = null;
+        public HotKeyPanel HotKeyPanel { get; set; } = null;
+        #endregion
 
+        #region Constructors
         public MainWindow(string rectangle, Size size) : base(rectangle, size)
         {
             LeftFilePanel = new FilePanel(LEFT_PANEL_POSITION, Size);
@@ -42,13 +53,11 @@ namespace FileCommander
             RightPanel = RightFilePanel;
 
             InfoPanel = new InfoPanel(RIGHT_PANEL_POSITION, Size);
-            InfoPanel.Visible = false;
-            InfoPanel.Disabled = true;
+            InfoPanel.Hide();            
             Add(InfoPanel);
             CommandManager.PathChange += InfoPanel.OnPathChange;
             LeftFilePanel.SelectFileEvent += InfoPanel.OnSelectFile;
             RightFilePanel.SelectFileEvent += InfoPanel.OnSelectFile;
-            //RightPanel = InfoPanel;
 
             HistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-2", Size);
             HistoryPanel.Border = LineType.Single;
@@ -56,18 +65,18 @@ namespace FileCommander
 
             CommandPanel = new CommandPanel("0, 100%-2, 100%, 1", Size, Alignment.None, "CommandPanel", Path);
             Add(CommandPanel);
-            CommandPanel.Disabled = true;
             CommandManager.PathChange += CommandPanel.OnPathChange;
 
-            var hotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
-            hotKeyPanel.Disabled = true;
-            Add(hotKeyPanel);
+            HotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
+            Add(HotKeyPanel);
 
             CommandManager.ErrorEvent += OnErrorHandler;
             RestoreSettings();
         }
-
-        public void RestoreSettings()
+        #endregion
+        
+        #region Methods
+        private void RestoreSettings()
         {
             LeftFilePanel.SetPath(Settings.LeftPanelPath);
             RightFilePanel.SetPath(Settings.RightPanelPath);
@@ -199,12 +208,14 @@ namespace FileCommander
                 leftInfoPanel.Hide();
                 LeftPanel = LeftFilePanel;
                 LeftFilePanel.Show();
+                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Info";
             }
             else if (RightPanel is InfoPanel rightInfoPanel)
             {
                 rightInfoPanel.Hide();
                 RightPanel = RightFilePanel;
                 RightFilePanel.Show();
+                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Info";
             }
             else if (FocusedComponent == LeftFilePanel)
             {
@@ -212,6 +223,7 @@ namespace FileCommander
                 RightPanel = InfoPanel;
                 InfoPanel.Show();
                 InfoPanel.SetRectangle(RIGHT_PANEL_POSITION, Size);
+                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Files";
             }
             else
             {
@@ -219,6 +231,7 @@ namespace FileCommander
                 LeftPanel = InfoPanel;
                 InfoPanel.Show();
                 InfoPanel.SetRectangle(LEFT_PANEL_POSITION, Size);
+                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Files";
             }
             Update();
         }
@@ -280,7 +293,7 @@ namespace FileCommander
 
         }
 
-        public void ShowMakeDirWindow()
+        private void ShowMakeDirWindow()
         {
             if (FocusedComponent is FilePanel sourcePanel)
             {
@@ -385,5 +398,6 @@ namespace FileCommander
         {
             CommandPanel.UpdateCursorPosition();
         }
+        #endregion
     }
 }

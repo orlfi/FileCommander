@@ -5,8 +5,18 @@ using System.Collections.Generic;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Extension methods
+    /// </summary>
     public static class Extensions
     {
+        /// <summary>
+        /// Returns a new string that center-aligns the characters in this instance 
+        /// by padding them with spaces on the left, for a specified total length.
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <param name="width">The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters</param>
+        /// <returns>A new string that is equivalent to this instance, but center-aligned and padded on the left and Right with as many spaces as needed to create a length of totalWidth</returns>
         public static string PadCenter(this string text, int width)
         {
             int marginLeft = (width - text.Length) / 2;
@@ -21,6 +31,15 @@ namespace FileCommander
 
             return $"{"".PadRight(marginLeft)}{text}{"".PadRight(marginRigth)}";
         }
+
+        /// <summary>
+        /// Returns a new string that aligns the characters in this instance 
+        /// by padding them with spaces on the left, for a specified total length.
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <param name="width">The number of characters in the resulting string, equal to the number of original characters plus any additional padding characters</param>
+        /// <param name="alignment">Align type</param>
+        /// <returns>A new string that is equivalent to this instance, but aligned</returns>
 
         public static string Align(this string text, int width, TextAlignment alignment)
         {
@@ -41,6 +60,13 @@ namespace FileCommander
             }
             return text;
         }
+
+        /// <summary>
+        /// Returns a new string that is aligned in width by adding missing spaces
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <param name="width">The number of characters in the resulting string, equal to the number of original characters plus missing spaces</param>
+        /// <returns>A new string that is equivalent to this instance, but aligned in width by adding missing spaces</returns>
         public static string PadWidth(this string text, int width)
         {
             
@@ -71,12 +97,26 @@ namespace FileCommander
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Returns a new string which is cropped to the width 
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <param name="width">The number of characters in the resulting string</param>
+        /// <param name="alignment">Align type</param>
+        /// <returns>A new string that is equivalent to this instance, but cropped to the width</returns>
         public static string Fit(this string text, int width, TextAlignment alignment = TextAlignment.Left)
         {
 
             return text.Substring(0, Math.Min(width, text.Length)).Align(width, alignment);
         }
 
+        /// <summary>
+        /// Returns a list of lines with word wrapping by paragraph
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <param name="lineWidth">Text instance</param>
+        /// <param name="alignment">Align type</param>
+        /// <returns>A list of wraped lines</returns>
         public static List<string> WrapParagraph(this string text, int lineWidth, TextAlignment alignment)
         {
             List<string> lines = new List<string>();
@@ -87,6 +127,13 @@ namespace FileCommander
             return lines;
         }
 
+        /// <summary>
+        /// Returns a list of lines with word wrapping
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <param name="lineWidth">Text instance</param>
+        /// <param name="alignment">Align type</param>
+        /// <returns>A list of wraped lines</returns>
         public static List<string> WrapText(this string text, int lineWidth, TextAlignment alignment)
         {
             string[] words = text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -111,12 +158,13 @@ namespace FileCommander
         }
 
         /// <summary>
-        /// Format file size
+        /// Format file size 
         /// </summary>
-        /// <param name="size"></param>
-        /// <param name="acronymCutting">‰ÎËÌ‡ ‡·Â‚Ë‡ÚÛ˚</param>
-        /// <returns></returns>
-        public static string FormatFileSize(this long size, int decimals = 0, FileSizeAcronim—utting acronymCutting = FileSizeAcronim—utting.TwoChar)
+        /// <param name="size">Size instance in bytes</param>
+        /// <param name="decimals">A number of simbols after comma</param>
+        /// <param name="acronymCutting">Number of characters in the abbreviation </param>
+        /// <returns>A new string</returns>
+        public static string FormatFileSize(this long size, int decimals = 0, FileSizeAcronimCutting acronymCutting = FileSizeAcronimCutting.TwoChar)
         {
             string mask = "###" + (decimals == 0 ? "": $".{new string('#', decimals)}");
             long KILOBYTE = 1024;
@@ -126,15 +174,15 @@ namespace FileCommander
             long PETABYTE = TERABYTE * 1024;
 
             if (size >= PETABYTE)
-                return ((double)size / PETABYTE).ToString(mask + (acronymCutting == FileSizeAcronim—utting.SingleChar ? "P": " PB")).PadLeft(8);
+                return ((double)size / PETABYTE).ToString(mask + (acronymCutting == FileSizeAcronimCutting.SingleChar ? "P": " PB")).PadLeft(8);
             else if (size > TERABYTE && size < PETABYTE)
-                return ((double)size / TERABYTE).ToString(mask + (acronymCutting == FileSizeAcronim—utting.SingleChar ? "T" : " TB")).PadLeft(8);
+                return ((double)size / TERABYTE).ToString(mask + (acronymCutting == FileSizeAcronimCutting.SingleChar ? "T" : " TB")).PadLeft(8);
             else if (size > GIGABYTE && size < TERABYTE)
-                return ((double)size / GIGABYTE).ToString(mask + (acronymCutting == FileSizeAcronim—utting.SingleChar ? "G" : " GB")).PadLeft(8);
+                return ((double)size / GIGABYTE).ToString(mask + (acronymCutting == FileSizeAcronimCutting.SingleChar ? "G" : " GB")).PadLeft(8);
             else if (size > MEGABYTE && size < GIGABYTE)
-                return ((double)size / MEGABYTE).ToString(mask + (acronymCutting == FileSizeAcronim—utting.SingleChar ? "M" : " MB")).PadLeft(8);
+                return ((double)size / MEGABYTE).ToString(mask + (acronymCutting == FileSizeAcronimCutting.SingleChar ? "M" : " MB")).PadLeft(8);
             else if (size > KILOBYTE && size < MEGABYTE)
-                return ((double)size / KILOBYTE).ToString(mask + (acronymCutting == FileSizeAcronim—utting.SingleChar ? "K" : " KB")).PadLeft(8);
+                return ((double)size / KILOBYTE).ToString(mask + (acronymCutting == FileSizeAcronimCutting.SingleChar ? "K" : " KB")).PadLeft(8);
             else
                 return (size).ToString().PadLeft(8);
         }

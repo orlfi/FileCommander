@@ -19,7 +19,7 @@ namespace FileCommander
 
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
-            string name = $"{Drive.Name.Fit(2)} │ { Drive.VolumeLabel.Fit(12)} │ {Drive.TotalSize.FormatFileSize(0, FileSizeAcronimСutting.TwoChar)}";
+            string name = $"{Drive.Name.Fit(2)} │ { Drive.VolumeLabel.Fit(12)} │ {Drive.TotalSize.FormatFileSize(0, FileSizeAcronimCutting.TwoChar)}";
             BackgroundColor = Focused ? Theme.DriveItemFocusedBackgroundColor : Theme.DriveItemBackgroundColor;
             buffer.WriteAt(name, X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
         }

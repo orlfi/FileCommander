@@ -3,17 +3,21 @@ using System.Linq;
 
 namespace FileCommander
 {
+    #region Delegates
     public delegate void PaintHandler(Component sender);
     
     public delegate void FocusHandler(bool focus);
+    #endregion
     
+    /// <summary>
+    /// Base class for all controls
+    /// </summary>
     public abstract class Component
     {
-        protected CursorState cursorState = new CursorState();
-
-        public Settings Settings => Settings.GetInstance();
+        #region Events
         public event FocusHandler FocusEvent;
         public event PaintHandler PaintEvent;
+        #endregion
 
         #region Constants
         private static ConsoleColor saveForegroundColor;
@@ -21,11 +25,13 @@ namespace FileCommander
         private static ConsoleColor saveBackgroundColor;
         #endregion
 
-        #region Fields
+        #region Fields && Properties
         protected string _path;
-        #endregion
 
-        #region Properties
+        protected CursorState cursorState = new CursorState();
+
+        public Settings Settings => Settings.GetInstance();
+
         public virtual string Path { get => _path; set => _path = value; }
 
         public virtual string Name { get; set; }
@@ -176,23 +182,6 @@ namespace FileCommander
         }
         #endregion
 
-        #region Static methods
-        protected static Point GetAbsolutePosition(Component component)
-        {
-            if (component == null)
-                return new Point(0, 0);
-
-            var location = GetAbsolutePosition(component.Parent);
-            return new Point(component.X + location.X, component.Y + location.Y);
-        }
-        
-        public static void Update(int x, int y, int width, int height)
-        {
-            CommandManager.GetInstance().Refresh(x, y, width, height);
-        }
-         
-        #endregion
-
         #region Methods
         public void Hide()
         {
@@ -236,6 +225,22 @@ namespace FileCommander
         public virtual void OnFocusChange(bool focused)
         {
             FocusEvent?.Invoke(_focused);
+        }
+        #endregion
+
+        #region Static methods
+        protected static Point GetAbsolutePosition(Component component)
+        {
+            if (component == null)
+                return new Point(0, 0);
+
+            var location = GetAbsolutePosition(component.Parent);
+            return new Point(component.X + location.X, component.Y + location.Y);
+        }
+        
+        public static void Update(int x, int y, int width, int height)
+        {
+            CommandManager.GetInstance().Refresh(x, y, width, height);
         }
         #endregion
     }

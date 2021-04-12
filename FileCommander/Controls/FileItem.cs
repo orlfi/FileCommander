@@ -45,7 +45,7 @@ namespace FileCommander
                         if (ItemType == FileTypes.File)
                         {
                             FileInfo fi = new FileInfo(Path);
-                            text = fi.Exists ? fi.Length.FormatFileSize(3, FileSizeAcronimСutting.SingleChar) : "";
+                            text = fi.Exists ? fi.Length.FormatFileSize(3, FileSizeAcronimCutting.SingleChar) : "";
                         }
                         break;
                     case FileColumnTypes.DateTime:

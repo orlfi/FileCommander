@@ -4,21 +4,54 @@ using System.Text;
 using System.IO;
 namespace FileCommander
 {
+    /// <summary>
+    /// Command bar class
+    /// handles console commands
+    /// </summary>
     public class CommandPanel : TextEdit
     {
+        /// <summary>
+        /// Main window reference
+        /// </summary>
         public MainWindow MainWindow => Parent as MainWindow;
 
+        /// <summary>
+        /// Command manager reference
+        /// </summary>
+        /// <returns></returns>
         public CommandManager CommandManager => CommandManager.GetInstance();
 
+        /// <summary>
+        /// Focused file catalog control reference
+        /// </summary>
+        /// <value></value>
         public FilePanel FocusedFilePanel { get; set; }
+
+        /// <summary>
+        /// History list
+        /// </summary>
+        /// <value></value>
         public List<string> History { get; set; }
 
+        /// <summary>
+        /// Current index in the history list
+        /// </summary>
         private int _historyIndex = 0;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <param name="alignment">Alignment relative to the parent control</param>
+        /// <param name="name">Control name</param>
+        /// <param name="value">Command initial text</param>
+        /// <returns></returns>
         public CommandPanel(string rectangle, Size size, Alignment alignment, string name, string value) : base(rectangle, size, alignment, name, value)
         {
+            Disabled = true;
             History = new List<string>();
-            HideCursorOnFocuseLeft = false;
+            HideCursorOnFocusLeft = false;
             ForegroundColor = Theme.CommandForegroundColor;
             BackgroundColor = Theme.CommandBackgroundColor;
             Console.CursorVisible = true;

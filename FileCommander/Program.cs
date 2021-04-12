@@ -7,10 +7,15 @@ namespace FileCommander
 {
     class Program
     {
+        #region Windows API to enable ConsoleVirtualProcessing
         private const int STD_INPUT_HANDLE = -10;
+        
         private const int STD_OUTPUT_HANDLE = -11;
+        
         private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
+
         private const uint DISABLE_NEWLINE_AUTO_RETURN = 0x0008;
+
         private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
 
         [DllImport("kernel32.dll")]
@@ -24,7 +29,12 @@ namespace FileCommander
 
         [DllImport("kernel32.dll")]
         public static extern uint GetLastError();
+        #endregion
 
+        /// <summary>
+        /// Program entry point
+        /// </summary>
+        /// <param name="args">Program parameters</param>
         static void Main(string[] args)
         {
             //try
@@ -55,8 +65,8 @@ namespace FileCommander
         /// <summary>
         /// Enable ConsoleVirtualProcessing to use the esc sequence
         /// </summary>
-        /// <param name="input">for console input</param>
-        /// <param name="output">for console output</param>
+        /// <param name="input">For console input</param>
+        /// <param name="output">For console output</param>
         static void SetConsoleVirtualProcessing(bool input = false, bool output = true)
         {
             if (input)

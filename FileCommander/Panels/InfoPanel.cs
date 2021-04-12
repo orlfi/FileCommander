@@ -181,8 +181,8 @@ namespace FileCommander
         {
             DriveInfo di = new DriveInfo(System.IO.Path.GetPathRoot(path));           
             DriveName.SetText($"{ di.DriveType} {di.Name} ({ di.DriveFormat})", false);
-            DriveTotalSize.SetText(di.TotalSize.FormatFileSize(0, FileSizeAcronimСutting.TwoChar), false);
-            DriveSpaceFree.SetText(di.AvailableFreeSpace.FormatFileSize(0, FileSizeAcronimСutting.TwoChar), false);
+            DriveTotalSize.SetText(di.TotalSize.FormatFileSize(0, FileSizeAcronimCutting.TwoChar), false);
+            DriveSpaceFree.SetText(di.AvailableFreeSpace.FormatFileSize(0, FileSizeAcronimCutting.TwoChar), false);
             DriveVolumeLabel.SetText(di.VolumeLabel, false);
         }
 

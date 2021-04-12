@@ -95,7 +95,7 @@ namespace FileCommander
         Left,
         Right
     }
-    public enum FileSizeAcronim—utting
+    public enum FileSizeAcronimCutting
     {
         SingleChar,
         TwoChar

@@ -552,9 +552,11 @@ namespace FileCommander
 
                 metrics = new MemoryMetrics();
 
-                metrics.Total = Math.Round(double.Parse(totalMemoryParts[1]), 0);
-                metrics.Free = Math.Round(double.Parse(freeMemoryParts[1]), 0);
-                metrics.Used = metrics.Total - metrics.Free;
+                if (long.TryParse(totalMemoryParts[1], out long total))
+                    metrics.Total = total;
+                
+                if (long.TryParse(totalMemoryParts[1], out long free))
+                    metrics.Free = free;
             }
             return metrics;
         }

@@ -5,6 +5,7 @@ namespace FileCommander
     {
         public HotKeyPanel(string rectangle, Size size) : base(rectangle, size) 
         {
+            Disabled = true;
             Initialize();
             Align(size);
         }
