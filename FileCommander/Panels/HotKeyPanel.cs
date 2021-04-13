@@ -52,19 +52,19 @@ namespace FileCommander
 
         private void Align(Size size)
         {
-            int itemWidth = size.Width / Components.Count;
-            int remains = size.Width - itemWidth * Components.Count;
+            int itemWidth = size.Width / Controls.Count;
+            int remains = size.Width - itemWidth * Controls.Count;
             int totalWidth = 0;
-            for (int i = 0; i < Components.Count; i++)
+            for (int i = 0; i < Controls.Count; i++)
             {
-                Components[i].Width = itemWidth;
-                Components[i].X = totalWidth;
+                Controls[i].Width = itemWidth;
+                Controls[i].X = totalWidth;
                 if (remains > 0)
                 {
-                    Components[i].Width++;
+                    Controls[i].Width++;
                     remains--;
                 }
-                totalWidth += Components[i].Width;
+                totalWidth += Controls[i].Width;
             }
         }
     }

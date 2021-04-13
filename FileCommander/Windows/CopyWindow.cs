@@ -4,37 +4,58 @@ using System.Numerics;
 
 namespace FileCommander
 {
-    public delegate void CopyHandler(Control sender, string source, string destination, bool move);
+    public delegate void CopyHandler(Control sender, string[] source, string destination, bool move);
     public class CopyWindow: Window
     {
         public event CopyHandler CopyEvent;
 
         public const string SOURCE_TEMPLATE = "{0} {1} to:";
-        
+
+        protected string[] source;
+
         public bool Move { get; set;} = false;
 
         public Button SaveButton { get; set;}
         
         public Button CancelButton { get; set;}
 
-        public Label Source { get; set; }
+        public Label SourceLabel { get; set; }
         public TextEdit Destination { get; set; }
 
         public FilePanel DestinationPanel {get;set;}
 
         public const string DEFAULT_NAME = "Copy";
         
-        public CopyWindow(Size targetSize, string sourcePath, string destinationPath, string name = DEFAULT_NAME) : base("50%-25, 50%-3, 50, 6", targetSize)
+        public CopyWindow(Size targetSize, string[] source, string destination, string name = DEFAULT_NAME) : base("50%-38, 50%-3, 76, 6", targetSize)
         {
             Name = name;
+            this.source = source;
+            string sourceValue = "";
+            string destinationValue = "";
+            if (this.source.Length == 1)
+            {
+                string sourceFileName = FileItem.GetFitName(System.IO.Path.GetFileName(this.source[0]), Width - SOURCE_TEMPLATE.Length - 2);
+                sourceValue = string.Format(SOURCE_TEMPLATE, base.Name, sourceFileName);
+                if (System.IO.File.Exists(this.source[0]))
+                {
+                    if (System.IO.Path.GetDirectoryName(this.source[0]) == destination)
+                        destinationValue = System.IO.Path.Combine(destination, System.IO.Path.GetFileNameWithoutExtension(this.source[0]) + "_copy" + System.IO.Path.GetExtension(this.source[0]));
+                    else
+                        destinationValue = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(this.source[0]));
+                }
+                else
+                    destinationValue = System.IO.Path.Combine(destination, "*.*");
+            }
+            else
+            {
+                sourceValue = string.Format(SOURCE_TEMPLATE, base.Name, $"{ this.source.Length } files");
+                destinationValue = System.IO.Path.Combine(destination, "*.*");
+            }
 
-            string sourceFileName = FileItem.GetFitName(System.IO.Path.GetFileName(sourcePath), Width - SOURCE_TEMPLATE.Length - 2);
-            Source = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "Source" , string.Format(SOURCE_TEMPLATE, Name, sourceFileName));
-            Source.Path = sourcePath;
-            Add(Source);
-            
-            Destination = new TextEdit("2, 2, 100%-4, 1", Size, Alignment.None, "FileName", destinationPath);
-            Destination.Path = destinationPath;
+            SourceLabel = new Label("2, 1, 100%-4, 1", Size, Alignment.None, "Source", sourceValue);
+            Add(SourceLabel);
+
+            Destination = new TextEdit("2, 2, 100%-4, 1", Size, Alignment.None, "FileName", destinationValue);
             Add(Destination);
             AddButtons();
         }
@@ -67,7 +88,7 @@ namespace FileCommander
         public override void OnEnter()
         {
             Close();
-            CopyEvent?.Invoke(this, Source.Path, Destination.Value, Move);
+            CopyEvent?.Invoke(this, source, Destination.Value, Move);
         }
 
         public override void Draw(Buffer buffer, int targetX, int targetY)

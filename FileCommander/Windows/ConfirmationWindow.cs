@@ -25,7 +25,6 @@ namespace FileCommander
             ForegroundColor = Theme.ErrorWindowForegroundColor;
             BackgroundColor = Theme.ErrorWindowBackgroundColor;
             var label = new Label("2, 2, 100%-4, 100%-4", Size, Alignment.None, "ConfirmationText", message);
-            //label.TextAlignment = TextAlignment.Center;
             label.Wrap = true;
             Add(label);
             AddButtons();

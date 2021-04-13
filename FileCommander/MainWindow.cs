@@ -270,14 +270,14 @@ namespace FileCommander
                 leftInfoPanel.Hide();
                 LeftPanel = LeftFilePanel;
                 LeftFilePanel.Show();
-                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Info";
+                HotKeyPanel.Controls.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Info";
             }
             else if (RightPanel is InfoPanel rightInfoPanel)
             {
                 rightInfoPanel.Hide();
                 RightPanel = RightFilePanel;
                 RightFilePanel.Show();
-                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Info";
+                HotKeyPanel.Controls.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Info";
             }
             else if (FocusedComponent == LeftFilePanel)
             {
@@ -285,7 +285,7 @@ namespace FileCommander
                 RightPanel = InfoPanel;
                 InfoPanel.Show();
                 InfoPanel.SetRectangle(RIGHT_PANEL_POSITION, Size);
-                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Files";
+                HotKeyPanel.Controls.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Files";
             }
             else
             {
@@ -293,7 +293,7 @@ namespace FileCommander
                 LeftPanel = InfoPanel;
                 InfoPanel.Show();
                 InfoPanel.SetRectangle(LEFT_PANEL_POSITION, Size);
-                HotKeyPanel.Components.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Files";
+                HotKeyPanel.Controls.Single(item=> ((HotKeyItem)item).Number == 4).Name = "Files";
             }
             Update();
         }
@@ -332,11 +332,11 @@ namespace FileCommander
         {
             if (FocusedComponent is FilePanel sourcePanel)
             {
-                string source = sourcePanel.View.FocusedItem.Path;
-                var window = new ConfirmationWindow(Size, source, "Delete");
+                string[] source = sourcePanel.View.GetSelectedItems();
+                var window = new ConfirmationWindow(Size, source.Length==1? source[0] : $"{source.Length} files", "Delete");
                 if (window.Open() == ModalWindowResult.Confirm)
                 {
-                    Delete(sourcePanel, new[] { source });
+                    Delete(sourcePanel, source);
                 }
             }
         }
@@ -362,6 +362,7 @@ namespace FileCommander
             CommandManager.ProgressEvent -= OnDeleteProgress;
             if (ActiveWindow is ProgressWindow)
                 progressWindow.Close();
+            sourcePanel.View.Top();
             sourcePanel.Refresh();
         }
 
@@ -414,12 +415,12 @@ namespace FileCommander
         {
             if (FocusedComponent is FilePanel sourcePanel)
             {
-                string sourcePath = sourcePanel.View.FocusedItem.Path;
-                var destinationPanel = (FilePanel)Components.Where(item => item is FilePanel && !item.Focused).SingleOrDefault();
-                string destinationPath = sourcePath;
+                string[] source = sourcePanel.View.GetSelectedItems();
+                var destinationPanel = (FilePanel)Controls.Where(item => item is FilePanel && !item.Focused).SingleOrDefault();
+                string destinationPath = sourcePanel.Path;
                 if (destinationPanel != null)
                     destinationPath = destinationPanel.Path;
-                var window = move ? new MoveWindow(Size, sourcePath, destinationPath) : new CopyWindow(Size, sourcePath, destinationPath);
+                var window = move ? new MoveWindow(Size, source, destinationPath) : new CopyWindow(Size, source, destinationPath);
                 window.DestinationPanel = destinationPanel;
                 window.CopyEvent += OnCopy;
                 window.Open();
@@ -430,10 +431,10 @@ namespace FileCommander
         /// Calls the function to copy files and directories 
         /// </summary>
         /// <param name="sender">Component that raised the event </param>
-        /// <param name="source">Source file or directory path</param>
+        /// <param name="source">Source file or directory path array</param>
         /// <param name="destination">The path to the destination file or directory</param>
         /// <param name="move">Move files and directories flag</param>
-        public void OnCopy(Control sender, string source, string destination, bool move)
+        public void OnCopy(Control sender, string[] source, string destination, bool move)
         {
             var progressWindow = new TotalProgressWindow(Size);
             progressWindow.FileDestinationInfo.Text = destination;
@@ -448,7 +449,7 @@ namespace FileCommander
             CommandManager.ProgressEvent += OnCopyProgress;
             CommandManager.ConfirmationEvent += OnReplaceConfirmation;
 
-            CommandManager.Copy(new[] { source }, destination, move);
+            CommandManager.Copy(source, destination, move);
 
             CommandManager.ProgressEvent -= OnCopyProgress;
             CommandManager.ConfirmationEvent -= OnReplaceConfirmation;
@@ -456,7 +457,7 @@ namespace FileCommander
             if (ActiveWindow is TotalProgressWindow)
                 progressWindow.Close();
 
-            foreach (var panel in Components.Where(item => item is FilePanel))
+            foreach (var panel in Controls.Where(item => item is FilePanel))
                 ((FilePanel)panel).Refresh();
         }
 

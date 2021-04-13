@@ -46,7 +46,7 @@ namespace FileCommander
             get => _cursorY;
             set
             {
-                var files = Components;
+                var files = Controls;
                 int max = Math.Min(MaxItems - 1, (files.Count == 0 ? 0 : files.Count - 1));
                 if (value < 0)
                 {
@@ -85,11 +85,11 @@ namespace FileCommander
             {
                 case ConsoleKey.UpArrow:
                     CursorY--;
-                    SetFocus(Components[CursorY + OffsetY], true);
+                    SetFocus(Controls[CursorY + OffsetY], true);
                     break;
                 case ConsoleKey.DownArrow:
                     CursorY++;
-                    SetFocus(Components[CursorY + OffsetY], true);
+                    SetFocus(Controls[CursorY + OffsetY], true);
                     break;
                 case ConsoleKey.Tab:
                     SetFocus(FocusNext());
@@ -128,7 +128,7 @@ namespace FileCommander
 
         protected override void DrawChildren(Buffer buffer, int targetX, int targetY)
         {
-            foreach (var component in Components)
+            foreach (var component in Controls)
             {
                 if (component.Y>=OffsetY+PaddingTop && component.Y<MaxItems+OffsetY+PaddingTop)
                     component.Draw(buffer, targetX + X, targetY + Y- OffsetY);
@@ -138,12 +138,12 @@ namespace FileCommander
         private void FocusDrive(string path)
         {
             string root = System.IO.Path.GetPathRoot(path).ToLower();
-            int index = Components.FindIndex(item => ((DriveItem)item).Drive.Name.ToLower() == root);
+            int index = Controls.FindIndex(item => ((DriveItem)item).Drive.Name.ToLower() == root);
             if (index >= 0)
             {
                 _offsetY = 0;
                 CursorY = index;
-                SetFocus(Components[CursorY + OffsetY], true);
+                SetFocus(Controls[CursorY + OffsetY], true);
             }
         }
 

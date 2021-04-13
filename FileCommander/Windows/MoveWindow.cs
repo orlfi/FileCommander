@@ -8,7 +8,7 @@ namespace FileCommander
     {
         public new const string DEFAULT_NAME = "Move";
         
-        public MoveWindow(Size targetSize, string sourcePath, string destinationPath) : base(targetSize, sourcePath, destinationPath, DEFAULT_NAME) 
+        public MoveWindow(Size targetSize, string[] source, string destinationPath) : base(targetSize, source, destinationPath, DEFAULT_NAME) 
         {
             Move = true;
         }

@@ -5,7 +5,7 @@ namespace FileCommander
 {
     public class Panel : Control
     {
-        public List<Control> Components { get; set; } = new List<Control>();
+        public List<Control> Controls { get; set; } = new List<Control>();
 
         protected CommandManager CommandManager => CommandManager.GetInstance();
         
@@ -32,7 +32,7 @@ namespace FileCommander
 
             SetRectangle(size);
             Align(size);
-            foreach (var component in Components)
+            foreach (var component in Controls)
             {
                 component.UpdateRectangle(Size);
             }
@@ -52,7 +52,7 @@ namespace FileCommander
 
         protected virtual void DrawChildren(Buffer buffer, int targetX, int targetY)
         {
-            foreach (var component in Components)
+            foreach (var component in Controls)
             {
                 if (component.Visible)
                     component.Draw(buffer, targetX + X, targetY + Y);
@@ -62,7 +62,7 @@ namespace FileCommander
         public void Add(Control item)
         {
             item.Parent = this;
-            Components.Add(item);
+            Controls.Add(item);
         }
 
         public void AddRange(IEnumerable<Control> items)
@@ -89,13 +89,13 @@ namespace FileCommander
 
         public Control FocusNext(bool round = true)
         {
-            int focusedIndex = Components.IndexOf(FocusedComponent);
+            int focusedIndex = Controls.IndexOf(FocusedComponent);
             int next = focusedIndex;
             int lastAvailable = focusedIndex;
             do
             {
                 next++;
-                if (next > Components.Count - 1)
+                if (next > Controls.Count - 1)
                 {
                     if (round)
                         next = 0;
@@ -105,26 +105,26 @@ namespace FileCommander
                         break;
                     }
                 }
-                else if (Components[next].Visible == true && Components[next].Disabled != false)
+                else if (Controls[next].Visible == true && Controls[next].Disabled != false)
                     lastAvailable = next;
-            } while (Components[next].Visible == false || Components[next].Disabled == true);
+            } while (Controls[next].Visible == false || Controls[next].Disabled == true);
 
-            return Components[next];
+            return Controls[next];
         }
 
         public Control FocusPrevious(bool round = true)
         {
-            int focusedIndex = Components.IndexOf(FocusedComponent);
+            int focusedIndex = Controls.IndexOf(FocusedComponent);
             int next = focusedIndex;
             do
             {
                 next--;
                 if (next < 0)
-                    next = round?Components.Count - 1:0;
+                    next = round?Controls.Count - 1:0;
                     
-            } while (Components[next].Visible == true && Components[next].Disabled != false);
+            } while (Controls[next].Visible == true && Controls[next].Disabled != false);
 
-            return Components[next];
+            return Controls[next];
         }
 
         public override void OnKeyPress(ConsoleKeyInfo keyInfo) { }

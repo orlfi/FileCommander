@@ -11,6 +11,12 @@ namespace FileCommander
 
         public new const string DEFAULT_NAME = "Rename";
         
-        public RenameWindow(Size targetSize, string sourcePath, string destinationPath) : base(targetSize, sourcePath, destinationPath, DEFAULT_NAME) {}
+        public RenameWindow(Size targetSize, string source, string destinationPath) : base(targetSize, new[] { source }, destinationPath, DEFAULT_NAME) {}
+
+        public override void OnEnter()
+        {
+            Close();
+            RenameEvent?.Invoke(this, source[0], Destination.Value);
+        }
     }
 }

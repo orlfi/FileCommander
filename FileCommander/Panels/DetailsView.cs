@@ -30,7 +30,7 @@ namespace FileCommander
             get => _cursorY;
             set
             {
-                var files = Components;
+                var files = Controls;
                 int max = Math.Min(Height - HeaderHeight , HeaderHeight + (files.Count == 0 ? 0 : files.Count - 1));
                 if (value < ((DrawHeader?HEADER_HEIGHT:0)))
                 {
@@ -76,7 +76,7 @@ namespace FileCommander
 
         public void SetFiles(List<FileSystemInfo> files)
         {
-            Components.Clear();
+            Controls.Clear();
             if (System.IO.Path.GetPathRoot(Path) != Path)
                     Add(new FileItem("..", null, "100%", Size, FileTypes.ParentDirectory));
             if (files.Count > 0)
@@ -110,7 +110,7 @@ namespace FileCommander
         public void End()
         {
             _offsetY = 0;
-            CursorY = Components.Count;
+            CursorY = Controls.Count;
             Update();
         }
 
@@ -130,7 +130,7 @@ namespace FileCommander
         {
             FocusedItem?.SetFocus(false);
             FocusedItem?.Update();
-            FocusedItem = (FileItem)Components.ElementAtOrDefault(CursorY + _offsetY - HeaderHeight);
+            FocusedItem = (FileItem)Controls.ElementAtOrDefault(CursorY + _offsetY - HeaderHeight);
             FocusedItem.Update();
         }
 
@@ -143,7 +143,7 @@ namespace FileCommander
 
         public void SelectAll()
         {
-            foreach (var item in Components)
+            foreach (var item in Controls)
                 if (item is FileItem fileItem && (fileItem.ItemType == FileTypes.File || fileItem.ItemType == FileTypes.Directory))
                     fileItem.Selected = true;
 
@@ -152,7 +152,7 @@ namespace FileCommander
 
         public void DeselectAll()
         {
-            foreach (var item in Components)
+            foreach (var item in Controls)
                 if (item is FileItem fileItem && (fileItem.ItemType == FileTypes.File || fileItem.ItemType == FileTypes.Directory))
                     fileItem.Selected = false;
 
@@ -161,16 +161,23 @@ namespace FileCommander
 
         public void InvertSelection()
         {
-            foreach (var item in Components)
+            foreach (var item in Controls)
                 if (item is FileItem fileItem && (fileItem.ItemType == FileTypes.File || fileItem.ItemType == FileTypes.Directory))
                     fileItem.Selected = !fileItem.Selected;
 
             Update();
         }
 
+        public string[] GetSelectedItems()
+        {
+
+            var selectedItems = Controls.Where(item => item is FileItem fileItem && fileItem.Selected).Select(item => item.Path).ToArray();
+            return selectedItems.Length == 0 ? new[] { FocusedItem.Path } : selectedItems;
+        }
+
         public void FocusItem(string path)
         {
-            var files = Components;
+            var files = Controls;
             int index = files.FindIndex(item => item.Path.ToLower() == path.ToLower());
             if (index >= 0)
             {
@@ -187,7 +194,7 @@ namespace FileCommander
 
         public void DrawItems(Buffer buffer, int targetX, int targetY)
         {
-            var files = Components;
+            var files = Controls;
             int count = Height - HeaderHeight;
             for (int i = 0; i < count; i++)
             {

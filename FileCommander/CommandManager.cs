@@ -470,18 +470,38 @@ namespace FileCommander
 
                 for (int i = 0; i < source.Length; i++)
                 {
+                    if (CancelOperation)
+                        break;
+
                     if (Directory.Exists(source[i]))
                     {
-                        if (System.IO.Path.GetDirectoryName(source[i]).ToLower() == destination.ToLower())
+                        if (System.IO.Path.GetDirectoryName(source[i]).ToLower() == System.IO.Path.GetDirectoryName(destination.ToLower()))
                         {
                             ErrorEvent?.Invoke("The destination folder is a source folder");
                             continue;
                         }
-                        CopyDirectory(source[i], destination, itemProgress, totalProgress, move);
+                        CopyDirectory(source[i], System.IO.Path.GetDirectoryName(destination.ToLower()), itemProgress, totalProgress, move);
                     }
                     else if (File.Exists(source[i]))
                     {
-                        CopyFile(source[i], System.IO.Path.Combine(destination, System.IO.Path.GetFileName(source[i])), itemProgress, totalProgress, move);
+                        if (source.Length == 1 && source[i] == destination)
+                        {
+                            ErrorEvent?.Invoke("The destination file is a source file");
+                            continue;
+                        }
+                        else
+                        {
+                            string destinationPath = destination;
+                            if (Directory.Exists(destinationPath))
+                                destinationPath = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(source[i]));
+                            else if (System.IO.Path.GetFileName(destinationPath) == "*.*")
+                                destinationPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(destination), System.IO.Path.GetFileName(source[i]));
+
+                            string destinationDirectory = System.IO.Path.GetDirectoryName(destinationPath);
+                            if (!Directory.Exists(destinationDirectory))
+                                CreateDirectory(destinationDirectory);
+                            CopyFile(source[i], destinationPath, itemProgress, totalProgress, move);
+                        }
                     }
                 }
                 totalProgress.Done = true;
@@ -553,6 +573,9 @@ namespace FileCommander
 
             foreach (var item in fileSystemEntries)
             {
+                if (CancelOperation)
+                    break;
+
                 string relative = System.IO.Path.GetRelativePath(root, System.IO.Path.GetDirectoryName(item));
                 string destinationPath = System.IO.Path.Combine(destination, relative == "." ? "" : relative);
                 string destinationFullName = System.IO.Path.Combine(destinationPath, System.IO.Path.GetFileName(item));
@@ -651,8 +674,9 @@ namespace FileCommander
                         itemProgress.Done = false;
 
                         ProgressEvent?.Invoke(this, itemProgress, totalProgress);
-                    } while (bytesRead > 0);
+                    } while (bytesRead > 0 && !CancelOperation);
                     writeStream.Flush();
+                    Thread.Sleep(600);
                 }
                 itemProgress.Done = true;
                 ProgressEvent?.Invoke(this, itemProgress, totalProgress);

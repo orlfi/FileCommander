@@ -131,7 +131,7 @@ namespace FileCommander
                 MainWindow.ShowError($"{args[0].ToUpper()} command must have 2 arguments", Parent.Size);
             else
             {
-                MainWindow.OnCopy(this, args[1], args[2], move);
+                MainWindow.OnCopy(this, new[] { args[1] }, args[2], move);
                 Value = "";
                 WriteString();
             }

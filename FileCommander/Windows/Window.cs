@@ -221,6 +221,7 @@ namespace FileCommander
             Update(true);
             if (_restoreActiveWindow)
                 RestoreActiveWindow();
+            MainWindow.UpdateCursorPosition();
         }
 
         /// <summary>
