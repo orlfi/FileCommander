@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace FileCommander
 {
-    public delegate void SelectDriveHandler(Component sender, DriveInfo driveInfo);
+    public delegate void SelectDriveHandler(Control sender, DriveInfo driveInfo);
     public class DriveSelectWindow : Window
     {
         public event SelectDriveHandler SelectDriveEvent;
@@ -65,7 +65,7 @@ namespace FileCommander
             }
         }
 
-        public DriveSelectWindow(Component parent) : base("0, 0, 32, 10", parent.Size, Alignment.HorizontalCenter | Alignment.VerticalCenter)
+        public DriveSelectWindow(Control parent) : base("0, 0, 32, 10", parent.Size, Alignment.HorizontalCenter | Alignment.VerticalCenter)
         {
             Name = DEFAULT_NAME;
             Parent = parent;
@@ -106,7 +106,7 @@ namespace FileCommander
             }
         }
 
-        public override void SetFocus(Component component, bool update = true)
+        public override void SetFocus(Control component, bool update = true)
         {
             if (FocusedComponent != component)
             {

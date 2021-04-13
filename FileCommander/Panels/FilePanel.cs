@@ -87,7 +87,7 @@ namespace FileCommander
                 }
             }
         }
-        private void OnChangeViewFocus(Component sender, FileItem item)
+        private void OnChangeViewFocus(Control sender, FileItem item)
         {
             if (item != null)
             {

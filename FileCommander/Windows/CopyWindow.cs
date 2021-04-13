@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace FileCommander
 {
-    public delegate void CopyHandler(Component sender, string source, string destination, bool move);
+    public delegate void CopyHandler(Control sender, string source, string destination, bool move);
     public class CopyWindow: Window
     {
         public event CopyHandler CopyEvent;

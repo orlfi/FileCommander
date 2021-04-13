@@ -14,7 +14,7 @@ namespace FileCommander
         public ProgressBar FileProgress { get; set; }
 
         public Button CancelButton { get; set; }
-        public List<Component> UpdateComponents { get; set; } = new List<Component>();
+        public List<Control> UpdateComponents { get; set; } = new List<Control>();
 
         const string DEFAULT_NAME = "Delete";
 

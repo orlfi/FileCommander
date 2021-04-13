@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace FileCommander
 {
-    public delegate void RenameHandler(Component sender, string source, string destination);
+    public delegate void RenameHandler(Control sender, string source, string destination);
     public class RenameWindow: CopyWindow
     {
         public event RenameHandler RenameEvent;

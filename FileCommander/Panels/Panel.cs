@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace FileCommander
 {
-    public class Panel : Component
+    public class Panel : Control
     {
-        public List<Component> Components { get; set; } = new List<Component>();
+        public List<Control> Components { get; set; } = new List<Control>();
 
         protected CommandManager CommandManager => CommandManager.GetInstance();
         
-        public Component FocusedComponent { get; set; } = null;
+        public Control FocusedComponent { get; set; } = null;
         
       
         public LineType Border { get; set; }
@@ -59,19 +59,19 @@ namespace FileCommander
             }
         }
 
-        public void Add(Component item)
+        public void Add(Control item)
         {
             item.Parent = this;
             Components.Add(item);
         }
 
-        public void AddRange(IEnumerable<Component> items)
+        public void AddRange(IEnumerable<Control> items)
         {
             foreach (var item in items)
                 Add(item);
         }
 
-        public virtual void SetFocus(Component component, bool update = true)
+        public virtual void SetFocus(Control component, bool update = true)
         {
             if (FocusedComponent != component)
             {
@@ -87,7 +87,7 @@ namespace FileCommander
             }
         }
 
-        public Component FocusNext(bool round = true)
+        public Control FocusNext(bool round = true)
         {
             int focusedIndex = Components.IndexOf(FocusedComponent);
             int next = focusedIndex;
@@ -112,7 +112,7 @@ namespace FileCommander
             return Components[next];
         }
 
-        public Component FocusPrevious(bool round = true)
+        public Control FocusPrevious(bool round = true)
         {
             int focusedIndex = Components.IndexOf(FocusedComponent);
             int next = focusedIndex;

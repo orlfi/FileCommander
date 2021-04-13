@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FileCommander
 {
-    public delegate void ChangeFocusHandler(Component sender, FileItem item);
+    public delegate void ChangeFocusHandler(Control sender, FileItem item);
 
     public class DetailsView: Panel
     {

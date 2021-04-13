@@ -153,7 +153,7 @@ namespace FileCommander
             Update();
         }
 
-        public void OnSelectFile(Component sender, FileItem item)
+        public void OnSelectFile(Control sender, FileItem item)
         {
             if (!Disabled && Visible)
             {

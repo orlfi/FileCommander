@@ -4,7 +4,7 @@ using System.Linq;
 namespace FileCommander
 {
     #region Delegates
-    public delegate void PaintHandler(Component sender);
+    public delegate void PaintHandler(Control sender);
     
     public delegate void FocusHandler(bool focus);
     #endregion
@@ -12,7 +12,7 @@ namespace FileCommander
     /// <summary>
     /// A base class for all controls
     /// </summary>
-    public abstract class Component
+    public class Control
     {
         #region Events
         public event FocusHandler FocusEvent;
@@ -84,7 +84,7 @@ namespace FileCommander
         public bool Visible { get; set; } = true;
 
 
-        public Component Parent { get; set; }
+        public Control Parent { get; set; }
 
         public ComponentPosition Position { get; set; }
 
@@ -113,12 +113,31 @@ namespace FileCommander
         #endregion
 
         #region Constructors
-        public Component(string rectangle, Size size, Alignment alignment = Alignment.None)
+        public Control(string rectangle, Size size, Alignment alignment = Alignment.None)
         {
             Name = this.GetType().Name;
             _rectangleString = rectangle;
             _alignment = alignment;
             SetRectangle(size);
+        }
+
+        public Control(string rectangle, Size size, Alignment alignment, string name) : this(rectangle, size, alignment)
+        {
+            SetName(name, size);
+        }
+
+        public Control(string rectangle, Size size, Alignment alignment, string name, ConsoleColor foregroundColor, ConsoleColor backgroundColor) : this(rectangle, size, alignment, name)
+        {
+            ForegroundColor = foregroundColor;
+            BackgroundColor = backgroundColor;
+        }
+
+        #endregion
+
+        #region Methods
+        public virtual void SetName(string name, Size size)
+        {
+            Name = name;
         }
 
         public virtual void UpdateRectangle(Size size)
@@ -180,9 +199,7 @@ namespace FileCommander
             result += operand * operation;
             return result;
         }
-        #endregion
 
-        #region Methods
         public void Hide()
         {
             Disabled = true;
@@ -199,7 +216,10 @@ namespace FileCommander
             Focused = focused;
         }
 
-        public abstract void Draw(Buffer buffer, int targetX, int targetY);
+        public virtual void Draw(Buffer buffer, int targetX, int targetY)
+        {
+            buffer.WriteAt(Name.Fit(Width), X + targetX, Y + targetY, ForegroundColor, BackgroundColor);
+        }
 
         public void Update(bool fullRepaint = false)
         {
@@ -220,16 +240,14 @@ namespace FileCommander
             OnPaint();
         }
 
-        public abstract void OnKeyPress(ConsoleKeyInfo keyInfo);
+        public virtual void OnKeyPress(ConsoleKeyInfo keyInfo) { }
 
         public virtual void OnFocusChange(bool focused)
         {
             FocusEvent?.Invoke(_focused);
         }
-        #endregion
 
-        #region Static methods
-        protected static Point GetAbsolutePosition(Component component)
+        protected static Point GetAbsolutePosition(Control component)
         {
             if (component == null)
                 return new Point(0, 0);

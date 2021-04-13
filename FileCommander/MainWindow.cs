@@ -319,7 +319,7 @@ namespace FileCommander
         /// <param name="sender">Component that raised the event </param>
         /// <param name="source">Source file or directory path</param>
         /// <param name="destination">The path to the destination file or directory</param>
-        private void OnRename(Component sender, string source, string destination)
+        private void OnRename(Control sender, string source, string destination)
         {
             CommandManager.Rename(source, destination);
             ((RenameWindow)sender).DestinationPanel?.Refresh();
@@ -398,7 +398,7 @@ namespace FileCommander
         /// <param name="sender">Component that raised the event </param>
         /// <param name="path">The path in which the directory is created </param>
         /// <param name="name">New directory name </param>
-        private void OnMakeDir(Component sender, string path, string name)
+        private void OnMakeDir(Control sender, string path, string name)
         {
             CommandManager.MakeDir(System.IO.Path.Combine(path, name));
             var panel = ((MakeDirectoryWindow)sender).DestinationPanel;
@@ -433,7 +433,7 @@ namespace FileCommander
         /// <param name="source">Source file or directory path</param>
         /// <param name="destination">The path to the destination file or directory</param>
         /// <param name="move">Move files and directories flag</param>
-        public void OnCopy(Component sender, string source, string destination, bool move)
+        public void OnCopy(Control sender, string source, string destination, bool move)
         {
             var progressWindow = new TotalProgressWindow(Size);
             progressWindow.FileDestinationInfo.Text = destination;

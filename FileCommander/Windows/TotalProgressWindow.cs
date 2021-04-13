@@ -59,7 +59,7 @@ namespace FileCommander
         /// </summary>
         public Button CancelButton { get; set; }
 
-        public List<Component> UpdateComponents { get; set; } = new List<Component>();
+        public List<Control> UpdateComponents { get; set; } = new List<Control>();
         #endregion
 
         public TotalProgressWindow(Size targetSize) : base("50%-25, 50%-6, 50, 11", targetSize)
