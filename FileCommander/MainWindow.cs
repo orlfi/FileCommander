@@ -14,36 +14,70 @@ namespace FileCommander
     {
         #region Constants
         /// <summary>
-        /// Left panel position and size
+        /// Contains left panel position and size
         /// </summary>
         public const string LEFT_PANEL_POSITION = "0,0,50%,100%-2";
 
         /// <summary>
-        /// Right panel position and size
+        /// Contains right panel position and size
         /// </summary>
         public const string RIGHT_PANEL_POSITION = "50%,0,50%,100%-2";
         #endregion
 
         #region Fields && Properties
+        
+        /// <summary>
+        /// Gets or sets active window reference
+        /// </summary>
         public Window ActiveWindow { get; set; } = null;
 
+        /// <summary>
+        /// Gets or sets left file panel instance reference
+        /// </summary>
         public FilePanel LeftFilePanel { get; set; } = null;
 
+        /// <summary>
+        /// Gets or sets right file panel instance reference
+        /// </summary>
         public FilePanel RightFilePanel { get; set; } = null;
 
+        /// <summary>
+        /// Gets or sets right panel instance reference
+        /// </summary>
         public Panel LeftPanel { get; set; } = null;
 
+        /// <summary>
+        /// Gets or sets right panel instance reference
+        /// </summary>
         public Panel RightPanel { get; set; } = null;
 
+        /// <summary>
+        /// Gets or sets information panel instance reference
+        /// </summary>
         public InfoPanel InfoPanel { get; set; } = null;
 
+        /// <summary>
+        /// Gets or sets command panel instance reference
+        /// </summary>
         public CommandPanel CommandPanel { get; set; } = null;
         
+        /// <summary>
+        /// Gets or sets history panel instance reference
+        /// </summary>
         public CommandHistoryPanel HistoryPanel { get; set; } = null;
+        
+        /// <summary>
+        /// Gets or sets hotkey panel instance reference
+        /// </summary>
         public HotKeyPanel HotKeyPanel { get; set; } = null;
         #endregion
 
         #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
         public MainWindow(string rectangle, Size size) : base(rectangle, size)
         {
             LeftFilePanel = new FilePanel(LEFT_PANEL_POSITION, Size);
@@ -76,12 +110,16 @@ namespace FileCommander
             HotKeyPanel = new HotKeyPanel("0, 100%-1, 100%-1, 1", Size);
             Add(HotKeyPanel);
 
-            CommandManager.ErrorEvent += OnErrorHandler;
+            CommandManager.ErrorEvent += (message) => ShowError(message, size);
             RestoreSettings();
         }
         #endregion
         
         #region Methods
+        /// <summary>
+        /// Restores the state of the main window from the settings file:
+        /// sets paths in file panels and focus 
+        /// </summary>
         private void RestoreSettings()
         {
             LeftFilePanel.SetPath(Settings.LeftPanelPath);
@@ -93,6 +131,10 @@ namespace FileCommander
                 SetFocus(RightPanel, false);
         }
 
+        /// <summary>
+        /// Handles button clicks
+        /// </summary>
+        /// <param name="keyInfo">ConsoleKeyInfo instance</param>
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
             if (ActiveWindow != null)
@@ -177,6 +219,11 @@ namespace FileCommander
                     break;
             }
         }
+
+        /// <summary>
+        /// Displays the drive selection window and sets the path to the drive
+        /// </summary>
+        /// <param name="panel">The file panel for which the drive is selected </param>
         public void SelectDrive(FilePanel panel)
         {
             if (panel != null)
@@ -193,12 +240,18 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Displays a help window 
+        /// </summary>
         public void ShowHelpWindow()
         {
             var window = new HelpWindow(Size, "Test");
             window.Open();
         }
 
+        /// <summary>
+        /// Refreshes the file list of the active file panel 
+        /// </summary>
         private void RefreshFilePanel()
         {
             if (FocusedComponent is FilePanel filePanel)
@@ -207,6 +260,9 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Shows and hides the information window
+        /// </summary>
         private void InvertInfoPanel()
         {
             if (LeftPanel is InfoPanel leftInfoPanel)
@@ -242,6 +298,9 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Displays a window for renaming files and directories
+        /// </summary>
         public void ShowRenameWindow()
         {
             if (FocusedComponent is FilePanel sourcePanel)
@@ -249,17 +308,26 @@ namespace FileCommander
                 string sourcePath = sourcePanel.View.FocusedItem.Path;
                 var window = new RenameWindow(Size, sourcePath, System.IO.Path.GetFileName(sourcePath));
                 window.DestinationPanel = sourcePanel;
-                window.CopyEvent += OnRename;
+                window.RenameEvent += OnRename;
                 window.Open();
             }
         }
 
-        private void OnRename(Component sender, string source, string destination, bool move)
+        /// <summary>
+        /// Renames a file or directory 
+        /// </summary>
+        /// <param name="sender">Component that raised the event </param>
+        /// <param name="source">Source file or directory path</param>
+        /// <param name="destination">The path to the destination file or directory</param>
+        private void OnRename(Component sender, string source, string destination)
         {
             CommandManager.Rename(source, destination);
             ((RenameWindow)sender).DestinationPanel?.Refresh();
         }
 
+        /// <summary>
+        /// Displays a window for deleting files or directories
+        /// </summary>
         public void ShowDeleteWindow()
         {
             if (FocusedComponent is FilePanel sourcePanel)
@@ -273,6 +341,11 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Deletes files or directories recursively
+        /// </summary>
+        /// <param name="sourcePanel"> Source file panel</param>
+        /// <param name="source">Source file or directory path array</param>
         public void Delete(FilePanel sourcePanel, string[] source)
         {
             var progressWindow = new ProgressWindow(Size);
@@ -292,6 +365,12 @@ namespace FileCommander
             sourcePanel.Refresh();
         }
 
+        /// <summary>
+        /// Displays the progress of an operation to delete files 
+        /// </summary>
+        /// <param name="sender">Component that raised the event </param>
+        /// <param name="progressInfo">Current file progress</param>
+        /// <param name="totalProgressInfo">Total progress</param>
         private void OnDeleteProgress(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo)
         {
             if (ActiveWindow is ProgressWindow progressWindow)
@@ -299,18 +378,27 @@ namespace FileCommander
 
         }
 
+        /// <summary>
+        /// Displays the directory creation window
+        /// </summary>
         private void ShowMakeDirWindow()
         {
             if (FocusedComponent is FilePanel sourcePanel)
             {
                 var window = new MakeDirectoryWindow(Size, sourcePanel.Path);
                 window.DestinationPanel = sourcePanel;
-                window.CopyEvent += OnMakeDir;
+                window.MakeDirectoryEvent += OnMakeDir;
                 window.Open();
             }
         }
 
-        private void OnMakeDir(Component sender, string path, string name, bool move)
+        /// <summary>
+        /// Creates a new directory at the specified path 
+        /// </summary>
+        /// <param name="sender">Component that raised the event </param>
+        /// <param name="path">The path in which the directory is created </param>
+        /// <param name="name">New directory name </param>
+        private void OnMakeDir(Component sender, string path, string name)
         {
             CommandManager.MakeDir(System.IO.Path.Combine(path, name));
             var panel = ((MakeDirectoryWindow)sender).DestinationPanel;
@@ -318,6 +406,10 @@ namespace FileCommander
             panel?.View.FocusItem(System.IO.Path.Combine(path, name));
         }
 
+        /// <summary>
+        /// Displays the window for copying or moving files and directories 
+        /// </summary>
+        /// <param name="move">Move files and directories flag</param>
         public void ShowCopyWindow(bool move = false)
         {
             if (FocusedComponent is FilePanel sourcePanel)
@@ -334,6 +426,13 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Calls the function to copy files and directories 
+        /// </summary>
+        /// <param name="sender">Component that raised the event </param>
+        /// <param name="source">Source file or directory path</param>
+        /// <param name="destination">The path to the destination file or directory</param>
+        /// <param name="move">Move files and directories flag</param>
         public void OnCopy(Component sender, string source, string destination, bool move)
         {
             var progressWindow = new TotalProgressWindow(Size);
@@ -361,6 +460,11 @@ namespace FileCommander
                 ((FilePanel)panel).Refresh();
         }
 
+        /// <summary>
+        /// Calls up a confirmation window for replacing files 
+        /// </summary>
+        /// <param name="sender">Component that raised the event </param>
+        /// <param name="args">Additional query parameters </param>
         private void OnReplaceConfirmation(CommandManager sender, ConfirmationEventArgs args)
         {
             var confirmationWindow = new ReplaceConfirmationWindow(Size, args.Message) { Modal = true };
@@ -369,30 +473,34 @@ namespace FileCommander
             confirmationWindow.RestoreActiveWindow();
         }
 
+        /// <summary>
+        /// Displays the progress of copying progress
+        /// </summary>
+        /// <param name="sender">Component that raised the event </param>
+        /// <param name="progressInfo">Current file progress</param>
+        /// <param name="totalProgressInfo">Total progress</param>
         private void OnCopyProgress(CommandManager sender, ProgressInfo progressInfo, ProgressInfo totalProgressInfo)
         {
             if (ActiveWindow is TotalProgressWindow progressWindow)
                 progressWindow.SetProgress(progressInfo, totalProgressInfo);
         }
 
-        public void OnErrorHandler(string message)
-        {
-            var errorWindow = new ErrorWindow(Size, message);
-            errorWindow.Open(true);
-        }
-
-        public static void ShowError(string message, Size parentSize)
-        {
-            var errorWindow = new ErrorWindow(parentSize, message);
-            errorWindow.Open(true);
-        }
-
+        /// <summary>
+        /// Outputs text to the buffer
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             base.Draw(buffer, targetX, targetY);
             ActiveWindow?.Draw(buffer, targetX + ActiveWindow.Parent.X, targetY + ActiveWindow.Parent.Y);
         }
 
+        /// <summary>
+        /// Recalculates the position and size of the component
+        /// </summary>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
         public override void UpdateRectangle(Size size)
         {
             base.UpdateRectangle(size);
@@ -400,9 +508,20 @@ namespace FileCommander
             ActiveWindow?.Align(ActiveWindow.Parent.Size);
         }
 
-        public void UpdateCursorPosition()
+        /// <summary>
+        /// Updates the position of the cursor in the command window 
+        /// </summary>
+        public void UpdateCursorPosition() => CommandPanel.UpdateCursorPosition();
+
+        /// <summary>
+        /// Displays the error output window 
+        /// </summary>
+        /// <param name="message">Error text</param>
+        /// <param name="parentSize">The size relative to which the values of the rectangle parameter are calculated</param>
+        public static void ShowError(string message, Size parentSize)
         {
-            CommandPanel.UpdateCursorPosition();
+            var errorWindow = new ErrorWindow(parentSize, message);
+            errorWindow.Open(true);
         }
         #endregion
     }

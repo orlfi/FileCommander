@@ -6,6 +6,8 @@ namespace FileCommander
 {
     public class MakeDirectoryWindow: CopyWindow
     {
+        public event RenameHandler MakeDirectoryEvent;
+
         public new const string SOURCE_TEMPLATE = "Make directory in {0}:";
         public new const string DEFAULT_NAME = "Make Directory";
         

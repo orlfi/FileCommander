@@ -10,6 +10,7 @@ namespace FileCommander
         public event CopyHandler CopyEvent;
 
         public const string SOURCE_TEMPLATE = "{0} {1} to:";
+        
         public bool Move { get; set;} = false;
 
         public Button SaveButton { get; set;}

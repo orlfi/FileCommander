@@ -4,36 +4,50 @@ using System.Collections.Generic;
 using System.Diagnostics;
 namespace FileCommander
 {
+    /// <summary>
+    /// Prints information to the console window 
+    /// </summary>
     public class Buffer
     {
-        private static int _cursorTop;
-        private static int _cursorLeft;
-        private static bool _cursorVivible;
-
-        public static void SaveCursor()
-        {
-            _cursorTop = Console.CursorTop;
-            _cursorLeft = Console.CursorLeft;
-            _cursorVivible = Console.CursorVisible;
-        }
-        public static void RestoreCursor()
-        {
-            Console.CursorTop = Math.Min(_cursorTop, Console.BufferHeight);
-            Console.CursorLeft = Math.Min(_cursorLeft, Console.BufferWidth); 
-            Console.CursorVisible = _cursorVivible;
-        }
+        /// <summary>
+        /// Contains a description of the foreground color and background color of the symbol
+        /// </summary>
         private struct ColorPair
         {
+            /// <summary>
+            /// Gets or sets foreground color
+            /// </summary>
             public ConsoleColor ForegroundColor { get; set; }
+
+            /// <summary>
+            /// Gets or sets background color
+            /// </summary>
             public ConsoleColor BackgroundColor { get; set; }
             
+            /// <summary>
+            /// Constructor
+            /// </summary>
+            /// <param name="foregroundColor">Foreground color</param>
+            /// <param name="backgroundColor">Background color</param>
             public ColorPair(ConsoleColor foregroundColor, ConsoleColor backgroundColor)
             {
                 ForegroundColor = foregroundColor;
                 BackgroundColor = backgroundColor;
             }
         }
+       
+        #region Fields && Properties
+        /// <summary>
+        /// Saves and restores the state of the command line cursor 
+        /// </summary>
+        /// <returns></returns>
+        private CursorState _cursorState = new CursorState();
 
+        /// <summary>
+        /// Matches esc code to the foreground color of the enumeration ConsoleColor
+        /// </summary>
+        /// <typeparam name="ConsoleColor">ConsoleColor instance</typeparam>
+        /// <typeparam name="string">Esc code</typeparam>
         public Dictionary<ConsoleColor, string> ForegroundEscCodes = new Dictionary<ConsoleColor, string>() 
         {
             { ConsoleColor.Black,       "\u001b[30m" },
@@ -54,6 +68,11 @@ namespace FileCommander
             { ConsoleColor.White,       "\u001b[97m" }
         };
 
+        /// <summary>
+        /// Matches esc code to the background color of the enumeration ConsoleColor
+        /// </summary>
+        /// <typeparam name="ConsoleColor">ConsoleColor instance</typeparam>
+        /// <typeparam name="string">Esc code</typeparam>
         public Dictionary<ConsoleColor, string> BackgroundEscCodes = new Dictionary<ConsoleColor, string>()
         {
             { ConsoleColor.Black,       "\u001b[40m" },
@@ -74,24 +93,52 @@ namespace FileCommander
             { ConsoleColor.White,       "\u001b[107m" }
         };
 
+        /// <summary>
+        /// Array of console window items 
+        /// </summary>
         private Pixel[,] _buffer;
 
+        /// <summary>
+        /// Gets a number of columns 
+        /// </summary>
         public int Width { get => _buffer.GetLength(0); }
 
+        /// <summary>
+        /// Gets a number of rows
+        /// </summary>
         public int Height { get => _buffer.GetLength(1); }
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="width">A number of columns </param>
+        /// <param name="height">A number of rows</param>
         public Buffer(int width, int height)
         {
             _buffer = new Pixel[width, height];
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="width">A number of columns </param>
+        /// <param name="height">A number of rows</param>
+        /// <param name="clear">A value indicating whether the buffer needs to be flushed</param>
         public Buffer(int width, int height, bool clear = false)
         {
             _buffer = new Pixel[width, height];
             if (clear)
                 Clear();
         }
+        #endregion
 
+        #region Methods        
+        /// <summary>
+        /// Clears the screen buffer 
+        /// </summary>
+        /// <param name="backgroudColor">Fill color </param>
         public void Clear(ConsoleColor backgroudColor = ConsoleColor.Black)
         {
             for (int j = 0; j < _buffer.GetLength(1); j++)
@@ -99,62 +146,46 @@ namespace FileCommander
                     _buffer[i, j] = new Pixel(' ', ConsoleColor.White, backgroudColor);
         }
 
+
+        /// <summary>
+        /// Gets the array of console window items 
+        /// </summary>
+        /// <returns></returns>
         public Pixel[,] GetBuffer()
         {
             return _buffer;
         }
 
-        public Buffer GetBuffer(int x, int y, int width, int height, bool clone = false)
-        {
-            Buffer result = new Buffer(width, height);
-
-            for (int j = 0; j < height; j++)
-                for (int i = 0; i < width; i++)
-                    result._buffer[i, j] = clone ? _buffer[x + i, y + j]?.Clone() : _buffer[i, j];
-
-            return result;
-
-        }
-
-        public void Merge(int x, int y, Buffer buffer)
-        {
-            for (int j = 0; j < buffer.Height; j++)
-                for (int i = 0; i < buffer.Width; i++)
-                    _buffer[x + i, y + j] = buffer._buffer[i, j];
-        }
-
-        public void Write(string text)
-        {
-            WriteAt(text, 0, 0);
-        }
-
-        public void Write(string text, ConsoleColor foreground, ConsoleColor background)
-        {
-            WriteAt(text, 0, 0, foreground, background);
-        }
-
-
-        public void WriteAt(string text, int x, int y)
-        {
-            WriteAt(text, x, y, Pixel.DAFAULT_FOREGROUND_COLOR, Pixel.DAFAULT_BACKGROUND_COLOR);
-        }
-
+        /// <summary>
+        /// Outputs text to the screen buffer at coordinates with a specified color 
+        /// </summary>
+        /// <param name="text">Text instance</param>
+        /// <param name="x">Column</param>
+        /// <param name="y">Row</param>
+        /// <param name="foreground">Foreground color</param>
+        /// <param name="background">Background color</param>
         public void WriteAt(string text, int x, int y, ConsoleColor foreground, ConsoleColor background)
         {
             for (int i = 0; i < text.Length; i++)
                 WriteAt(text[i], x + i, y, foreground, background);
         }
 
-        public void WriteAt(char ch, int x, int y)
-        {
-            WriteAt(ch, x, y, Pixel.DAFAULT_FOREGROUND_COLOR, Pixel.DAFAULT_BACKGROUND_COLOR);
-        }
-
+        /// <summary>
+        /// Outputs text to the screen buffer at coordinates with a specified color 
+        /// </summary>
+        /// <param name="ch">Character instance</param>
+        /// <param name="x">Column</param>
+        /// <param name="y">Row</param>
+        /// <param name="foreground">Foreground color</param>
+        /// <param name="background">Background color</param>
         public void WriteAt(char ch, int x, int y, ConsoleColor foreground, ConsoleColor background)
         {
             _buffer[x, y] = new Pixel(ch, foreground, background);
         }
 
+        /// <summary>
+        /// Outputs information from the buffer to the console
+        /// </summary>
         public void Paint()
         {
             if (CommandManager.CheckWindows())
@@ -163,6 +194,13 @@ namespace FileCommander
                 PaintConsoleColor();
         }
 
+        /// <summary>
+        /// Outputs an area from the buffer to the console at the specified coordinates 
+        /// </summary>
+        /// <param name="x">Column</param>
+        /// <param name="y">Row</param>
+        /// <param name="width">Number of characters horizontally</param>
+        /// <param name="height">Number of characters vertically</param>
         public void Paint(int x, int y, int width, int height)
         {
             if (CommandManager.CheckWindows())
@@ -171,9 +209,12 @@ namespace FileCommander
                 PaintConsoleColor(x, y, width, height);
         }
 
+        /// <summary>
+        /// Outputs information from the buffer to the console using ConsoleColor enum
+        /// </summary>
         public void PaintConsoleColor()
         {
-            SaveCursor();
+             _cursorState.Save();
             List<string> strings = new List<String>();
             List<ColorPair> colors = new List<ColorPair>();
             ConsoleColor foreground = Console.ForegroundColor;
@@ -221,12 +262,19 @@ namespace FileCommander
 
             WriteLastChar();
 
-            RestoreCursor();
+            _cursorState.Restore();
         }
 
+        /// <summary>
+        /// Outputs an area from the buffer to the console at the specified coordinates using ConsoleColor enum
+        /// </summary>
+        /// <param name="x">Column</param>
+        /// <param name="y">Row</param>
+        /// <param name="width">Number of characters horizontally</param>
+        /// <param name="height">Number of characters vertically</param>
         public void PaintConsoleColor(int x, int y, int width, int height)
         {
-            SaveCursor();
+            _cursorState.Save();
             int bufferHeight = _buffer.GetLength(1);
             Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
@@ -277,15 +325,15 @@ namespace FileCommander
 
             WriteLastChar();
 
-            RestoreCursor();
+            _cursorState.Restore();
         }
 
         /// <summary>
-        /// Write whole buffer with esc codes
+        /// Outputs information from the buffer to the console using esc codes
         /// </summary>
         public void PaintEsc()
         {
-            SaveCursor();
+            _cursorState.Save();
             ConsoleColor foreground = Console.ForegroundColor;
             ConsoleColor background = Console.BackgroundColor;
             StringBuilder sb = new StringBuilder();
@@ -323,19 +371,19 @@ namespace FileCommander
 
             WriteLastChar();
 
-            RestoreCursor();
+            _cursorState.Restore();
         }
 
         /// <summary>
-        /// Write buffer rectangle with esc codes
+        /// Outputs an area from the buffer to the console at the specified coordinates using esc codes
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
+        /// <param name="x">Column</param>
+        /// <param name="y">Row</param>
+        /// <param name="width">Number of characters horizontally</param>
+        /// <param name="height">Number of characters vertically</param>
         public void PaintEsc(int x, int y, int width, int height)
         {
-            SaveCursor();
+            _cursorState.Save();
             int bufferHeight = _buffer.GetLength(1);
             Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
@@ -378,7 +426,7 @@ namespace FileCommander
             WriteLastChar();
 
             // Write whole text lines
-            RestoreCursor();
+            _cursorState.Restore();
         }
 
         /// <summary>
@@ -393,6 +441,6 @@ namespace FileCommander
             //Console.BackgroundColor = lastChar.BackgroundColor;
             //Console.Write(lastChar.Char);
         }
-
+        #endregion
     }
 }

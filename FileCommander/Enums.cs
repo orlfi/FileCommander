@@ -2,6 +2,9 @@ using System;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Enumerating file types
+    /// </summary>
     public enum FileTypes
     {
         ParentDirectory,
@@ -10,6 +13,9 @@ namespace FileCommander
         Empty
     }
 
+    /// <summary>
+    /// Enumerating Column Types in File View 
+    /// </summary>
     public enum FileColumnTypes
     {
         FileName,
@@ -17,52 +23,46 @@ namespace FileCommander
         DateTime
     }
 
+    /// <summary>
+    /// Enumerates component layout types 
+    /// </summary>
     public enum ComponentPosition
     {
         Absolute,
         Relative
     }
 
+    /// <summary>
+    /// Enumerates the direction of information output 
+    /// </summary>
     public enum Direction
     {
         Horizontal,
         Vertical
     }
 
-    [Flags]
-    public enum WindowButton
-    {
-        Cancel = 0b_0000_0001,
-        Copy = 0b_0000_0010,
-        Move = 0b_0000_0100,
-        Delete = 0b_0000_1000
-    }
-
+    /// <summary>
+    /// Enumerates the possible control alignments
+    /// </summary>
     public enum Alignment
     {
         None,
-        HorizontalLeft = 0b_0000001,
-        HorizontalRight = 0b_0000010,
         HorizontalCenter = 0b_0000100,
-        VerticalLeft = 0b_0001000,
-        VerticalRight = 0b_0010000,
         VerticalCenter = 0b_0010000
     }
 
-    public enum MoveCursorDirection
-    {
-        Left,
-        Right,
-        LeftWord,
-        RightWord
-    }
-
+    /// <summary>
+    /// Enumerates the direction in which characters are removed in text
+    /// </summary>
     public enum TextRemoveDirection
     {
         Next,
         Previous
     }
 
+    /// <summary>
+    /// Enumerates the display types of lines 
+    /// </summary>
     public enum LineType
     {
         None,
@@ -70,17 +70,22 @@ namespace FileCommander
         Double
     }
 
+    /// <summary>
+    /// Enumerates the result of returning from a modal window 
+    /// </summary>
     public enum ModalWindowResult
     {
         None,
         Confirm,
         ConfirmAll,
-        Break,
         Cancel,
         Skip,
         SkipAll
     }
 
+    /// <summary>
+    /// Enumerates the possible text alignment options 
+    /// </summary>
     public enum TextAlignment
     {
         None,
@@ -90,11 +95,9 @@ namespace FileCommander
         Width
     }
 
-    public enum InfoPanelPosition
-    {
-        Left,
-        Right
-    }
+    /// <summary>
+    /// Enumerates the number of characters of an abbreviation
+    /// </summary>
     public enum FileSizeAcronimCutting
     {
         SingleChar,

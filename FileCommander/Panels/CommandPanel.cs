@@ -11,26 +11,23 @@ namespace FileCommander
     public class CommandPanel : TextEdit
     {
         /// <summary>
-        /// Main window reference
+        /// Gets main window reference
         /// </summary>
         public MainWindow MainWindow => Parent as MainWindow;
 
         /// <summary>
-        /// Command manager reference
+        /// Gets command manager reference
         /// </summary>
-        /// <returns></returns>
         public CommandManager CommandManager => CommandManager.GetInstance();
 
         /// <summary>
-        /// Focused file catalog control reference
+        /// Gets or sets focused file catalog control reference
         /// </summary>
-        /// <value></value>
         public FilePanel FocusedFilePanel { get; set; }
 
         /// <summary>
-        /// History list
+        /// Gets or sets history list
         /// </summary>
-        /// <value></value>
         public List<string> History { get; set; }
 
         /// <summary>
@@ -46,7 +43,6 @@ namespace FileCommander
         /// <param name="alignment">Alignment relative to the parent control</param>
         /// <param name="name">Control name</param>
         /// <param name="value">Command initial text</param>
-        /// <returns></returns>
         public CommandPanel(string rectangle, Size size, Alignment alignment, string name, string value) : base(rectangle, size, alignment, name, value)
         {
             Disabled = true;

@@ -6,25 +6,61 @@ using System.Threading.Tasks;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Displays a window with the current and general progress of the operation 
+    /// </summary>
     public class TotalProgressWindow : Window
     {
+        #region Constants
+        /// <summary>
+        /// Template for displaying information about the current file
+        /// </summary>
         public const string FILE_INFO_TEMPLATE = "Copying {0} to:";
+
+        /// <summary>
+        /// Contains the default window name
+        /// </summary>
+        const string DEFAULT_NAME = "Copy";
+        #endregion
+        
+        #region Fields && Properties
+        /// <summary>
+        /// Gets or sets the Label control for displaying information about the current file
+        /// </summary>
         public Label FileSourceInfo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying information about destination file
+        /// </summary>
         public Label FileDestinationInfo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the ProgreeBar control to display the current progress
+        /// </summary>
         public ProgressBar FileProgress { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying information about the total number of files
+        /// </summary>
         public Label TotalFilesCount { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying information about the total size of the files 
+        /// </summary>
         public Label TotalBytesCount { get; set; }
 
+        /// <summary>
+        /// Gets or sets the ProgreeBar control to display the total progress
+        /// </summary>
         public ProgressBar TotalProgress { get; set; }
 
+        /// <summary>
+        /// Gets or sets the button for canceling operations
+        /// </summary>
         public Button CancelButton { get; set; }
-        public List<Component> UpdateComponents { get; set; } = new List<Component>();
 
-        const string DEFAULT_NAME = "Copy";
+        public List<Component> UpdateComponents { get; set; } = new List<Component>();
+        #endregion
 
         public TotalProgressWindow(Size targetSize) : base("50%-25, 50%-6, 50, 11", targetSize)
         {

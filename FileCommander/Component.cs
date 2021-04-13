@@ -10,7 +10,7 @@ namespace FileCommander
     #endregion
     
     /// <summary>
-    /// Base class for all controls
+    /// A base class for all controls
     /// </summary>
     public abstract class Component
     {

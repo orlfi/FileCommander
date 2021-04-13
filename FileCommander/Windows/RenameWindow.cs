@@ -4,8 +4,11 @@ using System.Numerics;
 
 namespace FileCommander
 {
+    public delegate void RenameHandler(Component sender, string source, string destination);
     public class RenameWindow: CopyWindow
     {
+        public event RenameHandler RenameEvent;
+
         public new const string DEFAULT_NAME = "Rename";
         
         public RenameWindow(Size targetSize, string sourcePath, string destinationPath) : base(targetSize, sourcePath, destinationPath, DEFAULT_NAME) {}
