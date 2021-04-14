@@ -6,18 +6,43 @@ using System.Threading.Tasks;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Displays the progress window of the operation
+    /// </summary>
     public class ProgressWindow : Window
     {
+        #region Constants
+        /// <summary>
+        /// Template for displaying information about the current file
+        /// </summary>
         public const string FILE_INFO_TEMPLATE = "Deleting {0}:";
+        #endregion
+
+        #region Fields && Properties
+        /// <summary>
+        /// Gets or sets the Label control for displaying information about the current file
+        /// </summary>
         public Label FileInfo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the ProgreeBar control to display the current progress
+        /// </summary>
         public ProgressBar FileProgress { get; set; }
 
+        /// <summary>
+        /// Gets or sets the button for canceling operations
+        /// </summary>
         public Button CancelButton { get; set; }
-        public List<Control> UpdateComponents { get; set; } = new List<Control>();
 
         const string DEFAULT_NAME = "Delete";
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="targetSize">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <returns></returns>
         public ProgressWindow(Size targetSize) : base("50%-25, 50%-3, 50, 7", targetSize)
         {
             Name = DEFAULT_NAME;
@@ -30,7 +55,13 @@ namespace FileCommander
 
             AddButtons();
         }
+        #endregion
 
+        #region Methods
+        /// <summary>
+        /// Sets progress values 
+        /// </summary>
+        /// <param name="progress">Current progress</param>
         public void SetProgress(ProgressInfo progress)
         {
             if (progress.Done)
@@ -42,6 +73,9 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Adds buttons to the window 
+        /// </summary>
         private void AddButtons()
         {
             CancelButton = new Button("50%-5,100%-2, 10, 1", Size, Alignment.None, "Cancel");
@@ -50,6 +84,12 @@ namespace FileCommander
             Add(CancelButton);
         }
 
+        /// <summary>
+        /// Outputs text to the buffer
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             base.Draw(buffer, targetX, targetY);
@@ -59,14 +99,7 @@ namespace FileCommander
             line.ForegroundColor = ForegroundColor;
             line.BackgroundColor = BackgroundColor;
             line.Draw(buffer, targetX, targetY);
-
-            //line.Y = Y + Height - 5;
-            //line.Draw(buffer, targetX, targetY);
-
-            //line.Y = Y + Height - 9;
-            //line.Draw(buffer, targetX, targetY);
-            //buffer.WriteAt(" Total ", targetX + X + Width / 2 - 4, targetY + Y + 8, ForegroundColor, BackgroundColor);
         }
-
+        #endregion
     }
 }

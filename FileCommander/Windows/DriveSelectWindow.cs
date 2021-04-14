@@ -5,19 +5,41 @@ using System.Numerics;
 
 namespace FileCommander
 {
+    #region Delegates
+    /// <summary>
+    /// Drive select handler delegate
+    /// </summary>
     public delegate void SelectDriveHandler(Control sender, DriveInfo driveInfo);
+    #endregion
+
+    /// <summary>
+    /// Displays drive select window
+    /// </summary>
     public class DriveSelectWindow : Window
     {
+        #region Events
+        /// <summary>
+        /// Occurs when a disk is selected 
+        /// </summary>   
         public event SelectDriveHandler SelectDriveEvent;
+        #endregion
 
-        public Button CloseButton { get; set; }
-
+        #region Constants
+        /// <summary>
+        /// Default window name
+        /// </summary>
         const string DEFAULT_NAME = "Change Drive";
+        #endregion
 
-        public string Message { get; set; }
-
+        #region Fields && Properties
+        /// <summary>
+        /// Contains vertical offset when the number of list items exceeds the window height 
+        /// </summary>
         private int _offsetY;
 
+        /// <summary>
+        /// Gets or sets vertical offset when the number of list items exceeds the window height 
+        /// </summary>
         public int OffsetY
         {
             get => _offsetY;
@@ -33,14 +55,24 @@ namespace FileCommander
             }
         }
         
+        /// <summary>
+        /// Top indent from the beginning of the window to display 1 list item 
+        /// </summary>
         public int PaddingTop {get; set;} = 2;
-
-        public int PaddingBottom {get; set;} = 2;
         
+        /// <summary>
+        /// Gets or sets the maximum number of items displayed in the window
+        /// </summary>
         public int MaxItems { get; set; }
 
+        /// <summary>
+        /// Contains the index of the selected item 
+        /// </summary>
         private int _cursorY;
 
+        /// <summary>
+        /// Gets or sets the index of the selected item 
+        /// </summary>
         public int CursorY
         {
             get => _cursorY;
@@ -64,7 +96,13 @@ namespace FileCommander
                     _cursorY = value;
             }
         }
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="parent">Parental control relative to which the window will be drawn</param>
         public DriveSelectWindow(Control parent) : base("0, 0, 32, 10", parent.Size, Alignment.HorizontalCenter | Alignment.VerticalCenter)
         {
             Name = DEFAULT_NAME;
@@ -77,10 +115,15 @@ namespace FileCommander
             AddDrives(Size);
             FocusDrive(parent.Path);
         }
+        #endregion
 
+        #region Methods
+        /// <summary>
+        /// Handles button clicks
+        /// </summary>
+        /// <param name="keyInfo">ConsoleKeyInfo instance</param>
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
-
             switch (keyInfo.Key)
             {
                 case ConsoleKey.UpArrow:
@@ -92,7 +135,10 @@ namespace FileCommander
                     SetFocus(Controls[CursorY + OffsetY], true);
                     break;
                 case ConsoleKey.Tab:
-                    SetFocus(FocusNext());
+                    if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+                        SetFocus(FocusPrevious());
+                    else
+                        SetFocus(FocusNext());
                     break;
                 case ConsoleKey.Enter:
                     OnSelectDrive();
@@ -106,6 +152,11 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Sets focus to a new element 
+        /// </summary>
+        /// <param name="component">The element to which the focus is set</param>
+        /// <param name="update">If set to true, then redraws the current window </param>
         public override void SetFocus(Control component, bool update = true)
         {
             if (FocusedComponent != component)
@@ -121,11 +172,20 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Raises a disk select event 
+        /// </summary>
         public void OnSelectDrive()
         {
             SelectDriveEvent?.Invoke(this, ((DriveItem)FocusedComponent).Drive);
         }
 
+        /// <summary>
+        /// Renders list items 
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         protected override void DrawChildren(Buffer buffer, int targetX, int targetY)
         {
             foreach (var component in Controls)
@@ -135,6 +195,10 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Selects an item with a given path 
+        /// </summary>
+        /// <param name="path">The path for which you want to select an item from the list </param>
         private void FocusDrive(string path)
         {
             string root = System.IO.Path.GetPathRoot(path).ToLower();
@@ -147,6 +211,10 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Adds disks to the list 
+        /// </summary>
+        /// <param name="size">Window size </param>
         private void AddDrives(Size size)
         {
             var drives = DriveInfo.GetDrives();
@@ -155,5 +223,6 @@ namespace FileCommander
                 Add(new DriveItem($"2,{i+PaddingTop}, 100% - 2, 1", size, drives[i]));
             }
         }
+        #endregion
     }
 }

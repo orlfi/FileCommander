@@ -4,24 +4,42 @@ using System.Numerics;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Displays a confirmation window
+    /// </summary>
     public class ConfirmationWindow : Window
     {
+        #region Constants
+        /// <summary>
+        /// Window default name
+        /// </summary>
+        const string DEFAULT_NAME = "Confirmation";
+        #endregion
+
+        #region Fields && Properties
+
+        /// <summary>
+        /// Gets or sets the button to confirm the operation 
+        /// </summary>
         public Button YesButton { get; set; }
 
+        /// <summary>
+        /// Gets or sets the button to cancel the operation  
+        /// </summary>
         public Button NoButton { get; set;}
+        #endregion
 
-
-        const string DEFAULT_NAME = "Confirmation";
-
-        public string Message { get; set;}
-        
-        public ConfirmationWindow(Size targetSize, string message) : this(targetSize, message, DEFAULT_NAME) {}
-
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="targetSize">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <param name="message">Error message</param>
+        /// <param name="title">Window name</param>
         public ConfirmationWindow(Size targetSize, string message, string title) : base("50%-25, 50%-3, 60, 7", targetSize)
         {
             Modal = true;
             Name = title;
-            Message = message;
             ForegroundColor = Theme.ErrorWindowForegroundColor;
             BackgroundColor = Theme.ErrorWindowBackgroundColor;
             var label = new Label("2, 2, 100%-4, 100%-4", Size, Alignment.None, "ConfirmationText", message);
@@ -30,7 +48,12 @@ namespace FileCommander
             AddButtons();
             
         }
+        #endregion
 
+        #region Methods
+        /// <summary>
+        /// Adds buttons to the window 
+        /// </summary>              
         private void AddButtons()
         {
             YesButton = new Button("17,100%-2, 10, 1", Size, Alignment.None, "Yes") 
@@ -50,7 +73,12 @@ namespace FileCommander
             SetFocus(YesButton, false);
         }
 
-
+        /// <summary>
+        /// Outputs text to the buffer
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             base.Draw(buffer, targetX, targetY);
@@ -61,5 +89,6 @@ namespace FileCommander
             line.BackgroundColor = BackgroundColor;
             line.Draw(buffer, targetX, targetY);
         }
+        #endregion
     }
 }

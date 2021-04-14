@@ -10,6 +10,7 @@ namespace FileCommander
     /// </summary>
     public class CommandPanel : TextEdit
     {
+        #region Fields && Properties
         /// <summary>
         /// Gets main window reference
         /// </summary>
@@ -34,7 +35,9 @@ namespace FileCommander
         /// Current index in the history list
         /// </summary>
         private int _historyIndex = 0;
+        #endregion
 
+        #region Constructors
         /// <summary>
         /// Constructor
         /// </summary>
@@ -53,8 +56,13 @@ namespace FileCommander
             Console.CursorVisible = true;
             UpdateCursorPosition();
         }
+        #endregion
 
-
+        #region Methods
+        /// <summary>
+        /// Sets the cursor to the desired position when changing the path 
+        /// </summary>
+        /// <param name="path">Path</param>
         public void OnPathChange(string path)
         {
             if (path != Value)
@@ -65,11 +73,18 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Updates the cursor position 
+        /// </summary>
         public void UpdateCursorPosition()
         {
             Console.SetCursorPosition(AbsolutePosition.X + Cursor + Label.Length, AbsolutePosition.Y);
         }
 
+        /// <summary>
+        /// Handles button clicks
+        /// </summary>
+        /// <param name="keyInfo">ConsoleKeyInfo instance</param>
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
             base.OnKeyPress(keyInfo);
@@ -103,6 +118,10 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Parse commands
+        /// </summary>
+        /// <param name="command">Text containing a command with arguments </param>
         public void ParseCommand(string command)
         {
             string[] args = command.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -125,6 +144,11 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Calls the Copy method of the command manager 
+        /// </summary>
+        /// <param name="args">Command arguments</param>
+        /// <param name="move">Move flag </param>
         private void Copy(string[] args, bool move)
         {
             if (args.Length < 3)
@@ -137,6 +161,10 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Change path of the command manager 
+        /// </summary>
+        /// <param name="args">Command arguments</param>
         private void ChangePath(string[] args)
         {
             if (args.Length < 2)
@@ -163,6 +191,11 @@ namespace FileCommander
 
             }
         }
+
+        /// <summary>
+        /// Calls the Delete method of the command manager 
+        /// </summary>
+        /// <param name="args">Command arguments</param>
         private void Delete(string[] args)
         {
             if (args.Length < 2)
@@ -174,6 +207,11 @@ namespace FileCommander
                 WriteString();
             }
         }
+
+        /// <summary>
+        /// Adds a path to the command line
+        /// </summary>
+        /// <param name="path">Path</param>
         public void AddPath(string path)
         {
             string value = Value;
@@ -184,5 +222,6 @@ namespace FileCommander
             Cursor += path.Length;
             WriteString();
         }
+        #endregion        
     }
 }

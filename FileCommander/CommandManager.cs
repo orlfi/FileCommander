@@ -99,19 +99,9 @@ namespace FileCommander
         public bool CancelOperation { get; set; }
 
         /// <summary>
-        /// Default console window column count 
-        /// </summary>
-        public const int DEFAULT_WIDTH = 80;
-
-        /// <summary>
-        /// Default console window line count 
-        /// </summary>
-        public const int DEFAULT_HEIGHT = 24;
-
-        /// <summary>
         /// Gets or sets the size of the console window 
         /// </summary>
-        public Size Size { get; set; } = new Size(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        public Size Size { get; set; } = new Size(Settings.DEFAULT_CONSOLE_WINDOW_WIDTH, Settings.DEFAULT_CONSOLE_WINDOW_HEIGHT);
 
         /// <summary>
         /// Gets or sets to true when it is necessary to exit the program
@@ -270,7 +260,7 @@ namespace FileCommander
         private void ResizeWindow(Size size)
         {
             Console.SetWindowPosition(0, 0);
-            if (size.Width >= DEFAULT_WIDTH && size.Height >= DEFAULT_HEIGHT)
+            if (size.Width >= Settings.DEFAULT_CONSOLE_WINDOW_WIDTH && size.Height >= Settings.DEFAULT_CONSOLE_WINDOW_HEIGHT)
             {
                 Size = size;
                 Screen = new Buffer(Size.Width, Size.Height, true);
@@ -291,7 +281,7 @@ namespace FileCommander
         {
             CursorState cursorState = new CursorState();
             cursorState.Save();
-            if (Console.WindowWidth >= DEFAULT_WIDTH && Console.WindowHeight >= DEFAULT_HEIGHT)
+            if (Console.WindowWidth >= Settings.DEFAULT_CONSOLE_WINDOW_WIDTH && Console.WindowHeight >= Settings.DEFAULT_CONSOLE_WINDOW_HEIGHT)
             {
                 MainWindow.Draw(Screen, 0, 0);
                 Screen.Paint();
@@ -301,7 +291,7 @@ namespace FileCommander
                 Console.ResetColor();
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Clear();
-                Console.Write($"The console window should be larger than {DEFAULT_WIDTH}x{DEFAULT_HEIGHT}");
+                Console.Write($"The console window should be larger than {Settings.DEFAULT_CONSOLE_WINDOW_WIDTH}x{Settings.DEFAULT_CONSOLE_WINDOW_HEIGHT}");
             }
             cursorState.Restore();
         }
@@ -318,7 +308,7 @@ namespace FileCommander
             CursorState cursorState = new CursorState();
             cursorState.Save();
 
-            if (Console.WindowWidth >= DEFAULT_WIDTH && Console.WindowHeight >= DEFAULT_HEIGHT)
+            if (Console.WindowWidth >= Settings.DEFAULT_CONSOLE_WINDOW_WIDTH && Console.WindowHeight >= Settings.DEFAULT_CONSOLE_WINDOW_HEIGHT)
             {
                 MainWindow.Draw(Screen, 0, 0);
                 Screen.Paint(x, y, width, height);
@@ -328,7 +318,7 @@ namespace FileCommander
                 Console.ResetColor();
                 Console.BackgroundColor = ConsoleColor.Black;
                 Console.Clear();
-                Console.Write($"The console window should be larger than {DEFAULT_WIDTH}x{DEFAULT_HEIGHT}");
+                Console.Write($"The console window should be larger than {Settings.DEFAULT_CONSOLE_WINDOW_WIDTH}x{Settings.DEFAULT_CONSOLE_WINDOW_HEIGHT}");
             }
             cursorState.Restore();
         }
@@ -460,6 +450,7 @@ namespace FileCommander
         /// <param name="move">Sets value to true when it is necessary to transfer files and directories </param>
         public void Copy(string[] source, string destination, bool move = false)
         {
+            CancelOperation = false;
             try
             {
                 _skipAll = false;
@@ -664,6 +655,7 @@ namespace FileCommander
                     readStream = new FileStream(source, FileMode.Open, FileAccess.Read);
                     do
                     {
+                        CheckKeyPress(5);
                         bytesRead = readStream.Read(buff, 0, buffLength);
                         writeStream.Write(buff, 0, bytesRead);
 
@@ -690,6 +682,11 @@ namespace FileCommander
                 writeStream?.Close();
                 readStream?.Close();
                 totalProgress.Count++;
+            }
+
+            if (CancelOperation)
+            {
+                System.IO.File.Delete(destination);
             }
 
             if (move)

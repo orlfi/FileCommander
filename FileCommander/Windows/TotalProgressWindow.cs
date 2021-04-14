@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace FileCommander
 {
     /// <summary>
-    /// Displays a window with the current and general progress of the operation 
+    /// Displays a window with the current and total progress of the operation 
     /// </summary>
     public class TotalProgressWindow : Window
     {
@@ -58,10 +58,14 @@ namespace FileCommander
         /// Gets or sets the button for canceling operations
         /// </summary>
         public Button CancelButton { get; set; }
-
-        public List<Control> UpdateComponents { get; set; } = new List<Control>();
         #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="targetSize">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <returns></returns>
         public TotalProgressWindow(Size targetSize) : base("50%-25, 50%-6, 50, 11", targetSize)
         {
             Name = DEFAULT_NAME;
@@ -86,7 +90,14 @@ namespace FileCommander
 
             AddButtons();
         }
+        #endregion
 
+        #region Methods
+        /// <summary>
+        /// Sets progress values 
+        /// </summary>
+        /// <param name="itemProgress">Current progress</param>
+        /// <param name="totalProgress">Total progress</param>
         public void SetProgress(ProgressInfo itemProgress, ProgressInfo totalProgress)
         {
             if (totalProgress.Done)
@@ -101,6 +112,9 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Adds buttons to the window 
+        /// </summary>
         private void AddButtons()
         {
             CancelButton = new Button("50%-5,100%-2, 10, 1", Size, Alignment.None, "Cancel");
@@ -109,6 +123,12 @@ namespace FileCommander
             Add(CancelButton);
         }
 
+        /// <summary>
+        /// Outputs text to the buffer
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             base.Draw(buffer, targetX, targetY);
@@ -123,6 +143,6 @@ namespace FileCommander
             line.Draw(buffer, targetX, targetY);
             buffer.WriteAt(" Total ", targetX + X + Width / 2 - 4, targetY + Y + 4, ForegroundColor, BackgroundColor);
         }
-
+        #endregion
     }
 }

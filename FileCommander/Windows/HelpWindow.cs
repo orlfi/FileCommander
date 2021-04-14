@@ -9,11 +9,14 @@ namespace FileCommander
     /// </summary>
     public class HelpWindow : Window
     {
+        #region Constants
         /// <summary>
         /// Default window name
         /// </summary>
         const string DEFAULT_NAME = "Help";
+        #endregion
 
+        #region Constructors
         /// <summary>
         /// Constructor
         /// </summary>
@@ -31,5 +34,6 @@ namespace FileCommander
             Add(label);
             SetFocus(label, false);
         }
+        #endregion
     }
 }

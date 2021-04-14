@@ -62,11 +62,6 @@ namespace FileCommander
         public CommandPanel CommandPanel { get; set; } = null;
         
         /// <summary>
-        /// Gets or sets history panel instance reference
-        /// </summary>
-        public CommandHistoryPanel HistoryPanel { get; set; } = null;
-        
-        /// <summary>
         /// Gets or sets hotkey panel instance reference
         /// </summary>
         public HotKeyPanel HotKeyPanel { get; set; } = null;
@@ -98,10 +93,6 @@ namespace FileCommander
             CommandManager.PathChange += InfoPanel.OnPathChange;
             LeftFilePanel.SelectFileEvent += InfoPanel.OnSelectFile;
             RightFilePanel.SelectFileEvent += InfoPanel.OnSelectFile;
-
-            HistoryPanel = new CommandHistoryPanel("0, 0, 100%, 100%-2", Size);
-            HistoryPanel.Border = LineType.Single;
-            HistoryPanel.Fill = true;
 
             CommandPanel = new CommandPanel("0, 100%-2, 100%, 1", Size, Alignment.None, "CommandPanel", Path);
             Add(CommandPanel);

@@ -5,21 +5,48 @@ using System.Linq;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Represents a container that contains directory structure
+    /// </summary>
     public class FilePanel : Panel
     {
-        // TODO order view
-        //public int Order { get; set; }
-
+        #region Events
+        /// <summary>
+        /// Occurs when file item change focus
+        /// </summary>   
         public event ChangeFocusHandler SelectFileEvent;
+        #endregion
 
-        DirectoryPanelItem DirectoryPanel { get; set; }
+        #region Fields && Properties
+        /// <summary>
+        /// Gets or sets the Label control for displaying directory name
+        /// </summary>
+        public Label DirectoryName{ get; set; }
 
-        Control FileInfoPanel { get; set; }
+        /// <summary>
+        /// Gets or sets the Label control for displaying file name
+        /// </summary>
+        public Label FileInfoLabel{ get; set; }
 
+        /// <summary>
+        /// Gets or sets details view panel
+        /// </summary>        
         public DetailsView View { get; set; }
 
+        /// <summary>
+        /// Gets or sets a list of files and directories
+        /// </summary>
+        /// <typeparam name="FileSystemInfo"></typeparam>
+        /// <returns></returns>
         public List<FileSystemInfo> Files { get; set; } = new List<FileSystemInfo>();
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
         public FilePanel(string rectangle, Size size) : base(rectangle, size)
         {
             Path = Settings.GetDefaultPath();
@@ -29,22 +56,37 @@ namespace FileCommander
             View = new DetailsView("1,1,100%-2,100%-4", Size, Files);
             Add(View);
 
-            FileInfoPanel = new Control("1, 100%-2, 100% - 2, 1", this.Size, Alignment.None, "Test", Theme.FilePanelFileForegroundColor, Theme.FilePanelItemBackgroundColor);
-            Add(FileInfoPanel);
+            FileInfoLabel = new Label("1, 100%-2, 100% - 2, 1", this.Size, Alignment.None, "FileInfoLabel", "");
+            Add(FileInfoLabel);
 
-            DirectoryPanel = new DirectoryPanelItem("0, 0, 0, 1", this.Size, Alignment.HorizontalCenter, "Test");
-            Add(DirectoryPanel);
+            DirectoryName = new Label($"1, 0, 100%-4, 1", Size, Alignment.HorizontalCenter, "DirectoryName", "");
+            DirectoryName.TextAlignment = TextAlignment.Center;
+            DirectoryName.UseParentForegroundColor=false;
+            DirectoryName.UseParentBackgroundColor=false;
+            DirectoryName.ForegroundColor = Theme.FilePanelDirectoryForegroundColor;
+            DirectoryName.BackgroundColor = Theme.FilePanelBackgroundColor;
+            Add(DirectoryName);
 
             View.ChangeFocusEvent += OnChangeViewFocus;
-            FocusEvent += (focused)=> DirectoryPanel.SetBackgroundColor(focused); 
+            FocusEvent += (focused)=> DirectoryName.BackgroundColor = focused?Theme.FilePanelFocusedBackgroundColor:Theme.FilePanelBackgroundColor; 
         }
-
+        #endregion
+        
+        #region Methods
+        /// <summary>
+        /// Change focus of the panel 
+        /// </summary>
+        /// <param name="focused">The focus flag</param>        
         public override void SetFocus(bool focused)
         {
             base.SetFocus(focused);
             View.SetFocus(focused);
         }
 
+        /// <summary>
+        /// Handles button clicks
+        /// </summary>
+        /// <param name="keyInfo">ConsoleKeyInfo instance</param>
         public override void OnKeyPress(ConsoleKeyInfo keyInfo)
         {
             if (Focused)
@@ -87,17 +129,26 @@ namespace FileCommander
                 }
             }
         }
+
+        /// <summary>
+        /// Refreshes information about the selected file in the footer of the panel 
+        /// </summary>
+        /// <param name="sender">Component that raised the event </param>
+        /// <param name="item">Focused file item</param>        
         private void OnChangeViewFocus(Control sender, FileItem item)
         {
             if (item != null)
             {
-                FileInfoPanel?.SetName(FileItem.GetFitName(item.Name, Width - 2).PadRight(Width - 2, ' '), Parent.Size);
-                FileInfoPanel?.Update();
+                FileInfoLabel.SetText( FileItem.GetFitName(item.Name, Width - 2).PadRight(Width - 2, ' ') , true);
                 if (item.ItemType == FileTypes.File || item.ItemType == FileTypes.Directory)
                     SelectFileEvent?.Invoke(this, item);
             }
         }
 
+        /// <summary>
+        /// Refreshes the control when changing the path in the command window
+        /// </summary>
+        /// <param name="path">Path</param>
         public void OnPathChange(string path)
         {
             if (Focused && path != Path)
@@ -108,6 +159,10 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Refreshes the list of files and directories at the specified path 
+        /// </summary>
+        /// <param name="path">Path</param>
         public void SetPath(string path)
         {
             try
@@ -116,9 +171,8 @@ namespace FileCommander
                 Files.Clear();
                 Files.AddRange(di.GetDirectories());
                 Files.AddRange(di.GetFiles());
-
                 Path = path;
-                DirectoryPanel.SetName(Path, Size);
+                DirectoryName.SetText(Path, false);
                 View.Path = Path;
                 View.SetFiles(Files);
             }
@@ -128,12 +182,18 @@ namespace FileCommander
             }
         }
         
+        /// <summary>
+        /// Forcefully updates the file structure
+        /// </summary>
         public void Refresh()
         {
             SetPath(Path);
             Update();
         }
 
+        /// <summary>
+        /// Handles pressing the Enter button 
+        /// </summary>
         public void OnEnter()
         {
             if (View.FocusedItem != null)
@@ -144,7 +204,6 @@ namespace FileCommander
                     {
                         string path = View.FocusedItem.Path;
                         CommandManager.Path = path;
-                        //CommandManager.SetPath(path);
                         View.FocusItem(path);
                     }
                     catch (Exception) { }
@@ -155,7 +214,6 @@ namespace FileCommander
                     {
                         string path = Path;
                         CommandManager.Path = System.IO.Path.GetDirectoryName(Path);
-                        //CommandManager.SetPath(System.IO.Path.GetDirectoryName(Path));
                         View.FocusItem(path);
                     }
                     catch (Exception) { }
@@ -166,20 +224,26 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Outputs text to the buffer
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             var box = new Box(X, Y, Width, Height, Border, Fill);
             box.Draw(buffer, targetX, targetY);
-            DrawFooterBox(buffer, targetX, targetY);
+
+            var line = new Line(X, Y + Height - 3, Width, 1, Direction.Horizontal, LineType.Single);
+            line.FirstChar = '├';
+            line.LastChar = '┤';
+            line.ForegroundColor = ForegroundColor;
+            line.BackgroundColor = BackgroundColor;
+            line.Draw(buffer, targetX, targetY);
+
             DrawChildren(buffer, targetX, targetY);
         }
-        private void DrawFooterBox(Buffer buffer, int targetX, int targetY)
-        {
-            var box = new Box(X, Y + Height - 3, Width, 3);
-            box.TopLeft = '├';
-            box.TopRight = '┤';
-            box.Border = LineType.Single;
-            box.Draw(buffer, targetX, targetY);
-        }
+        #endregion
     }
 }

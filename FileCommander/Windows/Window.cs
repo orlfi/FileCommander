@@ -119,7 +119,10 @@ namespace FileCommander
             switch (keyInfo.Key)
             {
                 case ConsoleKey.Tab:
-                    SetFocus(FocusNext());
+                    if (keyInfo.Modifiers == ConsoleModifiers.Shift)
+                        SetFocus(FocusPrevious());
+                    else
+                        SetFocus(FocusNext());                
                     break;
                 case ConsoleKey.Enter:
                     FocusedComponent?.OnKeyPress(keyInfo);
@@ -253,7 +256,7 @@ namespace FileCommander
         }
 
         /// <summary>
-        /// Draws a shadow from the window 
+        /// Draws a window shadow
         /// </summary>
         /// <param name = "buffer"> Text buffer </param>
         /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>

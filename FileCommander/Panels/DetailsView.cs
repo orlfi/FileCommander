@@ -5,14 +5,43 @@ using System.Linq;
 
 namespace FileCommander
 {
+    #region Delegates
+    /// <summary>
+    /// Change focus handler delegate
+    /// </summary>
+    /// <param name="sender">Component that raised the event </param>
+    /// <param name="item">FileItem instance</param>
     public delegate void ChangeFocusHandler(Control sender, FileItem item);
+    #endregion
 
+    /// <summary>
+    /// Represents a directory detail view
+    /// </summary>
     public class DetailsView: Panel
     {
+        #region Events
+        /// <summary>
+        /// Occurs when file item change focus
+        /// </summary>   
         public event ChangeFocusHandler  ChangeFocusEvent;
+        #endregion
 
+        #region Constants
+        /// <summary>
+        /// Contains header height
+        /// </summary>
         private const int HEADER_HEIGHT = 1;
+        #endregion
+
+        #region Fields && Properties
+        /// <summary>
+        /// Contains vertical offset when the number of list items exceeds the window height 
+        /// </summary>        
         private int _offsetY;
+
+        /// <summary>
+        /// Gets or sets vertical offset when the number of list items exceeds the window height 
+        /// </summary>
         public int OffsetY
         {
             get => _offsetY;
@@ -23,8 +52,19 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Returns the height of the header depending on whether the header output flag is set to true
+        /// </summary>
         private int HeaderHeight => (DrawHeader?HEADER_HEIGHT:0);
+        
+        /// <summary>
+        /// Contains the index of the selected item 
+        /// </summary>
         private int _cursorY;
+        
+        /// <summary>
+        /// Gets or sets the index of the selected item 
+        /// </summary>
         public int CursorY
         {
             get => _cursorY;
@@ -35,7 +75,8 @@ namespace FileCommander
                 if (value < ((DrawHeader?HEADER_HEIGHT:0)))
                 {
                     if (OffsetY > 0)
-                        OffsetY--;
+                        OffsetY+= (value - (DrawHeader?HEADER_HEIGHT:0)) ;
+
                     _cursorY = HeaderHeight;
                 }   
                 else if (value > max)
@@ -43,14 +84,27 @@ namespace FileCommander
                     _cursorY = max;
                     if (value < files.Count - OffsetY + HeaderHeight)
                         OffsetY = OffsetY + value - max;
+                    else
+                        OffsetY += (files.Count - OffsetY - max);
                 }
                 else
                     _cursorY = value;
             }
         }
-        public int CursorX { get; set; }
+
+        /// <summary>
+        /// Column header output flag 
+        /// </summary>
         public bool DrawHeader { get; set; } = true;
+
+        /// <summary>
+        /// Contains focused item
+        /// </summary>
         private FileItem _focusedItem = null;
+
+        /// <summary>
+        /// Gest or sets focused item
+        /// </summary>
         public FileItem FocusedItem { 
             get => _focusedItem;
             set
@@ -62,18 +116,34 @@ namespace FileCommander
                 }
             }
         } 
-        public List<FilePanelColumn> Columns { get; set; } = new List<FilePanelColumn>();
 
+        /// <summary>
+        /// Gets or sets the list of columns 
+        /// </summary>
+        public List<FilePanelColumn> Columns { get; set; } = new List<FilePanelColumn>();
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <param name="files">Files list</param>
+        /// <returns></returns>
         public DetailsView(string rectangle, Size size, List<FileSystemInfo> files) : base(rectangle, size)
         {
             SetFiles(files);
-            CursorX = 0;
             CursorY = 1;
             Columns.Add(new FilePanelColumn(FileColumnTypes.FileName, "FileName") { Flex = 1 });
             Columns.Add(new FilePanelColumn(FileColumnTypes.Size, "Size") { Width = 8 });
             Columns.Add(new FilePanelColumn(FileColumnTypes.DateTime, "DateTime") { Width = 14 });
         }
 
+        /// <summary>
+        /// Populates a list of child elements of a view based on a list of files and directories 
+        /// </summary>
+        /// <param name="files">Files and directories list</param>
         public void SetFiles(List<FileSystemInfo> files)
         {
             Controls.Clear();
@@ -85,6 +155,9 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Positions the cursor to the beginning of the list
+        /// </summary>
         public void Start()
         {
             CursorY= HeaderHeight;
@@ -94,19 +167,41 @@ namespace FileCommander
                 OffsetY = 0;
         }
 
+        /// <summary>
+        /// Positions the cursor one page up 
+        /// </summary>
         public void Top()
         {
-            CursorY=HeaderHeight;
+            if ((CursorY + _offsetY - Height) < HeaderHeight)
+            {
+                _offsetY = 0;
+                CursorY=HeaderHeight;
+            }
+            else
+                CursorY -= Height-1;
             FocusItem();
-
+            Update();
         }
 
+        /// <summary>
+        /// Positions the cursor one page down
+        /// </summary>
         public void Bottom()
         {
-            CursorY=Height-1;
+            if (CursorY + _offsetY > Controls.Count)
+            {
+                _offsetY = 0;
+                CursorY = Controls.Count-1;
+            }
+            else
+                CursorY+=Height- HeaderHeight;
             FocusItem();
+            Update();
         }
 
+        /// <summary>
+        /// Positions the cursor to the end of the list
+        /// </summary>
         public void End()
         {
             _offsetY = 0;
@@ -114,18 +209,27 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Positions the cursor 1 position up 
+        /// </summary>
         public void Previous ()
         {
             CursorY--;
             FocusItem();
         }
 
+        /// <summary>
+        /// Positions the cursor 1 position down 
+        /// </summary>
         public void Next()
         {
             CursorY++;
             FocusItem();
         }
 
+        /// <summary>
+        /// Sets cursor to a new position 
+        /// </summary>
         public void FocusItem()
         {
             FocusedItem?.SetFocus(false);
@@ -134,6 +238,9 @@ namespace FileCommander
             FocusedItem.Update();
         }
 
+        /// <summary>
+        /// Inverts 1 element selection 
+        /// </summary>
         public void InvertItemSelection()
         {
             FocusedItem.Selected = !FocusedItem.Selected;
@@ -141,6 +248,9 @@ namespace FileCommander
             Next();
         }
 
+        /// <summary>
+        /// Selects all elements 
+        /// </summary>
         public void SelectAll()
         {
             foreach (var item in Controls)
@@ -150,6 +260,9 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Deselects all positions 
+        /// </summary>
         public void DeselectAll()
         {
             foreach (var item in Controls)
@@ -159,6 +272,9 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Inverts the selection of all positions 
+        /// </summary>
         public void InvertSelection()
         {
             foreach (var item in Controls)
@@ -168,6 +284,10 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Returns an array of selected items 
+        /// </summary>
+        /// <returns></returns>
         public string[] GetSelectedItems()
         {
 
@@ -175,6 +295,10 @@ namespace FileCommander
             return selectedItems.Length == 0 ? new[] { FocusedItem.Path } : selectedItems;
         }
 
+        /// <summary>
+        /// Sets the cursor to the position with the desired path 
+        /// </summary>
+        /// <param name="path">Path</param>
         public void FocusItem(string path)
         {
             var files = Controls;
@@ -186,12 +310,15 @@ namespace FileCommander
                 Update();
             }
             else
-            {
                 Start();
-            }
-
         }
 
+        /// <summary>
+        /// Draws list items 
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public void DrawItems(Buffer buffer, int targetX, int targetY)
         {
             var files = Controls;
@@ -210,7 +337,7 @@ namespace FileCommander
 
                 item.SetFocus(false);
 
-                if (x == CursorX && y == CursorY)
+                if (y == CursorY)
                 {
                     FocusedItem = item;
                     FocusedItem.SetFocus(true);
@@ -222,6 +349,12 @@ namespace FileCommander
 
         }
 
+        /// <summary>
+        /// Draws view columns 
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public void DrawColumns(Buffer buffer, int targetX, int targetY)
         {
             int x = X;
@@ -247,10 +380,17 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Draws view 
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             DrawColumns(buffer, targetX, targetY);
             DrawItems(buffer, targetX + X, targetY + Y);
         }
+        #endregion
     }
 }

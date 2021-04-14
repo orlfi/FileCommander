@@ -3,42 +3,115 @@ using System.IO;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// Represents a container that contains system information 
+    /// </summary>
     public class InfoPanel: Panel
     {
+        #region Constants
+        /// <summary>
+        /// Date format template
+        /// </summary>
         private const string DATE_FORMAT = "dd.MM.yyyy HH.mm.ss";
+        #endregion
+
+        #region Fields && Properties
+        /// <summary>
+        /// Gets or sets the Label control for displaying computer name
+        /// </summary>
         public Label ComputerName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying current user name
+        /// </summary>
         public Label UserName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying drive name of the focused panel
+        /// </summary>
         public Label DriveName { get; set; }
         
+        /// <summary>
+        /// Gets or sets the Label control for displaying drives size
+        /// </summary>
         public Label DriveTotalSize { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the Label control for displaying drives free space
+        /// </summary>
         public Label DriveSpaceFree { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying drives volume label
+        /// </summary>
         public Label DriveVolumeLabel { get; set; }
-      
+
+        /// <summary>
+        /// Gets or sets the Label control for displaying total memory installed
+        /// in bytes
+        /// </summary>
         public Label MemoryTotal { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying used memory
+        /// in bytes
+        /// </summary>
         public Label MemoryUsed { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying free memory
+        /// in bytes
+        /// </summary>
         public Label MemoryFree { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the Label control for displaying file name selected in focused panel
+        /// </summary>
         public Label FileName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying size of file selected in focused panel
+        /// in bytes
+        /// </summary>
         public Label FileSize { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying creation date and time of file selected in focused panel
+        /// </summary>
         public Label FileDateCreated { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying modification date and time of file selected in focused panel
+        /// </summary>
         public Label FileDateModified { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the Label control for displaying last access date date and time of file selected in focused panel
+        /// </summary>
         public Label FileLastAccessTime { get; set; }
 
+        /// <summary>
+        /// Gets or sets the Label control for displaying path of focused panel
+        /// </summary>
         public Label FilePath { get; set; }
+        #endregion
 
-        
+        #region Constructors        
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <returns></returns>
         public InfoPanel(string rectangle, Size size) : this(rectangle, size, Alignment.None) { }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <param name="alignment">Alignment relative to the parent control</param>
+        /// <returns></returns>
         public InfoPanel(string rectangle, Size size, Alignment alignment) : base(rectangle, size, alignment)
         {
             Name = "Information";
@@ -137,13 +210,24 @@ namespace FileCommander
             FilePath.ForegroundColor = Theme.FilePanelColumnForegroundColor;
             Add(FilePath);
         }
-
+        #endregion
+        
+        #region Methods
+        /// <summary>
+        /// Positions and resizes the panel according to the passed area 
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
         public void SetRectangle(string rectangle, Size size)
         {
             _rectangleString = rectangle;
             SetRectangle(size);
         }
 
+        /// <summary>
+        /// Updates information in child controls when the path changes
+        /// </summary>
+        /// <param name="path">Path</param>
         public void OnPathChange(string path)
         {
             SetBaseInfoValues();
@@ -153,6 +237,11 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Updates information in child controls when focus is changed in the file panel
+        /// </summary>
+        /// <param name="sender">File panel</param>
+        /// <param name="item">Focused file panel item</param>
         public void OnSelectFile(Control sender, FileItem item)
         {
             if (!Disabled && Visible)
@@ -164,11 +253,18 @@ namespace FileCommander
             Update();
         }
 
+        /// <summary>
+        /// Sets information about username and computer name
+        /// </summary>
         private void SetBaseInfoValues()
         {
             UserName.SetText(Environment.UserName);
             ComputerName.SetText(Environment.MachineName);
         }
+
+        /// <summary>
+        /// Sets memory information
+        /// </summary>
         private void SetMemoryInfoValues()
         {
             var memory = CommandManager.GetWindowsMetrics();
@@ -177,6 +273,9 @@ namespace FileCommander
             MemoryFree.SetText(memory.Free.ToString("#,#"), false);
         }
 
+        /// <summary>
+        /// Sets drive information
+        /// </summary>
         private void SetDriveInfoValues(string path)
         {
             DriveInfo di = new DriveInfo(System.IO.Path.GetPathRoot(path));           
@@ -186,6 +285,9 @@ namespace FileCommander
             DriveVolumeLabel.SetText(di.VolumeLabel, false);
         }
 
+        /// <summary>
+        /// Sets file information
+        /// </summary>
         private void SetFileInfoValues(string path)
         {
             FileName.SetText(FileItem.GetFitName(System.IO.Path.GetFileName(path), Width), false);
@@ -220,6 +322,12 @@ namespace FileCommander
             FilePath.SetText(directory, false);
         }
 
+        /// <summary>
+        /// Outputs text to the buffer
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             int y = 1;
@@ -263,5 +371,6 @@ namespace FileCommander
             buffer.WriteAt("Path", targetX + X + 1, targetY + Y + (y++), ForegroundColor, BackgroundColor);
             DrawChildren(buffer, targetX, targetY);
         }
+        #endregion
     }
 }
