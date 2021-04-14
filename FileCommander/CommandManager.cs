@@ -691,7 +691,7 @@ namespace FileCommander
 
             if (move)
             {
-                fileInfo.Delete();
+                System.IO.File.Delete(source);
             }
         }
 
