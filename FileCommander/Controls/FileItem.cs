@@ -6,20 +6,60 @@ using System.Collections.Generic;
 
 namespace FileCommander
 {
+    /// <summary>
+    /// File panel list item 
+    /// </summary>
     public class FileItem : Control
     {
+        #region Fields && Properties
+        /// <summary>
+        /// Gets or sets the flag of the selected item
+        /// </summary>
         public bool Selected { get; set; }
 
+        /// <summary>
+        /// Gets a link to the file panel 
+        /// </summary>
         public FilePanel FilePanel => (FilePanel)Parent.Parent;
 
+        /// <summary>
+        ///  Gets or sets an instance of the FileSystemInfo class 
+        /// </summary>
         FileSystemInfo FileSystemInfo { get; set; }
 
+        /// <summary>
+        /// Gets or sets the type of the element 
+        /// </summary>
         public FileTypes ItemType { get; set; }
 
+        /// <summary>
+        /// Gets or sets a list of file pane view columns 
+        /// </summary>
         public List<FilePanelColumn> Columns { get; set; }
+        #endregion
 
-        public FileItem(string path, FileSystemInfo fileSystemInfo, string width, Size size, FileTypes itemType = FileTypes.File) : this($"0, 0, {width}, 1", size, path, fileSystemInfo, itemType) { }
+        #region Constructors
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="path">File structure path</param>
+        /// <param name="fileSystemInfo">An instance of the FileSystemInfo class</param>
+        /// <param name="width">Item Width </param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <param name="itemType">The type of the element</param>
+        /// <returns></returns>
+        public FileItem(string path, FileSystemInfo fileSystemInfo, string width, Size size, FileTypes itemType = FileTypes.File) : 
+            this($"0, 0, {width}, 1", size, path, fileSystemInfo, itemType) { }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rectangle">Control position and size</param>
+        /// <param name="size">The size relative to which the values of the rectangle parameter are calculated</param>
+        /// <param name="path">File structure path </param>
+        /// <param name="fileSystemInfo">An instance of the FileSystemInfo class</param>
+        /// <param name="itemType">The type of the element</param>
+        /// <returns></returns>
         public FileItem(string rectangle, Size size, string path, FileSystemInfo fileSystemInfo, FileTypes itemType = FileTypes.File) : base(rectangle, size)
         {
             Path = path;
@@ -27,7 +67,16 @@ namespace FileCommander
             ItemType = itemType;
             FileSystemInfo = fileSystemInfo;
         }
+        #endregion
 
+        #region Methods
+        
+        /// <summary>
+        /// Outputs text to the buffer
+        /// </summary>
+        /// <param name = "buffer"> Text buffer </param>
+        /// <param name = "targetX"> The absolute horizontal position relative to which the component is positioned </param>
+        /// <param name = "targetY"> The absolute vertical position relative to which the component is positioned </param>
         public override void Draw(Buffer buffer, int targetX, int targetY)
         {
             ConsoleColor foreground = GetItemForegroundColor();
@@ -69,6 +118,10 @@ namespace FileCommander
             }
         }
 
+        /// <summary>
+        /// Returns the foreground color of an element based on the current state 
+        /// </summary>
+        /// <returns>ConsoleColor</returns>
         public ConsoleColor GetItemForegroundColor()
         {
             ConsoleColor result = ConsoleColor.Cyan;
@@ -94,6 +147,13 @@ namespace FileCommander
             }
             return result;
         }
+
+        /// <summary>
+        /// Returns a string containing the filename and formatted to fit the width of the element 
+        /// </summary>
+        /// <param name="name">File name</param>
+        /// <param name="width">The width for which you want to format the string</param>
+        /// <returns></returns>
         public static string GetFitName(string name, int width)
         {
             string result = name;
@@ -110,6 +170,6 @@ namespace FileCommander
             }
             return result;
         }
-
+        #endregion
     }
 }

@@ -60,6 +60,7 @@ namespace FileCommander
             Add(FileInfoLabel);
 
             DirectoryName = new Label($"1, 0, 100%-4, 1", Size, Alignment.HorizontalCenter, "DirectoryName", "");
+            DirectoryName.Disabled = true;
             DirectoryName.TextAlignment = TextAlignment.Center;
             DirectoryName.UseParentForegroundColor=false;
             DirectoryName.UseParentBackgroundColor=false;
@@ -188,6 +189,7 @@ namespace FileCommander
         public void Refresh()
         {
             SetPath(Path);
+            View.FocusItem(View.FocusedItem.Path);            
             Update();
         }
 

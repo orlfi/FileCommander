@@ -1,7 +1,7 @@
 {
-  "Path": "C:\\Windows",
-  "LeftPanelPath": "C:\\Windows",
-  "RightPanelPath": "C:\\Tmp\\3",
+  "Path": "C:\\Tmp",
+  "LeftPanelPath": "C:\\Tmp",
+  "RightPanelPath": "C:\\Tmp\\2",
   "FocusedPanel": "LeftPanel",
   "Size": {
     "Width": 80,

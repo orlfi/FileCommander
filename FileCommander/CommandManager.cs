@@ -200,6 +200,7 @@ namespace FileCommander
                 CheckWindowResize(5);
             }
             SaveSettings();
+            Console.ResetColor();
         }
 
         /// <summary>
@@ -450,6 +451,7 @@ namespace FileCommander
         /// <param name="move">Sets value to true when it is necessary to transfer files and directories </param>
         public void Copy(string[] source, string destination, bool move = false)
         {
+            destination = destination.ToLower();
             CancelOperation = false;
             try
             {
@@ -464,34 +466,42 @@ namespace FileCommander
                     if (CancelOperation)
                         break;
 
-                    if (Directory.Exists(source[i]))
+                    string sourceItem = source[i].ToLower();
+                    string destinationPath = destination;
+
+                    if (Directory.Exists(sourceItem))
                     {
-                        if (System.IO.Path.GetDirectoryName(source[i]).ToLower() == System.IO.Path.GetDirectoryName(destination.ToLower()))
+                        if (System.IO.Path.GetFileName(destinationPath).Contains('*'))
+                            destinationPath = System.IO.Path.GetDirectoryName(destination);
+
+                        //if (System.IO.Path.GetDirectoryName(sourceItem) == System.IO.Path.GetDirectoryName(destination))
+                        if (System.IO.Path.GetDirectoryName(sourceItem) == destinationPath)
                         {
                             ErrorEvent?.Invoke("The destination folder is a source folder");
                             continue;
                         }
-                        CopyDirectory(source[i], System.IO.Path.GetDirectoryName(destination.ToLower()), itemProgress, totalProgress, move);
+
+                        //CopyDirectory(source[i], System.IO.Path.GetDirectoryName(destination.ToLower()), itemProgress, totalProgress, move);
+                        CopyDirectory(sourceItem, destinationPath, itemProgress, totalProgress, move);
                     }
                     else if (File.Exists(source[i]))
                     {
-                        if (source.Length == 1 && source[i] == destination)
+                        if (source.Length == 1 && sourceItem == destination)
                         {
                             ErrorEvent?.Invoke("The destination file is a source file");
                             continue;
                         }
                         else
                         {
-                            string destinationPath = destination;
                             if (Directory.Exists(destinationPath))
-                                destinationPath = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(source[i]));
+                                destinationPath = System.IO.Path.Combine(destination, System.IO.Path.GetFileName(sourceItem));
                             else if (System.IO.Path.GetFileName(destinationPath) == "*.*")
-                                destinationPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(destination), System.IO.Path.GetFileName(source[i]));
+                                destinationPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(destination), System.IO.Path.GetFileName(sourceItem));
 
                             string destinationDirectory = System.IO.Path.GetDirectoryName(destinationPath);
                             if (!Directory.Exists(destinationDirectory))
                                 CreateDirectory(destinationDirectory);
-                            CopyFile(source[i], destinationPath, itemProgress, totalProgress, move);
+                            CopyFile(sourceItem, destinationPath, itemProgress, totalProgress, move);
                         }
                     }
                 }
@@ -552,13 +562,14 @@ namespace FileCommander
         /// <param name="move">Sets value to true when it is necessary to transfer files and directories </param>
         private void CopyDirectory(string source, string destination, ProgressInfo itemProgress, ProgressInfo totalProgress, bool move)
         {
-            if (move && $"{destination.ToLower()}\\".StartsWith($"{source.ToLower()}\\"))
+            if (move && $"{destination}\\".StartsWith($"{source}\\"))
             {
                 ErrorEvent?.Invoke("The destination folder is a subfolder of the source folder");
                 return;
             }
 
-            CreateDirectory(System.IO.Path.Combine(destination, System.IO.Path.GetFileName(source)));
+            //CreateDirectory(System.IO.Path.Combine(destination, System.IO.Path.GetFileName(source)));
+            CreateDirectory(destination);
             string root = System.IO.Path.GetDirectoryName(source);
             IEnumerable<string> fileSystemEntries = Directory.EnumerateFileSystemEntries(source, "*.*", SearchOption.AllDirectories);
 
@@ -668,7 +679,6 @@ namespace FileCommander
                         ProgressEvent?.Invoke(this, itemProgress, totalProgress);
                     } while (bytesRead > 0 && !CancelOperation);
                     writeStream.Flush();
-                    Thread.Sleep(600);
                 }
                 itemProgress.Done = true;
                 ProgressEvent?.Invoke(this, itemProgress, totalProgress);
@@ -708,7 +718,7 @@ namespace FileCommander
         /// <summary>
         /// Returns the physical size and amount of free RAM 
         /// </summary>
-        /// <returns>MemoryMetrics inctance</returns>
+        /// <returns>MemoryMetrics instance</returns>
         public static MemoryMetrics GetWindowsMetrics()
         {
             MemoryMetrics metrics = null;

@@ -9,9 +9,9 @@ namespace FileCommander
     {
         #region Windows API to enable ConsoleVirtualProcessing
         private const int STD_INPUT_HANDLE = -10;
-        
+
         private const int STD_OUTPUT_HANDLE = -11;
-        
+
         private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
 
         private const uint DISABLE_NEWLINE_AUTO_RETURN = 0x0008;
@@ -34,32 +34,38 @@ namespace FileCommander
         /// <summary>
         /// Program entry point
         /// </summary>
-        /// <param name="args">Program parameters</param>
+        /// <param name="args">Program parameters. If the first parameter contains the path of the file structure, 
+        /// then the program displays the file structure in the active panel at the specified path</param>
         static void Main(string[] args)
         {
-            //try
-            //{
-            
-             if (CommandManager.CheckWindows())
-                 SetConsoleVirtualProcessing();
+            try
+            {
+                if (CommandManager.CheckWindows())
+                    SetConsoleVirtualProcessing();
 
-            string path = Settings.GetInstance().Path;
+                string path = Settings.GetInstance().Path;
 
-            if (args.Length > 0)
-                path = args[0];
+                if (args.Length > 0)
+                    path = args[0];
 
-            CommandManager manager = CommandManager.GetInstance();
-            manager.Path = path;
-            manager.Run();
-            Settings.GetInstance().Save();
-            //}
-            //catch(Exception ex)
-            //{
-            //    string path = Path.Combine(Directory.GetCurrentDirectory(), "Erorrs");
-            //    if (Directory.Exists(path))
-            //        Directory.CreateDirectory(path);
-            //    File.WriteAllText(path, ex.Message);
-            //}
+                CommandManager manager = CommandManager.GetInstance();
+                manager.Path = path;
+                manager.Run();
+                Settings.GetInstance().Save();
+            }
+            catch (Exception ex)
+            {
+                string directory = Path.Combine(Directory.GetCurrentDirectory(), "Erorrs");
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+                string errorFileName = $"{DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")}_error.txt";
+                string fullPath = Path.Combine(directory, errorFileName);
+                try
+                {
+                    File.WriteAllText(fullPath, ex.Message);
+                }
+                catch { };
+            }
         }
 
         /// <summary>
