@@ -385,7 +385,6 @@ namespace FileCommander
         {
             _cursorState.Save();
             int bufferHeight = _buffer.GetLength(1);
-            Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
             ConsoleColor background = Console.BackgroundColor;
             StringBuilder sb = new StringBuilder();
