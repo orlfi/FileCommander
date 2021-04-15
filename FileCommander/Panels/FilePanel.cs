@@ -115,7 +115,8 @@ namespace FileCommander
                     case ConsoleKey.PageDown:
                         View.Bottom();
                         break;
-                    case ConsoleKey.Insert or ConsoleKey.Spacebar:
+                    case ConsoleKey.Insert:
+                    case ConsoleKey.Spacebar:
                         View.InvertItemSelection();
                         break;
                     case ConsoleKey.Multiply:

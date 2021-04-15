@@ -22,7 +22,7 @@ File operations:
 F5         Copy files and directories recursively
 F6         Move files and directories recursively
 F7         Creating a folder
-F8         Delete files and directories recursively
+F8 or Del  Delete files and directories recursively
 
 Command line:
 Ctrl+Enter Copy the file name under the cursor to the command line
@@ -32,7 +32,7 @@ Enter      Command execution
 
 Command line commands:
 HELP       Output of the help window
-CD         Move to another folder
-CP         Copying files and directories
-MV         Moving files and directories
-RM         Deleting files and directories
+CD         Move to another folder (cd <absolute path>)
+CP         Copying files and directories (cp <source> <destination>)
+MV         Moving files and directories (mv <source> <destination>)
+RM         Deleting files and directories (rm <absolute path>)

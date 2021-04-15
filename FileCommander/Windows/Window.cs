@@ -126,7 +126,7 @@ namespace FileCommander
                     break;
                 case ConsoleKey.Enter:
                     FocusedComponent?.OnKeyPress(keyInfo);
-                    if ((FocusedComponent == null || FocusedComponent is not Button) && Enter)
+                    if ((FocusedComponent == null || !(FocusedComponent is Button)) && Enter)
                         OnEnter();
                     else if (FocusedComponent is Button button)
                         OnButtonClick(button);

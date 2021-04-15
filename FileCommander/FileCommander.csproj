@@ -2,8 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <ApplicationIcon>filecommander.ico</ApplicationIcon>
+    <Authors>Orlikov Fedor</Authors>
+    <Company>ORLFI</Company>
+    <Copyright>© Orlfi</Copyright>
+    <Description>FileCommander is an entry-level console two-panel file manager for .NET Core.</Description>
+    <PackageIcon>filecommander.ico</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +24,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="filecommander.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
