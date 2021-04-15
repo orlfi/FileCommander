@@ -28,7 +28,7 @@ FileCommander is an entry-level console two-panel file manager for .NET Core.
 
 ## Running and Building
 
-* Windows - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet ./UICatalog/bin/Debug/net5.0/FileCommander.dll` or by directly executing `./UICatalog/bin/Debug/net5.0/FileCommander.exe`.
+* Windows - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `FileCommander` with `dotnet ./FileCommander/bin/Debug/netcoreapp3.1/FileCommander.dll` or by directly executing `./FileCommander/bin/Debug/netcoreapp3.1/FileCommander.exe`.
 * Windows - Open `FileCommander.sln` with Visual Studio 2019.
 
 ## Licence
