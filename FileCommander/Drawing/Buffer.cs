@@ -1,4 +1,4 @@
-using System;
+gitusing System;
 using System.Text;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -203,10 +203,15 @@ namespace FileCommander
         /// <param name="height">Number of characters vertically</param>
         public void Paint(int x, int y, int width, int height)
         {
+            _cursorState.Save();
+            Console.CursorVisible = false;
+            
             if (CommandManager.CheckWindows())
                 PaintEsc(x, y, width, height);
             else
                 PaintConsoleColor(x, y, width, height);
+            
+            _cursorState.Restore();
         }
 
         /// <summary>
@@ -214,7 +219,6 @@ namespace FileCommander
         /// </summary>
         public void PaintConsoleColor()
         {
-             _cursorState.Save();
             List<string> strings = new List<String>();
             List<ColorPair> colors = new List<ColorPair>();
             ConsoleColor foreground = Console.ForegroundColor;
@@ -259,10 +263,6 @@ namespace FileCommander
                 Console.BackgroundColor = colors[i].BackgroundColor;
                 Console.Write(strings[i]);
             }
-
-            WriteLastChar();
-
-            _cursorState.Restore();
         }
 
         /// <summary>
@@ -274,9 +274,7 @@ namespace FileCommander
         /// <param name="height">Number of characters vertically</param>
         public void PaintConsoleColor(int x, int y, int width, int height)
         {
-            _cursorState.Save();
             int bufferHeight = _buffer.GetLength(1);
-            Console.CursorVisible = false;
             ConsoleColor foreground = Console.ForegroundColor;
             ConsoleColor background = Console.BackgroundColor;
             StringBuilder sb = new StringBuilder();
@@ -322,10 +320,6 @@ namespace FileCommander
                 }
                 sb.Clear();
             }
-
-            WriteLastChar();
-
-            _cursorState.Restore();
         }
 
         /// <summary>
@@ -333,7 +327,6 @@ namespace FileCommander
         /// </summary>
         public void PaintEsc()
         {
-            _cursorState.Save();
             ConsoleColor foreground = Console.ForegroundColor;
             ConsoleColor background = Console.BackgroundColor;
             StringBuilder sb = new StringBuilder();
@@ -368,10 +361,6 @@ namespace FileCommander
             // Write whole text lines
             Console.SetCursorPosition(0, 0);
             Console.Write(sb.ToString());
-
-            WriteLastChar();
-
-            _cursorState.Restore();
         }
 
         /// <summary>
@@ -383,7 +372,6 @@ namespace FileCommander
         /// <param name="height">Number of characters vertically</param>
         public void PaintEsc(int x, int y, int width, int height)
         {
-            _cursorState.Save();
             int bufferHeight = _buffer.GetLength(1);
             ConsoleColor foreground = Console.ForegroundColor;
             ConsoleColor background = Console.BackgroundColor;
@@ -421,24 +409,6 @@ namespace FileCommander
                 Console.Write(sb.ToString());
                 sb.Clear();
             }
-
-            WriteLastChar();
-
-            // Write whole text lines
-            _cursorState.Restore();
-        }
-
-        /// <summary>
-        /// To avoid scrolling when writing character in the last column of a last row.
-        /// </summary>
-        private void WriteLastChar()
-        {
-            //Console.MoveBufferArea(Width - 2, Height - 1, 1, 1, Width - 1, Height - 1);
-            //var lastChar = _buffer[Width - 2, Height - 1];
-            //Console.SetCursorPosition(Width - 2, Height - 1);
-            //Console.ForegroundColor = lastChar.ForegroundColor;
-            //Console.BackgroundColor = lastChar.BackgroundColor;
-            //Console.Write(lastChar.Char);
         }
         #endregion
     }
