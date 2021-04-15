@@ -353,8 +353,9 @@ namespace FileCommander
             CommandManager.ProgressEvent -= OnDeleteProgress;
             if (ActiveWindow is ProgressWindow)
                 progressWindow.Close();
-            sourcePanel.View.Top();
-            sourcePanel.Refresh();
+
+            foreach (var panel in Controls.Where(item => item is FilePanel))
+                ((FilePanel)panel).Refresh();
         }
 
         /// <summary>
