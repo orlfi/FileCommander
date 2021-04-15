@@ -129,6 +129,9 @@ namespace FileCommander
                 return;
             switch (args[0].ToLower())
             {
+                case "help":
+                    MainWindow.ShowHelpWindow();
+                    break;
                 case "cp":
                     Copy(args, false);
                     break;
