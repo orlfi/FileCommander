@@ -13,7 +13,7 @@ namespace FileCommander
         /// Contains a description of the foreground color and background color of the symbol
         /// </summary>
         private struct ColorPair
-        {
+        { 
             /// <summary>
             /// Gets or sets foreground color
             /// </summary>
