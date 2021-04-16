@@ -107,7 +107,8 @@ namespace FileCommander
                     Value = History.Count > 0 ? History[_historyIndex] : "";
                     WriteString();
                     break;
-                case ConsoleKey.Escape or ConsoleKey.Tab:
+                case ConsoleKey.Escape:
+                case ConsoleKey.Tab:
                     Value = "";
                     WriteString();
                     if (keyInfo.Key == ConsoleKey.Tab)
@@ -129,6 +130,9 @@ namespace FileCommander
                 return;
             switch (args[0].ToLower())
             {
+                case "help":
+                    MainWindow.ShowHelpWindow();
+                    break;
                 case "cp":
                     Copy(args, false);
                     break;

@@ -139,7 +139,9 @@ namespace FileCommander
             Columns.Add(new FilePanelColumn(FileColumnTypes.Size, "Size") { Width = 8 });
             Columns.Add(new FilePanelColumn(FileColumnTypes.DateTime, "DateTime") { Width = 14 });
         }
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Populates a list of child elements of a view based on a list of files and directories 
         /// </summary>

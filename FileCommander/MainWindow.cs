@@ -163,7 +163,8 @@ namespace FileCommander
                 case ConsoleKey.F7:
                     ShowMakeDirWindow();
                     break;
-                case ConsoleKey.F8 or ConsoleKey.Delete:
+                case ConsoleKey.F8:
+                case ConsoleKey.Delete:
                     ShowDeleteWindow();
                     break;
                 case ConsoleKey.F9:
@@ -195,7 +196,9 @@ namespace FileCommander
                         }
                     }
                     else if (keyInfo.KeyChar != '\u0000' && keyInfo.Key != ConsoleKey.Tab
-                        && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter &&  keyInfo.Key != ConsoleKey.Spacebar)
+                        && keyInfo.Key != ConsoleKey.Escape && keyInfo.Key != ConsoleKey.Enter 
+                        &&  keyInfo.Key != ConsoleKey.Spacebar && keyInfo.Key != ConsoleKey.Multiply
+                        && keyInfo.Key != ConsoleKey.Add && keyInfo.Key != ConsoleKey.Subtract)
                     {
 
 
@@ -353,8 +356,9 @@ namespace FileCommander
             CommandManager.ProgressEvent -= OnDeleteProgress;
             if (ActiveWindow is ProgressWindow)
                 progressWindow.Close();
-            sourcePanel.View.Top();
-            sourcePanel.Refresh();
+
+            foreach (var panel in Controls.Where(item => item is FilePanel))
+                ((FilePanel)panel).Refresh();
         }
 
         /// <summary>
